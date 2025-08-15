@@ -4,3 +4,5 @@ pandas
 tqdm
 PyYAML
 python-Levenshtein
+pytest
+flask
