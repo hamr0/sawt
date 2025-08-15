@@ -1,0 +1,11 @@
+# Mixed scripts
+"Hello 123 العالم"
+
+# Extreme gemination
+"شَطَّطْ"
+
+# Special characters
+"؟ الْأَمْرُ @"
+
+# Long vowels
+"سُوء"
