@@ -6,7 +6,7 @@ channel = "stable-25_05"
 packages = ["glibcLocales"]
 
 [workflows]
-runButton = "Test Arabic TTS"
+runButton = "Run Web App"
 
 [[workflows.workflow]]
 name = "Test Arabic TTS"
@@ -16,6 +16,15 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python test_system.py"
+
+[[workflows.workflow]]
+name = "Run Web App"
+author = 46301053
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python app.py"
 
 [deployment]
 run = ["sh", "-c", "python -m pytest tests/ -v"]
