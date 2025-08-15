@@ -67,6 +67,7 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-right: 10px;
         }
         
         button:hover {
@@ -76,6 +77,19 @@
         button:disabled {
             background-color: #ccc;
             cursor: not-allowed;
+        }
+        
+        .download-section {
+            border-top: 1px solid #e9ecef;
+            padding-top: 20px;
+        }
+        
+        .download-section button {
+            background-color: #28a745;
+        }
+        
+        .download-section button:hover {
+            background-color: #218838;
         }
         
         .controls {
@@ -143,21 +157,32 @@
                 </select>
                 
                 <button id="parseBtn" onclick="parseText()">Parse Text</button>
+                <button id="downloadJsonBtn" onclick="downloadJson()" disabled>Download JSON</button>
             </div>
         </div>
         
         <div class="output-section">
             <label>Parsed Output (JSON):</label>
             <pre id="output">Click "Parse Text" to see the parsed JSON output...</pre>
+            
+            <div class="download-section" style="margin-top: 20px;">
+                <label>Additional Downloads:</label>
+                <div style="margin-top: 10px;">
+                    <button onclick="downloadDictionary()">Download Master Dictionary (CSV)</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        let currentParsedData = null;
+        
         async function parseText() {
             const text = document.getElementById('arabicText').value.trim();
             const dialect = document.getElementById('dialect').value;
             const output = document.getElementById('output');
             const parseBtn = document.getElementById('parseBtn');
+            const downloadJsonBtn = document.getElementById('downloadJsonBtn');
             
             if (!text) {
                 output.textContent = 'Please enter some Arabic text.';
@@ -168,6 +193,7 @@
             // Show loading state
             parseBtn.disabled = true;
             parseBtn.textContent = 'Parsing...';
+            downloadJsonBtn.disabled = true;
             output.textContent = 'Processing...';
             output.className = 'loading';
             
@@ -188,16 +214,82 @@
                 if (response.ok) {
                     output.textContent = JSON.stringify(result, null, 2);
                     output.className = 'success';
+                    currentParsedData = { text, dialect, result };
+                    downloadJsonBtn.disabled = false;
                 } else {
                     output.textContent = `Error: ${result.error}`;
                     output.className = 'error';
+                    currentParsedData = null;
+                    downloadJsonBtn.disabled = true;
                 }
             } catch (error) {
                 output.textContent = `Network Error: ${error.message}`;
                 output.className = 'error';
+                currentParsedData = null;
+                downloadJsonBtn.disabled = true;
             } finally {
                 parseBtn.disabled = false;
                 parseBtn.textContent = 'Parse Text';
+            }
+        }
+        
+        async function downloadJson() {
+            if (!currentParsedData) {
+                alert('Please parse some text first.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/download/json', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: currentParsedData.text,
+                        dialect: currentParsedData.dialect
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `arabic_tts_output_${currentParsedData.dialect.toLowerCase()}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Error downloading file');
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+        
+        async function downloadDictionary() {
+            try {
+                const response = await fetch('/download/dictionary/csv');
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'masterTTS_dictionary.csv';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Error downloading dictionary');
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
             }
         }
         
