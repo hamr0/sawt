@@ -8,7 +8,43 @@ class ArabicSyllabifier:
         self.dialect = dialect
         with open("data/dictionaries/masterTTS.json", "r", encoding="utf-8") as f:
             self.master = json.load(f)
-        self.patterns = self.master["syllable_patterns"][dialect]
+        
+        # Create default syllable patterns if missing
+        if "syllable_patterns" not in self.master:
+            self.master["syllable_patterns"] = {
+                "EG": {
+                    "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
+                    "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
+                    "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
+                    "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
+                },
+                "MSA": {
+                    "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
+                    "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
+                    "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
+                    "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
+                },
+                "Gulf": {
+                    "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
+                    "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
+                    "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
+                    "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
+                },
+                "Levantine": {
+                    "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
+                    "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
+                    "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
+                    "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
+                },
+                "Maghreb": {
+                    "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
+                    "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
+                    "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
+                    "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
+                }
+            }
+        
+        self.patterns = self.master["syllable_patterns"].get(dialect, self.master["syllable_patterns"]["MSA"])
         self.vowels = {'َ', 'ُ', 'ِ', 'ْ', 'ّ', 'ا', 'ي', 'و'}
 
     def segment_syllables(self, word: str) -> List[List[str]]:
@@ -235,17 +271,21 @@ class ArabicTTS:
 
 
 # Dialect instances with proper initialization
+def get_tts_instance(dialect: str) -> ArabicTTS:
+    """Get TTS instance for specified dialect"""
+    return ArabicTTS(dialect)
+
 DIALECTS = {
-    "EG": ArabicTTS("EG"),
-    "MSA": ArabicTTS("MSA"),
-    "Gulf": ArabicTTS("Gulf"),
-    "Levantine": ArabicTTS("Levantine"),
-    "Maghreb": ArabicTTS("Maghreb")
+    "EG": lambda: get_tts_instance("EG"),
+    "MSA": lambda: get_tts_instance("MSA"),
+    "Gulf": lambda: get_tts_instance("Gulf"),
+    "Levantine": lambda: get_tts_instance("Levantine"),
+    "Maghreb": lambda: get_tts_instance("Maghreb")
 }
 
 # Example usage
 if __name__ == "__main__":
-    processor = DIALECTS["MSA"]
+    processor = DIALECTS["MSA"]()  # Call the lambda to get instance
     text = "الْحَمْدُ لِلّٰهِ"
     result = processor.process_text(text)
     processor.to_json(result)
