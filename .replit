@@ -1,4 +1,5 @@
 modules = ["python-3.12"]
+run = "python -m pytest tests/ -v"
 
 [nix]
 channel = "stable-25_05"
@@ -15,3 +16,6 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python test_system.py"
+
+[deployment]
+run = ["sh", "-c", "python -m pytest tests/ -v"]
