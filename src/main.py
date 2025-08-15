@@ -6,7 +6,7 @@ from typing import List, Dict, Tuple
 class ArabicSyllabifier:
     def __init__(self, dialect: str):
         self.dialect = dialect
-        with open("masterTTS.json", "r", encoding="utf-8") as f:
+        with open("data/dictionaries/masterTTS.json", "r", encoding="utf-8") as f:
             self.master = json.load(f)
         self.patterns = self.master["syllable_patterns"][dialect]
         self.vowels = {'َ', 'ُ', 'ِ', 'ْ', 'ّ', 'ا', 'ي', 'و'}
