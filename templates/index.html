@@ -6,29 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arabic TTS Parser</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
             background-color: #f5f5f5;
+            line-height: 1.6;
         }
         
         .container {
             background: white;
-            padding: 30px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
         }
         
         h1 {
             color: #333;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
         }
         
         .input-section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
         label {
@@ -36,6 +43,7 @@
             margin-bottom: 8px;
             font-weight: bold;
             color: #555;
+            font-size: 0.95rem;
         }
         
         textarea {
@@ -51,23 +59,28 @@
         }
         
         select {
-            padding: 8px 12px;
+            padding: 10px 12px;
             border: 2px solid #ddd;
             border-radius: 5px;
             font-size: 14px;
-            margin-right: 15px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            min-width: 120px;
         }
         
         button {
             background-color: #007bff;
             color: white;
-            padding: 12px 24px;
+            padding: 12px 20px;
             border: none;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             transition: background-color 0.3s;
-            margin-right: 10px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            min-height: 44px;
         }
         
         button:hover {
@@ -94,24 +107,31 @@
         
         .controls {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
+            gap: 10px;
             margin-top: 15px;
         }
         
+        .controls label {
+            margin-bottom: 0;
+            margin-right: 5px;
+        }
+        
         .output-section {
-            margin-top: 30px;
+            margin-top: 25px;
         }
         
         pre {
             background-color: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 5px;
-            padding: 20px;
+            padding: 15px;
             overflow-x: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
             font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.4;
         }
         
@@ -131,6 +151,110 @@
         
         .success {
             border-left: 4px solid #28a745;
+        }
+        
+        /* Mobile-first responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .controls label {
+                margin-bottom: 5px;
+            }
+            
+            select, button {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            button {
+                padding: 14px 20px;
+                font-size: 16px;
+            }
+            
+            textarea {
+                height: 100px;
+                font-size: 16px;
+            }
+            
+            pre {
+                padding: 12px;
+                font-size: 12px;
+            }
+            
+            .download-section {
+                padding-top: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .container {
+                padding: 12px;
+                border-radius: 8px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            textarea {
+                height: 90px;
+                padding: 10px;
+            }
+            
+            pre {
+                padding: 10px;
+                font-size: 11px;
+            }
+            
+            button {
+                padding: 12px 16px;
+                font-size: 15px;
+            }
+        }
+        
+        /* Larger screens */
+        @media (min-width: 1024px) {
+            body {
+                padding: 30px;
+            }
+            
+            .container {
+                padding: 40px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 35px;
+            }
+            
+            .controls {
+                flex-wrap: nowrap;
+            }
+            
+            textarea {
+                height: 140px;
+            }
         }
     </style>
 </head>
