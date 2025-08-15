@@ -1,0 +1,110 @@
+We are building a Text-to-Speech (TTS) system for Arabic dialects. The project involves:
+1. Processing Arabic text (with diacritics) and converting it into phonetic representations (IPA/X-SAMPA) considering dialect-specific rules.
+2. Handling syllabification and applying phonological rules (gemination, coarticulation, etc.).
+3. Outputting structured data (JSON) that can be used by a TTS engine.
+Given the complexity, we need a well-organized GitHub repository. Here's a suggested structure:
+```
+arabic-tts-engine/
+├── data/                   # Contains data files (dictionaries, rules, etc.)
+│   ├── masterTTS.json      # Master dictionary for IPA mappings and dialect info
+│   └── syllable_patterns.json # Syllable patterns for each dialect (if separate)
+├── src/                    # Source code
+│   ├── preprocessing/      # Text preprocessing utilities
+│   │   ├── tokenization.py
+│   │   ├── normalization.py
+│   │   └── __init__.py
+│   ├── syllabification/    # Syllabification modules
+│   │   ├── syllabifier.py  # ArabicSyllabifier class
+│   │   └── __init__.py
+│   ├── tts/                # Core TTS processing
+│   │   ├── arabic_tts.py   # ArabicTTS class (main processing)
+│   │   └── __init__.py
+│   ├── utils/              # Utility functions
+│   │   ├── file_io.py      # Reading/writing files
+│   │   ├── phonology.py    # Phonological rules
+│   │   └── __init__.py
+│   └── main.py             # Entry point for the application
+├── tests/                  # Unit and integration tests
+│   ├── test_tokenization.py
+│   ├── test_syllabifier.py
+│   └── ...
+├── scripts/                # Helper scripts (e.g., for data generation)
+│   └── build_master_tts.py # Script to build masterTTS.json from raw data
+├── config/                 # Configuration files
+│   └── config.yaml         # General configuration (e.g., default dialect)
+├── docs/                   # Documentation
+│   └── design.md           # Design decisions and architecture
+├── requirements.txt        # Python dependencies
+├── .gitignore
+├── README.md               # Project overview, setup, usage
+└── LICENSE
+```
+### Detailed Explanation:
+1. **data/**: 
+   - `masterTTS.json`: The core dictionary containing for each dialect the mapping of Arabic letters to IPA/X-SAMPA, along with syllable position adjustments and other phonological information.
+   - `syllable_patterns.json`: If we decide to keep syllable patterns separate, but we can also embed them in `masterTTS.json` as we did earlier.
+2. **src/**:
+   - **preprocessing/**: 
+     - `tokenization.py`: Splits text into tokens (words, punctuation) and handles special cases.
+     - `normalization.py`: Normalizes Arabic text (e.g., handling hamzas, alefs, etc.).
+   - **syllabification/**:
+     - `syllabifier.py`: Contains the `ArabicSyllabifier` class that segments words into syllables and classifies patterns (CV, CVC, etc.).
+   - **tts/**:
+     - `arabic_tts.py`: The main `ArabicTTS` class that orchestrates the entire process (tokenization, normalization, syllabification, IPA mapping, and applying phonological rules).
+   - **utils/**:
+     - `file_io.py`: Functions for reading/writing JSON, text files, etc.
+     - `phonology.py`: Functions for applying phonological rules (gemination, assimilation, etc.).
+3. **tests/**:
+   - Unit tests for each module to ensure correctness.
+4. **scripts/**:
+   - Scripts for generating or updating the masterTTS.json from raw data (e.g., CSV files).
+5. **config/**:
+   - Configuration file to set default dialect, paths to data files, etc.
+6. **docs/**:
+   - Documentation on the design, data structures, and how to extend the system.
+7. **Top-level files**:
+   - `requirements.txt`: Lists Python dependencies.
+   - `README.md`: Instructions for installation, usage, and contribution.
+   - `LICENSE`: Project license.
+### Example `README.md` Outline:
+```markdown
+# Arabic TTS Engine
+A Text-to-Speech system for Arabic dialects (MSA, Egyptian, Gulf, Levantine, Maghreb).
+## Features
+- Converts Arabic text into phonetic representations (IPA/X-SAMPA) with dialect-specific rules.
+- Handles syllabification and applies phonological rules (gemination, coarticulation, etc.).
+- Outputs structured JSON for integration with TTS engines.
+## Installation
+1. Clone the repository: `git clone https://github.com/yourusername/arabic-tts-engine.git`
+2. Install dependencies: `pip install -r requirements.txt`
+## Usage
+```python
+from src.tts.arabic_tts import ArabicTTS
+processor = ArabicTTS(dialect="MSA")
+result = processor.process_text("الْحَمْدُ لِلّٰهِ")
+processor.to_json(result, "output.json")
+```
+## Data Structure
+The `masterTTS.json` file contains dialect-specific mappings and rules. See [data/README.md](data/README.md) for details.
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first.
+```
+### Example `.gitignore`:
+```
+# Byte-compiled files
+__pycache__/
+*.pyc
+# Data files
+*.json
+*.csv
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+# Editor files
+.idea/
+*.swp
+```
+This structure keeps the project organized, modular, and scalable. It separates concerns (preprocessing, syllabification, TTS core) and makes testing and maintenance easier.
