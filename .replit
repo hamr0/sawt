@@ -3,3 +3,15 @@ modules = ["python-3.12"]
 [nix]
 channel = "stable-25_05"
 packages = ["glibcLocales"]
+
+[workflows]
+runButton = "Test Arabic TTS"
+
+[[workflows.workflow]]
+name = "Test Arabic TTS"
+author = 46301053
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python test_system.py"
