@@ -1,0 +1,89 @@
+Step-by-Step TTS Pipeline with Gemination Priority
+
+1. Initial IPA Mapping (Current Stage)
+
+· Map each Arabic grapheme to its base IPA/X-SAMPA value (e.g., ب → /b/).
+· Output: A flat list of phonemes with positional tags (word-initial, medial, final).
+
+2. Gemination Processing (Shadda ّ)
+
+· Rule: A consonant with shadda is geminated (doubled in duration).
+· Implementation:
+  · Detect shadda (ّ) in the input text.
+  · Modify the preceding consonant’s IPA to mark gemination (e.g., /b/ → /b:/).
+  · Delete the shadda from further processing (it’s now represented by the gemination symbol :).
+
+3. Positional Allophonic Rules
+
+· Apply dialect-specific changes based on position and neighboring phonemes:
+  · Examples:
+    · Word-Final Devoicing: /d/ → /t/ in some dialects.
+    · Emphatic Spread: A consonant near emphatics (e.g., ص, ط) may become pharyngealized.
+    · Intervocalic Lenition: /k/ → /g/ between vowels in Gulf Arabic.
+
+4. Coarticulation & Assimilation
+
+· Preceding/Following Context Matters:
+  · Velarization: /s/ → /sˁ/ if followed by an emphatic consonant.
+  · Nasal Assimilation: /n/ → /m/ before /b/ (e.g., "من بيروت" → /m biːruːt/).
+· Implementation:
+  · Iterate through the phoneme list and apply rules based on adjacent phonemes.
+
+5. Prosody and Suprasegmentals
+
+· Syllabification: Group phonemes into syllables (critical for stress and timing).
+· Stress Patterns: Assign primary stress based on dialect (e.g., MSA: penultimate syllable).
+· Pauses/Intonation: Mark phrase boundaries (e.g., # for pauses, ↑ for question rise).
+
+6. Final Output for Synthesis
+
+· Format the processed phonemes into a synthesis-friendly notation (e.g., SAMPA or SSML).
+· Example:
+  ```
+  /bː/ /a/ /sˁ/ /m/ /#/   (for "باصّ من" with gemination and emphatic spread)
+  ```
+
+---
+
+Key Implementation Tips
+
+1. Separate Rules for Each Dialect:
+   · Store rules in JSON (e.g., {"EG": {"emphatic_spread": true, "final_devoicing": false}}).
+2. Rule Application Order:
+   ```python
+   def apply_rules(phonemes, dialect):
+       phonemes = geminate_shadda(phonemes)      # Step 2
+       phonemes = apply_positional_rules(phonemes, dialect)  # Step 3
+       phonemes = coarticulate(phonemes)         # Step 4
+       return add_prosody(phonemes)              # Step 5
+   ```
+3. Testing Edge Cases:
+   · Test words like "شَدَّة" (shadda), "قَلْب" (emphatic + sun letter), and "زَنْبَق" (nasal assimilation).
+
+---
+
+From Here to Final Speech
+
+1. Waveform Generation:
+   · Use a concatenative TTS engine (e.g., diphone synthesis) or neural vocoder (e.g., Tacotron2 + WaveNet).
+   · Input: Processed IPA string with prosodic markers.
+2. Optional Enhancements:
+   · Diacritic Prediction: If input lacks tashkeel, add a neural model to predict vowels/shadda.
+   · Voice Customization: Modify pitch/rate per dialect (e.g., Gulf Arabic’s slower tempo).
+
+---
+
+Example Workflow
+
+Input: "الْحَمْدُ لِلّٰهِ"
+
+1. IPA Mapping: /ʔ a l h a m d u l i l ɑː h i/
+2. Gemination: Shadda on لّ → /l:/
+3. Positional Rules:
+   · /ʔ/ (initial) → glottal stop emphasized.
+   · /a/ after /l:/ → backed to /ɑ/ (emphatic spread).
+4. Output: [ʔ] [ɑ l h a m d u] [l: i l ɑː h i] (with stress on [dú]).
+
+---
+
+By prioritizing gemination and positional rules early, you ensure phonetic accuracy before higher-level prosody. This mirrors natural speech production (articulation → prosody). Would you like me to draft code for any specific step (e.g., shadda handling)?
