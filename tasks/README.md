@@ -1,6 +1,6 @@
 # Tasks Directory
 
-This directory contains all project management, planning, and implementation tracking documents for the Arabic TTS MVP Phase 1.
+This directory contains **task management, PRD, and implementation tracking** documents for the Arabic TTS MVP Phase 1.
 
 ---
 
@@ -10,24 +10,18 @@ This directory contains all project management, planning, and implementation tra
 tasks/
 ├── README.md                           # This file
 ├── TASK_LIST.md                        # Main task tracking (7 parent tasks)
-├── MVP_PHASE1_COMPLETE.md              # Final completion report
-├── AGENT_RULES.md                      # Development agent rules
 ├── 0001-prd-mvp-phase1.md              # Product Requirements Document
 ├── tasks-0001-prd-mvp-phase1.md        # Detailed task breakdown
+├── AGENT_RULES.md                      # Development agent rules
 │
 ├── session_notes/                      # Session implementation notes
-│   ├── SESSION_NOTES.md                # Complete session notes
-│   └── DEMO_SUMMARY.md                 # Demo system summary
+│   └── SESSION_NOTES.md                # Complete session notes
 │
 ├── planning/                           # Project planning documents
 │   ├── COMPLETE_ROADMAP.md             # Full project roadmap
 │   └── MVP_IMPLEMENTATION_PLAN.md      # MVP implementation strategy
 │
-├── business/                           # Business analysis
-│   └── BUSINESS_ANALYSIS_REPORT.md     # Business case and analysis
-│
-├── reports/                            # Task-specific reports
-│   ├── MVP_VALIDATION_RESULTS.md       # Final validation results
+├── reports/                            # Task-specific implementation reports
 │   ├── TASK_2_2_STATUS.md              # Syllabification task status
 │   ├── TASK_2_2_REMAINING_ISSUES.md    # Known issues
 │   └── SYLLABIFICATION_ISSUES.md       # Initial issue analysis
@@ -35,17 +29,18 @@ tasks/
 └── agents/                             # Agent-specific configurations
 ```
 
+**Note:** Final validation results, completion reports, and user documentation are in `/docs`.
+
 ---
 
 ## Key Documents
 
 ### Project Status
 - **TASK_LIST.md** - Main task tracking with 7 parent tasks (100% complete)
-- **MVP_PHASE1_COMPLETE.md** - Final project completion report
+- See `/docs/reports/MVP_PHASE1_COMPLETE.md` for final completion report
 
 ### Session Notes
 - **session_notes/SESSION_NOTES.md** - Complete implementation notes
-- **session_notes/DEMO_SUMMARY.md** - System overview and demo guide
 
 ### Planning Documents
 - **0001-prd-mvp-phase1.md** - Product requirements
@@ -53,9 +48,11 @@ tasks/
 - **planning/COMPLETE_ROADMAP.md** - Project roadmap
 - **planning/MVP_IMPLEMENTATION_PLAN.md** - Implementation strategy
 
-### Validation Reports
-- **reports/MVP_VALIDATION_RESULTS.md** - End-to-end validation results
+### Task Implementation Reports
 - **reports/TASK_2_2_STATUS.md** - Syllabification implementation status
+- **reports/TASK_2_2_REMAINING_ISSUES.md** - Known issues
+- **reports/SYLLABIFICATION_ISSUES.md** - Initial issue analysis
+- See `/docs/reports/MVP_VALIDATION_RESULTS.md` for final validation results
 
 ---
 
