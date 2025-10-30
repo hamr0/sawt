@@ -9,9 +9,9 @@
 
 ## Progress Overview
 - **Phase:** 4.0 Create Audio Generation Integration  
-- **Current Subtask:** 4.6 Create unit tests for eSpeak integration  
+- **Current Subtask:** 4.7 Manual audio quality testing  
 - **Completion:** 3/7 parent tasks complete (43%)
-- **Status:** Tasks 4.1-4.5 COMPLETE! Flask API endpoints added: /generate_audio (POST) and /download/audio/<filename>. IPA extraction from phonological pipeline. Test script created. Ready for unit tests (4.6) and manual testing (4.7).
+- **Status:** Task 4.6 COMPLETE! 28 unit tests created for eSpeak integration. 28/28 passing (100%). Coverage: installation, IPA→X-SAMPA, audio generation (text/IPA), parameters, error handling, real words. Total: 225/225 project tests passing! Ready for manual testing (4.7).
 
 ---
 
@@ -119,7 +119,7 @@
 - [x] **4.3** Add error handling for eSpeak subprocess (built-in)
 - [x] **4.4** Create Flask API endpoint for audio generation (implementation complete)
 - [x] **4.5** Add audio download endpoint (implementation complete)
-- [ ] **4.6** Create unit tests for eSpeak integration
+- [x] **4.6** Create unit tests for eSpeak integration (28/28 tests passing, 100%)
 - [ ] **4.7** Manual audio quality testing
 
 ---
@@ -201,6 +201,7 @@
 - `src/integrations/espeak.py` - eSpeak NG wrapper with IPA→X-SAMPA conversion (3/3 tests passing)
 - `app.py` - MODIFIED: Added /generate_audio and /download/audio endpoints with full pipeline integration
 - `scripts/test_api.py` - Flask API test script (3 test cases)
+- `tests/unit/test_espeak_integration.py` - eSpeak integration tests (28 tests, 100% passing)
 
 ### Files to Create
 - `src/core/diacritizer.py` - mishkal integration
