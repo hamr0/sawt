@@ -9,9 +9,9 @@
 
 ## Progress Overview
 - **Phase:** 4.0 Create Audio Generation Integration  
-- **Current Subtask:** 4.4 Create Flask API endpoint for audio generation  
+- **Current Subtask:** 4.6 Create unit tests for eSpeak integration  
 - **Completion:** 3/7 parent tasks complete (43%)
-- **Status:** Tasks 4.1-4.3 COMPLETE! ESpeakTTS wrapper with IPA→X-SAMPA conversion working. 3/3 tests passing (Arabic text, IPA, X-SAMPA). Error handling built-in. Ready for Flask API (4.4).
+- **Status:** Tasks 4.1-4.5 COMPLETE! Flask API endpoints added: /generate_audio (POST) and /download/audio/<filename>. IPA extraction from phonological pipeline. Test script created. Ready for unit tests (4.6) and manual testing (4.7).
 
 ---
 
@@ -117,8 +117,8 @@
 - [x] **4.1** Create eSpeak integration wrapper (2/2 tests passing)
 - [x] **4.2** Implement IPA to X-SAMPA conversion (5/5 conversions working)
 - [x] **4.3** Add error handling for eSpeak subprocess (built-in)
-- [ ] **4.4** Create Flask API endpoint for audio generation
-- [ ] **4.5** Add audio download endpoint
+- [x] **4.4** Create Flask API endpoint for audio generation (implementation complete)
+- [x] **4.5** Add audio download endpoint (implementation complete)
 - [ ] **4.6** Create unit tests for eSpeak integration
 - [ ] **4.7** Manual audio quality testing
 
@@ -199,6 +199,8 @@
 - `src/main.py` - MODIFIED: Integrated all 4 phonological processors into ArabicTTS pipeline
 - `scripts/test_phonology_integration.py` - Integration test script (5/5 test cases passing)
 - `src/integrations/espeak.py` - eSpeak NG wrapper with IPA→X-SAMPA conversion (3/3 tests passing)
+- `app.py` - MODIFIED: Added /generate_audio and /download/audio endpoints with full pipeline integration
+- `scripts/test_api.py` - Flask API test script (3 test cases)
 
 ### Files to Create
 - `src/core/diacritizer.py` - mishkal integration
