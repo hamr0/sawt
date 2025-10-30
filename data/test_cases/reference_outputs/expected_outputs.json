@@ -1,0 +1,1477 @@
+{
+  "metadata": {
+    "source_dataset": "egyptian_arabic_test_dataset.json",
+    "dialect": "Egyptian Arabic (EG)",
+    "total_sentences": 25,
+    "generation_date": "2025-10-30",
+    "tts_version": "1.0"
+  },
+  "sentences": [
+    {
+      "id": 1,
+      "arabic": "السلام عليكم",
+      "transliteration": "as-salāmu ʿalaykum",
+      "english": "Peace be upon you (greeting)",
+      "category": "Basic Greeting",
+      "processed_words": [
+        {
+          "original": "السلام",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لسلا",
+              "pattern": "UNKNOWN",
+              "ipa": "lslɑ",
+              "generated_ipa": "lsluː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "م",
+              "pattern": "UNKNOWN",
+              "ipa": "m",
+              "generated_ipa": "m",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "عليكم",
+          "syllables": [
+            {
+              "syllable": "علي",
+              "pattern": "UNKNOWN",
+              "ipa": "ʕlɪ",
+              "generated_ipa": "ʕlej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "كم",
+              "pattern": "UNKNOWN",
+              "ipa": "km",
+              "generated_ipa": "km",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Sun letter assimilation (السلام)",
+        "Long vowels (ā, u)",
+        "Pharyngeal consonant (ʿ)"
+      ]
+    },
+    {
+      "id": 2,
+      "arabic": "صباح الخير",
+      "transliteration": "ṣabāḥ al-khayr",
+      "english": "Good morning",
+      "category": "Morning Greeting",
+      "processed_words": [
+        {
+          "original": "صباح",
+          "syllables": [
+            {
+              "syllable": "صبا",
+              "pattern": "UNKNOWN",
+              "ipa": "sʕbɑ",
+              "generated_ipa": "sʕbuː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": true,
+              "pharyngealized_ipa": "sˁʕbɑ"
+            },
+            {
+              "syllable": "ح",
+              "pattern": "UNKNOWN",
+              "ipa": "ħ",
+              "generated_ipa": "ħ",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "الخير",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لخي",
+              "pattern": "UNKNOWN",
+              "ipa": "lxɪ",
+              "generated_ipa": "lxej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ر",
+              "pattern": "UNKNOWN",
+              "ipa": "ɾ",
+              "generated_ipa": "",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Emphatic consonant (ṣ) with pharyngealization",
+        "Pharyngeal fricative (ḥ)",
+        "Moon letter (الخير)",
+        "Diphthong (ay)"
+      ]
+    },
+    {
+      "id": 3,
+      "arabic": "صباح النور",
+      "transliteration": "ṣabāḥ an-nūr",
+      "english": "Morning of light (response)",
+      "category": "Response Greeting",
+      "processed_words": [
+        {
+          "original": "صباح",
+          "syllables": [
+            {
+              "syllable": "صبا",
+              "pattern": "UNKNOWN",
+              "ipa": "sʕbɑ",
+              "generated_ipa": "sʕbuː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": true,
+              "pharyngealized_ipa": "sˁʕbɑ"
+            },
+            {
+              "syllable": "ح",
+              "pattern": "UNKNOWN",
+              "ipa": "ħ",
+              "generated_ipa": "ħ",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "النور",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لنو",
+              "pattern": "UNKNOWN",
+              "ipa": "lnw",
+              "generated_ipa": "lnow",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ر",
+              "pattern": "UNKNOWN",
+              "ipa": "ɾ",
+              "generated_ipa": "",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Emphatic consonant (ṣ)",
+        "Sun letter assimilation (النور)",
+        "Long vowel (ū)",
+        "Gemination (nn)"
+      ]
+    },
+    {
+      "id": 4,
+      "arabic": "إزيك",
+      "transliteration": "izzayyak",
+      "english": "How are you? (Egyptian colloquial)",
+      "category": "Simple Question",
+      "processed_words": [
+        {
+          "original": "إزيك",
+          "syllables": [
+            {
+              "syllable": "إزي",
+              "pattern": "UNKNOWN",
+              "ipa": "إzʕɪ",
+              "generated_ipa": "zʕej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ك",
+              "pattern": "UNKNOWN",
+              "ipa": "k",
+              "generated_ipa": "k",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Gemination (zz)",
+        "Diphthong (ay)",
+        "Egyptian pronunciation"
+      ]
+    },
+    {
+      "id": 5,
+      "arabic": "الحمد لله",
+      "transliteration": "al-ḥamdu lillāh",
+      "english": "Praise be to God (I'm fine)",
+      "category": "Response",
+      "processed_words": [
+        {
+          "original": "الحمد",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لحمد",
+              "pattern": "UNKNOWN",
+              "ipa": "lħmd",
+              "generated_ipa": "l~ħmd",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "لله",
+          "syllables": [
+            {
+              "syllable": "لله",
+              "pattern": "UNKNOWN",
+              "ipa": "llh",
+              "generated_ipa": "llh",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Moon letter (الحمد)",
+        "Pharyngeal fricative (ḥ)",
+        "Sun letter assimilation (لله)",
+        "Gemination (ll)",
+        "Long vowel (ā)"
+      ]
+    },
+    {
+      "id": 6,
+      "arabic": "الشمس",
+      "transliteration": "ash-shams",
+      "english": "The sun",
+      "category": "Common Noun",
+      "processed_words": [
+        {
+          "original": "الشمس",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لشمس",
+              "pattern": "UNKNOWN",
+              "ipa": "lʃms",
+              "generated_ipa": "l~ʃms",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Sun letter assimilation (الشمس)",
+        "Gemination (sh-sh)",
+        "Cluster (ms)"
+      ]
+    },
+    {
+      "id": 7,
+      "arabic": "القمر",
+      "transliteration": "al-qamar",
+      "english": "The moon",
+      "category": "Common Noun",
+      "processed_words": [
+        {
+          "original": "القمر",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لقمر",
+              "pattern": "UNKNOWN",
+              "ipa": "lqmɾ",
+              "generated_ipa": "l~qm",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": true,
+              "pharyngealized_ipa": "lqˁmɾ"
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Moon letter (القمر)",
+        "Emphatic/uvular (q)",
+        "No assimilation"
+      ]
+    },
+    {
+      "id": 8,
+      "arabic": "النهار",
+      "transliteration": "an-nahār",
+      "english": "The day",
+      "category": "Time Expression",
+      "processed_words": [
+        {
+          "original": "النهار",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لنها",
+              "pattern": "UNKNOWN",
+              "ipa": "nhɑ",
+              "generated_ipa": "lnuː",
+              "has_gemination": false,
+              "sun_letter_assimilation": true,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ر",
+              "pattern": "UNKNOWN",
+              "ipa": "ɾ",
+              "generated_ipa": "",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Sun letter assimilation (النهار)",
+        "Gemination (nn)",
+        "Long vowel (ā)"
+      ]
+    },
+    {
+      "id": 9,
+      "arabic": "الليل",
+      "transliteration": "al-layl",
+      "english": "The night",
+      "category": "Time Expression",
+      "processed_words": [
+        {
+          "original": "الليل",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "للي",
+              "pattern": "UNKNOWN",
+              "ipa": "llɪ",
+              "generated_ipa": "llej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ل",
+              "pattern": "UNKNOWN",
+              "ipa": "l",
+              "generated_ipa": "l~",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Sun letter assimilation (الليل)",
+        "Gemination (ll)",
+        "Diphthong (ay)"
+      ]
+    },
+    {
+      "id": 10,
+      "arabic": "الطعام",
+      "transliteration": "aṭ-ṭaʿām",
+      "english": "The food",
+      "category": "Food",
+      "processed_words": [
+        {
+          "original": "الطعام",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لطعا",
+              "pattern": "UNKNOWN",
+              "ipa": "ltʕʕɑ",
+              "generated_ipa": "ltʕʔuː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": true,
+              "pharyngealized_ipa": "ltˁʕʕɑ"
+            },
+            {
+              "syllable": "م",
+              "pattern": "UNKNOWN",
+              "ipa": "m",
+              "generated_ipa": "m",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Sun letter assimilation (الطعام)",
+        "Emphatic consonant (ṭ)",
+        "Pharyngealization spread",
+        "Gemination (ṭṭ)",
+        "Pharyngeal consonant (ʿ)",
+        "Long vowel (ā)"
+      ]
+    },
+    {
+      "id": 11,
+      "arabic": "كتاب",
+      "transliteration": "kitāb",
+      "english": "Book",
+      "category": "Common Word",
+      "processed_words": [
+        {
+          "original": "كتاب",
+          "syllables": [
+            {
+              "syllable": "كتا",
+              "pattern": "UNKNOWN",
+              "ipa": "ktɑ",
+              "generated_ipa": "ktʕuː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ب",
+              "pattern": "UNKNOWN",
+              "ipa": "b",
+              "generated_ipa": "b",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Long vowel (ā)",
+        "Simple syllable pattern (CV-CVC)"
+      ]
+    },
+    {
+      "id": 12,
+      "arabic": "مدرسة",
+      "transliteration": "madrasa",
+      "english": "School",
+      "category": "Common Word",
+      "processed_words": [
+        {
+          "original": "مدرسة",
+          "syllables": [
+            {
+              "syllable": "مدرسة",
+              "pattern": "UNKNOWN",
+              "ipa": "mdɾsة",
+              "generated_ipa": "mdɾsʕ",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Cluster (dr)",
+        "Common Egyptian word",
+        "Three syllables"
+      ]
+    },
+    {
+      "id": 13,
+      "arabic": "مُدَرِّس",
+      "transliteration": "mudarris",
+      "english": "Teacher (male)",
+      "category": "Profession",
+      "processed_words": [
+        {
+          "original": "مُدَرِّس",
+          "syllables": [
+            {
+              "syllable": "مُ",
+              "pattern": "CV",
+              "ipa": "mُ",
+              "generated_ipa": "m",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "دَ",
+              "pattern": "CV",
+              "ipa": "dَ",
+              "generated_ipa": "d",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "رِ",
+              "pattern": "CV",
+              "ipa": "ɾِ",
+              "generated_ipa": "ɾ",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ّ",
+              "pattern": "UNKNOWN",
+              "ipa": "ّ",
+              "generated_ipa": "",
+              "has_gemination": true,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "س",
+              "pattern": "UNKNOWN",
+              "ipa": "s",
+              "generated_ipa": "s",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Gemination with shadda (رّ)",
+        "Multiple short vowels",
+        "Three syllables"
+      ]
+    },
+    {
+      "id": 14,
+      "arabic": "طبيب",
+      "transliteration": "ṭabīb",
+      "english": "Doctor",
+      "category": "Profession",
+      "processed_words": [
+        {
+          "original": "طبيب",
+          "syllables": [
+            {
+              "syllable": "طبي",
+              "pattern": "UNKNOWN",
+              "ipa": "tʕbɪ",
+              "generated_ipa": "tʕbej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": true,
+              "pharyngealized_ipa": "tˁʕbɪ"
+            },
+            {
+              "syllable": "ب",
+              "pattern": "UNKNOWN",
+              "ipa": "b",
+              "generated_ipa": "b",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Emphatic consonant (ṭ)",
+        "Long vowel (ī)",
+        "Pharyngealization"
+      ]
+    },
+    {
+      "id": 15,
+      "arabic": "أمّي",
+      "transliteration": "ummī",
+      "english": "My mother",
+      "category": "Family",
+      "processed_words": [
+        {
+          "original": "أمّي",
+          "syllables": [
+            {
+              "syllable": "أمّ",
+              "pattern": "UNKNOWN",
+              "ipa": "ʔmّ",
+              "generated_ipa": "ʔm",
+              "has_gemination": true,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ي",
+              "pattern": "UNKNOWN",
+              "ipa": "ɪ",
+              "generated_ipa": "ej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Gemination (mm)",
+        "Long vowel (ī)",
+        "Possessive suffix"
+      ]
+    },
+    {
+      "id": 16,
+      "arabic": "أبي",
+      "transliteration": "abī",
+      "english": "My father",
+      "category": "Family",
+      "processed_words": [
+        {
+          "original": "أبي",
+          "syllables": [
+            {
+              "syllable": "أبي",
+              "pattern": "UNKNOWN",
+              "ipa": "ʔbɪ",
+              "generated_ipa": "ʔbej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Long vowel (ī)",
+        "Simple structure",
+        "Possessive suffix"
+      ]
+    },
+    {
+      "id": 17,
+      "arabic": "شكرا",
+      "transliteration": "shukran",
+      "english": "Thank you",
+      "category": "Common Phrase",
+      "processed_words": [
+        {
+          "original": "شكرا",
+          "syllables": [
+            {
+              "syllable": "شكرا",
+              "pattern": "UNKNOWN",
+              "ipa": "ʃkɾɑ",
+              "generated_ipa": "ʃkɾuː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Cluster (sh-k)",
+        "Short vowels",
+        "Tanween (an)"
+      ]
+    },
+    {
+      "id": 18,
+      "arabic": "من فضلك",
+      "transliteration": "min faḍlak",
+      "english": "Please",
+      "category": "Common Phrase",
+      "processed_words": [
+        {
+          "original": "من",
+          "syllables": [
+            {
+              "syllable": "من",
+              "pattern": "UNKNOWN",
+              "ipa": "mn",
+              "generated_ipa": "mn",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "فضلك",
+          "syllables": [
+            {
+              "syllable": "فضلك",
+              "pattern": "UNKNOWN",
+              "ipa": "fdʕlk",
+              "generated_ipa": "fdʕlk",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": true,
+              "pharyngealized_ipa": "fdˁʕlk"
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Emphatic consonant (ḍ)",
+        "Pharyngealization",
+        "Possessive suffix (k)"
+      ]
+    },
+    {
+      "id": 19,
+      "arabic": "فين",
+      "transliteration": "fēn",
+      "english": "Where? (Egyptian)",
+      "category": "Question Word",
+      "processed_words": [
+        {
+          "original": "فين",
+          "syllables": [
+            {
+              "syllable": "في",
+              "pattern": "CV",
+              "ipa": "fɪ",
+              "generated_ipa": "fej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ن",
+              "pattern": "UNKNOWN",
+              "ipa": "n",
+              "generated_ipa": "n~",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Long vowel (ē)",
+        "Egyptian colloquial",
+        "Simple structure"
+      ]
+    },
+    {
+      "id": 20,
+      "arabic": "أنا مصري",
+      "transliteration": "ana maṣrī",
+      "english": "I am Egyptian",
+      "category": "Simple Sentence",
+      "processed_words": [
+        {
+          "original": "أنا",
+          "syllables": [
+            {
+              "syllable": "أنا",
+              "pattern": "UNKNOWN",
+              "ipa": "ʔnɑ",
+              "generated_ipa": "ʔnuː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "مصري",
+          "syllables": [
+            {
+              "syllable": "مصري",
+              "pattern": "UNKNOWN",
+              "ipa": "msʕɾɪ",
+              "generated_ipa": "msʕɾej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": true,
+              "pharyngealized_ipa": "msˁʕɾɪ"
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Emphatic consonant (ṣ)",
+        "Long vowel (ī)",
+        "Pharyngealization",
+        "Nisba adjective"
+      ]
+    },
+    {
+      "id": 21,
+      "arabic": "اللغة العربية لغة جميلة",
+      "transliteration": "al-lugha al-ʿarabiyya lugha jamīla",
+      "english": "The Arabic language is a beautiful language",
+      "category": "Complex Sentence",
+      "processed_words": [
+        {
+          "original": "اللغة",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "للغة",
+              "pattern": "UNKNOWN",
+              "ipa": "llɣة",
+              "generated_ipa": "l~l~ɣ",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "العربية",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لعربي",
+              "pattern": "UNKNOWN",
+              "ipa": "lʕɾbɪ",
+              "generated_ipa": "lʔɾbej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ة",
+              "pattern": "UNKNOWN",
+              "ipa": "ة",
+              "generated_ipa": "",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "لغة",
+          "syllables": [
+            {
+              "syllable": "لغة",
+              "pattern": "UNKNOWN",
+              "ipa": "lɣة",
+              "generated_ipa": "lʁ",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "جميلة",
+          "syllables": [
+            {
+              "syllable": "جمي",
+              "pattern": "UNKNOWN",
+              "ipa": "gmɪ",
+              "generated_ipa": "ʒmej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لة",
+              "pattern": "UNKNOWN",
+              "ipa": "lة",
+              "generated_ipa": "l~",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Moon letters (اللغة)",
+        "Sun letters (العربية)",
+        "Pharyngeal consonant (ʿ)",
+        "Long vowels (ī, a)",
+        "Multiple words"
+      ]
+    },
+    {
+      "id": 22,
+      "arabic": "الشمال",
+      "transliteration": "ash-shamāl",
+      "english": "The north",
+      "category": "Direction",
+      "processed_words": [
+        {
+          "original": "الشمال",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لشما",
+              "pattern": "UNKNOWN",
+              "ipa": "ʃmɑ",
+              "generated_ipa": "lʃmuː",
+              "has_gemination": false,
+              "sun_letter_assimilation": true,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ل",
+              "pattern": "UNKNOWN",
+              "ipa": "l",
+              "generated_ipa": "l~",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Sun letter assimilation",
+        "Gemination (sh-sh)",
+        "Long vowel (ā)"
+      ]
+    },
+    {
+      "id": 23,
+      "arabic": "الأبيض",
+      "transliteration": "al-abyaḍ",
+      "english": "The white",
+      "category": "Color",
+      "processed_words": [
+        {
+          "original": "الأبيض",
+          "syllables": [
+            {
+              "syllable": "ا",
+              "pattern": "UNKNOWN",
+              "ipa": "ɑ",
+              "generated_ipa": "uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "لأبي",
+              "pattern": "UNKNOWN",
+              "ipa": "lʔbɪ",
+              "generated_ipa": "lbej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "ض",
+              "pattern": "UNKNOWN",
+              "ipa": "dʕ",
+              "generated_ipa": "dʕ",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": true,
+              "pharyngealized_ipa": "dˁʕ"
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Moon letter (الأبيض)",
+        "Emphatic consonant (ḍ)",
+        "Diphthong (ay)"
+      ]
+    },
+    {
+      "id": 24,
+      "arabic": "مستشفى",
+      "transliteration": "mustashfā",
+      "english": "Hospital",
+      "category": "Complex Word",
+      "processed_words": [
+        {
+          "original": "مستشفى",
+          "syllables": [
+            {
+              "syllable": "مستشفى",
+              "pattern": "UNKNOWN",
+              "ipa": "mstʃfى",
+              "generated_ipa": "msʕtʕʃf",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Clusters (st, shf)",
+        "Long vowel (ā)",
+        "Four syllables",
+        "Complex structure"
+      ]
+    },
+    {
+      "id": 25,
+      "arabic": "أهلا وسهلا في مصر",
+      "transliteration": "ahlan wa sahlan fī maṣr",
+      "english": "Welcome to Egypt",
+      "category": "Complete Conversation",
+      "processed_words": [
+        {
+          "original": "أهلا",
+          "syllables": [
+            {
+              "syllable": "أهلا",
+              "pattern": "UNKNOWN",
+              "ipa": "ʔhlɑ",
+              "generated_ipa": "ʔhluː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "وسهلا",
+          "syllables": [
+            {
+              "syllable": "و",
+              "pattern": "UNKNOWN",
+              "ipa": "w",
+              "generated_ipa": "ew",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            },
+            {
+              "syllable": "سهلا",
+              "pattern": "UNKNOWN",
+              "ipa": "shlɑ",
+              "generated_ipa": "sl~uː",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "في",
+          "syllables": [
+            {
+              "syllable": "في",
+              "pattern": "CV",
+              "ipa": "fɪ",
+              "generated_ipa": "fej",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": false
+            }
+          ]
+        },
+        {
+          "original": "مصر",
+          "syllables": [
+            {
+              "syllable": "مصر",
+              "pattern": "UNKNOWN",
+              "ipa": "msʕɾ",
+              "generated_ipa": "msʕɾ",
+              "has_gemination": false,
+              "sun_letter_assimilation": false,
+              "has_emphatic": true,
+              "pharyngealized_ipa": "msˁʕɾ"
+            }
+          ]
+        }
+      ],
+      "phonological_features": [
+        "Multiple words",
+        "Pharyngeal consonant (h)",
+        "Conjunction (wa)",
+        "Emphatic consonant (ṣ)",
+        "Long vowel (ī)",
+        "Cluster (ṣr)"
+      ]
+    }
+  ],
+  "audio_files": [
+    {
+      "sentence_id": 1,
+      "audio": {
+        "success": true,
+        "filename": "sentence_01_as-salāmu_ʿalaykum.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_01_as-salāmu_ʿalaykum.wav",
+        "size_bytes": 83304,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_01_as-salāmu_ʿalaykum.wav (83304 bytes)"
+      }
+    },
+    {
+      "sentence_id": 2,
+      "audio": {
+        "success": true,
+        "filename": "sentence_02_ṣabāḥ_al-khayr.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_02_ṣabāḥ_al-khayr.wav",
+        "size_bytes": 75130,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_02_ṣabāḥ_al-khayr.wav (75130 bytes)"
+      }
+    },
+    {
+      "sentence_id": 3,
+      "audio": {
+        "success": true,
+        "filename": "sentence_03_ṣabāḥ_an-nūr.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_03_ṣabāḥ_an-nūr.wav",
+        "size_bytes": 78362,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_03_ṣabāḥ_an-nūr.wav (78362 bytes)"
+      }
+    },
+    {
+      "sentence_id": 4,
+      "audio": {
+        "success": true,
+        "filename": "sentence_04_izzayyak.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_04_izzayyak.wav",
+        "size_bytes": 46628,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_04_izzayyak.wav (46628 bytes)"
+      }
+    },
+    {
+      "sentence_id": 5,
+      "audio": {
+        "success": true,
+        "filename": "sentence_05_al-ḥamdu_lillāh.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_05_al-ḥamdu_lillāh.wav",
+        "size_bytes": 56156,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_05_al-ḥamdu_lillāh.wav (56156 bytes)"
+      }
+    },
+    {
+      "sentence_id": 6,
+      "audio": {
+        "success": true,
+        "filename": "sentence_06_ash-shams.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_06_ash-shams.wav",
+        "size_bytes": 49862,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_06_ash-shams.wav (49862 bytes)"
+      }
+    },
+    {
+      "sentence_id": 7,
+      "audio": {
+        "success": true,
+        "filename": "sentence_07_al-qamar.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_07_al-qamar.wav",
+        "size_bytes": 42682,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_07_al-qamar.wav (42682 bytes)"
+      }
+    },
+    {
+      "sentence_id": 8,
+      "audio": {
+        "success": true,
+        "filename": "sentence_08_an-nahār.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_08_an-nahār.wav",
+        "size_bytes": 49196,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_08_an-nahār.wav (49196 bytes)"
+      }
+    },
+    {
+      "sentence_id": 9,
+      "audio": {
+        "success": true,
+        "filename": "sentence_09_al-layl.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_09_al-layl.wav",
+        "size_bytes": 44972,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_09_al-layl.wav (44972 bytes)"
+      }
+    },
+    {
+      "sentence_id": 10,
+      "audio": {
+        "success": true,
+        "filename": "sentence_10_aṭ-ṭaʿām.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_10_aṭ-ṭaʿām.wav",
+        "size_bytes": 51436,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_10_aṭ-ṭaʿām.wav (51436 bytes)"
+      }
+    },
+    {
+      "sentence_id": 11,
+      "audio": {
+        "success": true,
+        "filename": "sentence_11_kitāb.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_11_kitāb.wav",
+        "size_bytes": 46386,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_11_kitāb.wav (46386 bytes)"
+      }
+    },
+    {
+      "sentence_id": 12,
+      "audio": {
+        "success": true,
+        "filename": "sentence_12_madrasa.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_12_madrasa.wav",
+        "size_bytes": 43934,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_12_madrasa.wav (43934 bytes)"
+      }
+    },
+    {
+      "sentence_id": 13,
+      "audio": {
+        "success": true,
+        "filename": "sentence_13_mudarris.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_13_mudarris.wav",
+        "size_bytes": 41472,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_13_mudarris.wav (41472 bytes)"
+      }
+    },
+    {
+      "sentence_id": 14,
+      "audio": {
+        "success": true,
+        "filename": "sentence_14_ṭabīb.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_14_ṭabīb.wav",
+        "size_bytes": 44754,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_14_ṭabīb.wav (44754 bytes)"
+      }
+    },
+    {
+      "sentence_id": 15,
+      "audio": {
+        "success": true,
+        "filename": "sentence_15_ummī.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_15_ummī.wav",
+        "size_bytes": 38180,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_15_ummī.wav (38180 bytes)"
+      }
+    },
+    {
+      "sentence_id": 16,
+      "audio": {
+        "success": true,
+        "filename": "sentence_16_abī.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_16_abī.wav",
+        "size_bytes": 42138,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_16_abī.wav (42138 bytes)"
+      }
+    },
+    {
+      "sentence_id": 17,
+      "audio": {
+        "success": true,
+        "filename": "sentence_17_shukran.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_17_shukran.wav",
+        "size_bytes": 45824,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_17_shukran.wav (45824 bytes)"
+      }
+    },
+    {
+      "sentence_id": 18,
+      "audio": {
+        "success": true,
+        "filename": "sentence_18_min_faḍlak.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_18_min_faḍlak.wav",
+        "size_bytes": 53910,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_18_min_faḍlak.wav (53910 bytes)"
+      }
+    },
+    {
+      "sentence_id": 19,
+      "audio": {
+        "success": true,
+        "filename": "sentence_19_fēn.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_19_fēn.wav",
+        "size_bytes": 44356,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_19_fēn.wav (44356 bytes)"
+      }
+    },
+    {
+      "sentence_id": 20,
+      "audio": {
+        "success": true,
+        "filename": "sentence_20_ana_maṣrī.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_20_ana_maṣrī.wav",
+        "size_bytes": 58244,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_20_ana_maṣrī.wav (58244 bytes)"
+      }
+    },
+    {
+      "sentence_id": 21,
+      "audio": {
+        "success": true,
+        "filename": "sentence_21_al-lugha_al-ʿarabiyya_lugha_jamīla.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_21_al-lugha_al-ʿarabiyya_lugha_jamīla.wav",
+        "size_bytes": 120862,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_21_al-lugha_al-ʿarabiyya_lugha_jamīla.wav (120862 bytes)"
+      }
+    },
+    {
+      "sentence_id": 22,
+      "audio": {
+        "success": true,
+        "filename": "sentence_22_ash-shamāl.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_22_ash-shamāl.wav",
+        "size_bytes": 52942,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_22_ash-shamāl.wav (52942 bytes)"
+      }
+    },
+    {
+      "sentence_id": 23,
+      "audio": {
+        "success": true,
+        "filename": "sentence_23_al-abyaḍ.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_23_al-abyaḍ.wav",
+        "size_bytes": 47544,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_23_al-abyaḍ.wav (47544 bytes)"
+      }
+    },
+    {
+      "sentence_id": 24,
+      "audio": {
+        "success": true,
+        "filename": "sentence_24_mustashfā.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_24_mustashfā.wav",
+        "size_bytes": 57558,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_24_mustashfā.wav (57558 bytes)"
+      }
+    },
+    {
+      "sentence_id": 25,
+      "audio": {
+        "success": true,
+        "filename": "sentence_25_ahlan_wa_sahlan_fī_maṣr.wav",
+        "path": "/home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_25_ahlan_wa_sahlan_fī_maṣr.wav",
+        "size_bytes": 93768,
+        "message": "Audio generated: /home/hamr/PycharmProjects/ArabicTTS/data/test_cases/reference_audio/sentence_25_ahlan_wa_sahlan_fī_maṣr.wav (93768 bytes)"
+      }
+    }
+  ]
+}
