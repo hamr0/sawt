@@ -8,10 +8,10 @@
 ---
 
 ## Progress Overview
-- **Phase:** 4.0 Create Audio Generation Integration  
-- **Current Subtask:** ALL COMPLETE! Task 4.0 finished!  
+- **Phase:** 5.0 Build Comprehensive Test Suite  
+- **Current Subtask:** 5.4 Create error handling tests  
 - **Completion:** 4/7 parent tasks complete (57%)
-- **Status:** Task 4.0 COMPLETE! All 7 subtasks finished. Manual testing: 8/8 tests passing (100%). Audio generation verified: text→IPA→X-SAMPA→audio. Speed/pitch parameters working. File sizes: 23KB-111KB. Generation time: 0.13-0.17s. Ready for Task 5.0 (Integration Testing)!
+- **Status:** Task 5.1 & 5.3 COMPLETE! Integration tests created: 17 diacritization + 21 pipeline = 38 new tests. Total: 263/263 tests passing (100%)! Validates complete TTS workflow: text→syllables→phonology→IPA→audio. Next: error handling tests (5.4).
 
 ---
 
@@ -127,12 +127,12 @@
 ### Task 5.0: Build Comprehensive Test Suite
 **Estimated:** 16-24 hours | **Priority:** 🟡 High | **Dependencies:** Tasks 2.0, 3.0, 4.0
 
-- [ ] **5.1** Create diacritization integration tests
-- [ ] **5.2** Expand syllabification test coverage
-- [ ] **5.3** Create integration test for full pipeline
+- [x] **5.1** Create diacritization integration tests (17/17 tests passing)
+- [ ] **5.2** Expand syllabification test coverage (already 25 tests, comprehensive)
+- [x] **5.3** Create integration test for full pipeline (21/21 tests passing)
 - [ ] **5.4** Create error handling tests
 - [ ] **5.5** Create performance benchmark tests
-- [ ] **5.6** Run full test suite and fix failures
+- [ ] **5.6** Run full test suite and fix failures (263/263 passing!)
 - [ ] **5.7** Create test documentation
 - [ ] **5.8** Set up pre-commit test hook
 
@@ -203,6 +203,8 @@
 - `scripts/test_api.py` - Flask API test script (3 test cases)
 - `scripts/manual_audio_test.py` - Manual audio quality test script (8 test cases, 100% passing)
 - `tests/unit/test_espeak_integration.py` - eSpeak integration tests (28 tests, 100% passing)
+- `tests/integration/test_diacritization.py` - Diacritization integration tests (17 tests, 100% passing)
+- `tests/integration/test_complete_pipeline.py` - Full pipeline integration tests (21 tests, 100% passing)
 
 ### Files to Create
 - `src/core/diacritizer.py` - mishkal integration
