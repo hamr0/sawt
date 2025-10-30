@@ -1,0 +1,263 @@
+{
+  "_comment": "Syllable pattern definitions for Arabic dialects",
+  "_format_version": "1.0",
+  "_created": "2025-10-30",
+  "_description": "Defines valid syllable patterns, constraints, and examples for Egyptian Arabic (EG). Used by syllabification algorithm to validate and classify syllable structures.",
+  
+  "dialects": {
+    "EG": {
+      "name": "Egyptian Arabic",
+      "description": "Syllable patterns for Egyptian Arabic dialect",
+      "patterns": {
+        "CV": {
+          "structure": "Consonant + Vowel",
+          "allowed": true,
+          "description": "Open syllable: single consonant followed by vowel",
+          "examples": [
+            {"arabic": "مَ", "transliteration": "ma", "word": "مَدْرَسَة (madrasa)"},
+            {"arabic": "لِ", "transliteration": "li", "word": "لِلْمَدْرَسَة (lilmadrasa)"},
+            {"arabic": "كَ", "transliteration": "ka", "word": "كَتَبَ (kataba)"},
+            {"arabic": "بِ", "transliteration": "bi", "word": "بِنْت (bint)"}
+          ],
+          "constraints": {
+            "min_length": 2,
+            "max_length": 2,
+            "vowel_types": ["fatha", "kasra", "damma", "long_a", "long_i", "long_u"]
+          },
+          "frequency": "very_common",
+          "stress_eligible": true
+        },
+        
+        "CVC": {
+          "structure": "Consonant + Vowel + Consonant",
+          "allowed": true,
+          "description": "Closed syllable: consonant-vowel-consonant",
+          "examples": [
+            {"arabic": "كَتْ", "transliteration": "kat", "word": "كَتَبَ (kataba)"},
+            {"arabic": "مَدْ", "transliteration": "mad", "word": "مَدْرَسَة (madrasa)"},
+            {"arabic": "بِنْ", "transliteration": "bin", "word": "بِنْت (bint)"},
+            {"arabic": "كُلْ", "transliteration": "kul", "word": "كُلّ (kull)"}
+          ],
+          "constraints": {
+            "min_length": 3,
+            "max_length": 3,
+            "coda_condition": "any_consonant",
+            "vowel_types": ["fatha", "kasra", "damma", "sukun"],
+            "final_position_only": false
+          },
+          "frequency": "very_common",
+          "stress_eligible": true
+        },
+        
+        "CVV": {
+          "structure": "Consonant + Long Vowel",
+          "allowed": true,
+          "description": "Syllable with long vowel (aa, ii, uu) or diphthong (ay, aw)",
+          "examples": [
+            {"arabic": "كا", "transliteration": "kaa", "word": "كاتِب (kaatib)"},
+            {"arabic": "لي", "transliteration": "lii", "word": "ليمون (limuun)"},
+            {"arabic": "مو", "transliteration": "moo", "word": "موز (mooz)"},
+            {"arabic": "باي", "transliteration": "bay", "word": "بَيْت (bayt)"},
+            {"arabic": "ماو", "transliteration": "maw", "word": "مَوْت (mawt)"}
+          ],
+          "constraints": {
+            "min_length": 2,
+            "max_length": 3,
+            "long_vowel_markers": ["ا", "و", "ي"],
+            "vowel_types": ["long_a", "long_i", "long_u", "diphthong_ay", "diphthong_aw"],
+            "diphthongs_allowed": true
+          },
+          "frequency": "common",
+          "stress_eligible": true
+        },
+        
+        "CVCC": {
+          "structure": "Consonant + Vowel + Consonant + Consonant",
+          "allowed": true,
+          "description": "Super-heavy syllable: two consonants in coda (typically word-final or with gemination)",
+          "examples": [
+            {"arabic": "كُلّ", "transliteration": "kull", "word": "كُلّ (all) - geminated"},
+            {"arabic": "شَمْس", "transliteration": "shams", "word": "شَمْس (sun)"},
+            {"arabic": "بِنْت", "transliteration": "bint", "word": "بِنْت (girl)"}
+          ],
+          "constraints": {
+            "min_length": 4,
+            "max_length": 4,
+            "coda_condition": "geminate_or_cluster",
+            "position_constraint": "word_final_or_geminated",
+            "gemination_marker": "ّ",
+            "vowel_types": ["fatha", "kasra", "damma"],
+            "requires_special_condition": true
+          },
+          "frequency": "uncommon",
+          "stress_eligible": true,
+          "notes": "Usually word-final or contains gemination (shadda). Medial CVCC is rare in Egyptian Arabic."
+        },
+        
+        "CVVC": {
+          "structure": "Consonant + Long Vowel + Consonant",
+          "allowed": true,
+          "description": "Syllable with long vowel or diphthong plus coda consonant",
+          "examples": [
+            {"arabic": "بَيْت", "transliteration": "bayt", "word": "بَيْت (house)"},
+            {"arabic": "مَوْت", "transliteration": "mawt", "word": "مَوْت (death)"},
+            {"arabic": "نُور", "transliteration": "nuur", "word": "نُور (light)"}
+          ],
+          "constraints": {
+            "min_length": 4,
+            "max_length": 4,
+            "long_vowel_markers": ["ا", "و", "ي"],
+            "vowel_types": ["long_a", "long_i", "long_u", "diphthong_ay", "diphthong_aw"],
+            "coda_condition": "any_consonant"
+          },
+          "frequency": "common",
+          "stress_eligible": true
+        },
+        
+        "V": {
+          "structure": "Vowel only",
+          "allowed": false,
+          "description": "Vowel-only syllables not allowed in Arabic (except word-initial hamza)",
+          "constraints": {
+            "exception": "word_initial_hamza"
+          },
+          "frequency": "rare",
+          "stress_eligible": false,
+          "notes": "Only occurs with initial hamza (ء) which is technically a consonant"
+        }
+      },
+      
+      "phonotactic_constraints": {
+        "onset": {
+          "required": true,
+          "description": "All syllables must start with at least one consonant",
+          "exception": "Hamza (ء) can appear as onset, which may be silent in some contexts"
+        },
+        "nucleus": {
+          "required": true,
+          "types": ["short_vowel", "long_vowel", "diphthong"],
+          "short_vowels": ["َ (fatha)", "ِ (kasra)", "ُ (damma)"],
+          "long_vowels": ["ا (aa)", "ي (ii)", "و (uu)"],
+          "diphthongs": ["َيْ (ay)", "َوْ (aw)"]
+        },
+        "coda": {
+          "required": false,
+          "max_consonants": 2,
+          "gemination_allowed": true,
+          "description": "Coda can be empty (CV), single consonant (CVC), or double consonant (CVCC)"
+        },
+        "word_final": {
+          "allowed_patterns": ["CV", "CVC", "CVV", "CVCC", "CVVC"],
+          "preferred_patterns": ["CVC", "CVV", "CVVC"]
+        },
+        "word_initial": {
+          "allowed_patterns": ["CV", "CVC", "CVV"],
+          "onset_required": true
+        }
+      },
+      
+      "special_rules": {
+        "gemination": {
+          "description": "Doubled consonant (shadda ّ) creates heavy syllable",
+          "marker": "ّ",
+          "affects_pattern": true,
+          "creates_pattern": "CVCC",
+          "example": "مُدَرِّس → mu-dar-ris (not mu-da-ris)"
+        },
+        "sun_letters": {
+          "description": "Definite article ال assimilates with sun letters",
+          "sun_letters": ["ت", "ث", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط", "ظ", "ل", "ن"],
+          "assimilation_rule": "ال + sun_letter → gemination",
+          "example": "الشمس → ash-shams (not al-shams)"
+        },
+        "sukun": {
+          "description": "Sukun (ْ) marks absence of vowel, creates coda consonant",
+          "marker": "ْ",
+          "function": "creates_coda"
+        }
+      },
+      
+      "validation_rules": {
+        "max_syllable_length": 5,
+        "min_syllable_length": 2,
+        "unknown_pattern_handling": "reject",
+        "strict_mode": true,
+        "allow_partial_match": false
+      }
+    },
+    
+    "MSA": {
+      "name": "Modern Standard Arabic",
+      "description": "Placeholder for MSA syllable patterns (to be implemented in Phase 2)",
+      "status": "not_implemented",
+      "note": "MSA patterns are similar to EG but with different phonological rules and prosody"
+    }
+  },
+  
+  "diacritic_markers": {
+    "َ": {"name": "fatha", "type": "short_vowel", "sound": "a"},
+    "ِ": {"name": "kasra", "type": "short_vowel", "sound": "i"},
+    "ُ": {"name": "damma", "type": "short_vowel", "sound": "u"},
+    "ْ": {"name": "sukun", "type": "no_vowel", "sound": "none"},
+    "ّ": {"name": "shadda", "type": "gemination", "sound": "doubled_consonant"},
+    "ً": {"name": "tanween_fath", "type": "nunation", "sound": "an"},
+    "ٍ": {"name": "tanween_kasr", "type": "nunation", "sound": "in"},
+    "ٌ": {"name": "tanween_damm", "type": "nunation", "sound": "un"}
+  },
+  
+  "long_vowel_markers": {
+    "ا": {"name": "alif", "type": "long_vowel", "sound": "aa"},
+    "و": {"name": "waw", "type": "long_vowel_or_consonant", "sound": "uu_or_w"},
+    "ي": {"name": "yaa", "type": "long_vowel_or_consonant", "sound": "ii_or_y"}
+  },
+  
+  "pattern_priority": {
+    "description": "Order of pattern matching when classifying syllables",
+    "order": ["CVVC", "CVCC", "CVV", "CVC", "CV"],
+    "rationale": "Longest patterns first to avoid premature matches"
+  },
+  
+  "testing_examples": {
+    "description": "Test cases for syllabification validation",
+    "words": [
+      {
+        "word": "مَدْرَسَة",
+        "transliteration": "madrasa",
+        "syllables": ["مَدْ", "رَ", "سَة"],
+        "patterns": ["CVC", "CV", "CV"],
+        "english": "school"
+      },
+      {
+        "word": "الشَّمْس",
+        "transliteration": "ash-shams",
+        "syllables": ["اَشْ", "شَمْس"],
+        "patterns": ["CVC", "CVCC"],
+        "english": "the sun",
+        "note": "Sun letter assimilation"
+      },
+      {
+        "word": "كِتَاب",
+        "transliteration": "kitaab",
+        "syllables": ["كِ", "تَاب"],
+        "patterns": ["CV", "CVVC"],
+        "english": "book"
+      },
+      {
+        "word": "بَيْت",
+        "transliteration": "bayt",
+        "syllables": ["بَيْت"],
+        "patterns": ["CVVC"],
+        "english": "house",
+        "note": "Diphthong ay"
+      },
+      {
+        "word": "مُدَرِّس",
+        "transliteration": "mudarris",
+        "syllables": ["مُ", "دَرْ", "رِس"],
+        "patterns": ["CV", "CVC", "CVC"],
+        "english": "teacher",
+        "note": "Gemination (shadda on ر)"
+      }
+    ]
+  }
+}

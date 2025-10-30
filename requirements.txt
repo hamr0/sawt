@@ -4,4 +4,6 @@ tqdm
 PyYAML
 python-Levenshtein
 pytest
+pytest-cov
 flask
+mishkal
