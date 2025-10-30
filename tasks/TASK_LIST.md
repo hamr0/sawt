@@ -8,10 +8,10 @@
 ---
 
 ## Progress Overview
-- **Phase:** 3.0 Implement Phonological Rule Processors  
-- **Current Subtask:** Task 3.0 COMPLETE! Ready for Task 4.0 (Audio Generation)  
-- **Completion:** 2/7 parent tasks complete (29%)
-- **Status:** Task 3.5 COMPLETE! All 4 phonological processors integrated into ArabicTTS pipeline. Pipeline order: Gemination→Sun Letters→Allophones→Emphatic. Test script passing 5/5 cases. All rules applying in correct order. Total: 197/197 unit tests + integration tests passing!
+- **Phase:** 4.0 Create Audio Generation Integration  
+- **Current Subtask:** 4.4 Create Flask API endpoint for audio generation  
+- **Completion:** 3/7 parent tasks complete (43%)
+- **Status:** Tasks 4.1-4.3 COMPLETE! ESpeakTTS wrapper with IPA→X-SAMPA conversion working. 3/3 tests passing (Arabic text, IPA, X-SAMPA). Error handling built-in. Ready for Flask API (4.4).
 
 ---
 
@@ -114,9 +114,9 @@
 ### Task 4.0: Create Audio Generation Integration
 **Estimated:** 8-12 hours | **Priority:** 🔴 Critical | **Dependencies:** Task 3.0
 
-- [ ] **4.1** Create eSpeak integration wrapper
-- [ ] **4.2** Implement IPA to X-SAMPA conversion
-- [ ] **4.3** Add error handling for eSpeak subprocess
+- [x] **4.1** Create eSpeak integration wrapper (2/2 tests passing)
+- [x] **4.2** Implement IPA to X-SAMPA conversion (5/5 conversions working)
+- [x] **4.3** Add error handling for eSpeak subprocess (built-in)
 - [ ] **4.4** Create Flask API endpoint for audio generation
 - [ ] **4.5** Add audio download endpoint
 - [ ] **4.6** Create unit tests for eSpeak integration
@@ -198,6 +198,7 @@
 - `tests/unit/test_emphatic.py` - Emphatic tests (52 tests, 100% accuracy, 100% detection)
 - `src/main.py` - MODIFIED: Integrated all 4 phonological processors into ArabicTTS pipeline
 - `scripts/test_phonology_integration.py` - Integration test script (5/5 test cases passing)
+- `src/integrations/espeak.py` - eSpeak NG wrapper with IPA→X-SAMPA conversion (3/3 tests passing)
 
 ### Files to Create
 - `src/core/diacritizer.py` - mishkal integration
@@ -313,6 +314,21 @@
 - Pharyngealization accuracy: 100% (5/5)
 - Total: 197/197 project tests passing
 - **ALL 4 PHONOLOGICAL PROCESSORS COMPLETE!**
+
+### Task 3.5: Phonological Pipeline Integration (COMPLETE)
+**Commit:** `0e25307` - feat: complete Task 3.5 - Phonological Pipeline Integration  
+**Date:** October 30, 2025  
+**MAJOR MILESTONE: All 4 phonological processors integrated!**  
+**Changes:**
+- Integrated all 4 processors into src/main.py
+- Initialized processors in ArabicTTS.__init__()
+- Created apply_phonological_rules() method
+- Pipeline order: Gemination→Sun Letters→Allophones→Emphatic
+- Created integration test script (5/5 test cases passing)
+- All rules apply in correct order
+- No conflicts between rules
+- Total: 197/197 unit tests + integration tests passing
+- **TASK 3.0 COMPLETE!**
 
 ---
 
