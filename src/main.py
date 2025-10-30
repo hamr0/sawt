@@ -1,6 +1,13 @@
 import re
 import json
 from typing import List, Dict, Tuple
+from pathlib import Path
+
+# Import phonological processors
+from src.core.gemination import GeminationProcessor
+from src.core.sun_letters import SunLetterProcessor
+from src.core.allophones import AllophoneProcessor
+from src.core.emphatic import EmphaticProcessor
 
 
 class ArabicSyllabifier:
@@ -148,6 +155,12 @@ class ArabicTTS:
         self.special_chars = ['\"', "\'", '(', ')', '[', ']', '^', '*', '-', '_', '%', '#', '@', 'ـ']
         self.tashkeel = ['َ', 'ُ', 'ِ', 'ً', 'ٌ', 'ٍ', 'ْ', 'ٓ']
         self.punctuation = [',', ';', ':', '،', '.', '?', '!']
+        
+        # Initialize phonological processors
+        self.gemination_processor = GeminationProcessor(dialect)
+        self.sun_letter_processor = SunLetterProcessor(dialect)
+        self.allophone_processor = AllophoneProcessor(dialect)
+        self.emphatic_processor = EmphaticProcessor(dialect)
 
     def process_text(self, text: str) -> Dict:
         """Main processing pipeline for Arabic text"""
@@ -244,6 +257,10 @@ class ArabicTTS:
             word_str = ''.join(char["char"] for char in word["chars"])
             # Syllabify and get IPA
             syllables = self.syllabifier.map_to_ipa(word_str)
+            
+            # Apply phonological rules in correct order
+            syllables = self.apply_phonological_rules(syllables, word_str)
+            
             # Add position info to each syllable
             for syllable in syllables:
                 start = word_str.find(syllable["syllable"])
@@ -257,6 +274,40 @@ class ArabicTTS:
             })
 
         return result
+    
+    def apply_phonological_rules(self, syllables: List[Dict], word_text: str) -> List[Dict]:
+        """
+        Apply all phonological rules in the correct order
+        
+        Order of application:
+        1. Gemination (shadda detection) - highest priority
+        2. Sun letter assimilation (/al/ + sun letter)
+        3. Positional allophones (position-dependent IPA)
+        4. Emphatic spread (pharyngealization)
+        
+        Args:
+            syllables: List of syllable dictionaries from syllabifier
+            word_text: Original Arabic word text
+        
+        Returns:
+            Syllables with all phonological rules applied
+        """
+        # Rule 1: Gemination (detect shadda)
+        syllables = self.gemination_processor.process(syllables)
+        
+        # Rule 2: Sun letter assimilation
+        syllables = self.sun_letter_processor.process(syllables)
+        syllables = self.sun_letter_processor.apply_assimilation(syllables, word_text)
+        
+        # Rule 3: Positional allophones
+        syllables = self.allophone_processor.process(syllables, word_text)
+        syllables = self.allophone_processor.apply_ipa_to_syllables(syllables)
+        
+        # Rule 4: Emphatic spread
+        syllables = self.emphatic_processor.process(syllables)
+        syllables = self.emphatic_processor.apply_pharyngealization(syllables)
+        
+        return syllables
 
     def process_file(self, filename: str = "input.txt") -> Dict:
         """Process text from file"""
