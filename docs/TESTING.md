@@ -1,8 +1,10 @@
 # Testing Documentation
 
-**Project:** Egyptian Arabic TTS System  
+**Project:** Arabic TTS System (Multi-Dialect)  
 **Test Suite Version:** 1.0  
 **Total Tests:** 329 (100% passing)  
+**Primary Dialect:** Egyptian Arabic (EG)  
+**Other Dialects:** MSA, Gulf, Levantine, Maghrebi  
 **Date:** October 30, 2025
 
 ---

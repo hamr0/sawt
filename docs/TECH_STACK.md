@@ -1,8 +1,9 @@
 # Technology Stack Documentation
 
-**Project:** Egyptian Arabic TTS System  
+**Project:** Arabic TTS System (Multi-Dialect)  
 **Version:** 1.0  
-**Date:** October 30, 2025
+**Date:** October 30, 2025  
+**Dialects:** Egyptian (primary), MSA, Gulf, Levantine, Maghrebi
 
 ---
 
