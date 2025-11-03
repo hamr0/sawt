@@ -7,3 +7,4 @@ pytest
 pytest-cov
 flask
 mishkal
+boto3>=1.28.0
