@@ -92,7 +92,7 @@
   - [x] 3.6 Add summary report generation: total tests, success/failure count, file sizes, estimated costs, next steps
   - [x] 3.7 Test the script end-to-end with mock AWS credentials (should fail gracefully) and document expected output
 
-- [ ] 4.0 Create Documentation
+- [x] 4.0 Create Documentation (COMPLETED - Commit b602377)
   - [x] 4.1 Create `docs/polly/AWS_SETUP_GUIDE.md` with step-by-step instructions: AWS account creation, IAM user setup, access key generation, credential configuration (FR-020) - Already created in task 1.4
   - [x] 4.2 Add IAM policy requirements section to setup guide: minimal permissions needed (polly:SynthesizeSpeech, required for FR-002/003) - Already included in AWS_SETUP_GUIDE.md
   - [x] 4.3 Create `docs/polly/POLLY_USAGE_GUIDE.md` with usage examples: basic usage, voice options (Zeina/Hala), engine options (neural/standard), error handling (FR-022)
