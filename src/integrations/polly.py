@@ -54,16 +54,22 @@ class PollyTTS:
         Convert X-SAMPA phonetic string to Polly SSML format
         
         Args:
-            xsampa: X-SAMPA phonetic transcription
+            xsampa: X-SAMPA phonetic transcription (can be empty)
             text: Original Arabic text
         
         Returns:
-            SSML string with phoneme tags for Polly
+            SSML string with phoneme tags for Polly (or plain text if X-SAMPA empty)
         
         Example:
             >>> polly.xsampa_to_ssml("saba:H", "صباح")
             '<speak><phoneme alphabet="x-sampa" ph="saba:H">صباح</phoneme></speak>'
+            >>> polly.xsampa_to_ssml("", "صباح")
+            '<speak>صباح</speak>'
         """
+        # If X-SAMPA is empty, use plain text (Polly's built-in pronunciation)
+        if not xsampa or xsampa.strip() == "":
+            return f'<speak>{text}</speak>'
+        # Otherwise use phoneme control
         return f'<speak><phoneme alphabet="x-sampa" ph="{xsampa}">{text}</phoneme></speak>'
     
     def generate_audio(

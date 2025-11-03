@@ -85,13 +85,17 @@ class TestXSAMPAToSSML:
     
     @patch('src.integrations.polly.boto3')
     def test_xsampa_to_ssml_empty_text(self, mock_boto3):
-        """Test SSML conversion with empty text"""
+        """Test SSML conversion with empty text - should use plain text"""
         mock_boto3.client.return_value = Mock()
         polly = PollyTTS()
         
+        # Empty X-SAMPA should return plain text SSML (no phoneme tag)
         result = polly.xsampa_to_ssml("", "")
+        assert result == '<speak></speak>'
         
-        assert result == '<speak><phoneme alphabet="x-sampa" ph=""></phoneme></speak>'
+        # Empty X-SAMPA with text should return text without phoneme tag
+        result = polly.xsampa_to_ssml("", "صباح")
+        assert result == '<speak>صباح</speak>'
 
 
 class TestGenerateAudio:

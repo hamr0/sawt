@@ -78,14 +78,28 @@ class PollyTestRunner:
         tts = ArabicTTS(dialect=dialect)
         result = tts.process_text(text)
         
-        # Display your processing results
-        print(f"  Syllabification: {result.get('syllabification', 'N/A')}")
-        print(f"  IPA: {result.get('ipa', 'N/A')}")
+        # Extract IPA from complex nested structure
+        ipa_parts = []
+        if 'words' in result:
+            for word in result['words']:
+                if word.get('type') == 'arabic_word' and 'syllables' in word:
+                    for syllable in word['syllables']:
+                        # Get the pharyngealized IPA if available, otherwise regular IPA
+                        syl_ipa = syllable.get('pharyngealized_ipa', syllable.get('ipa', ''))
+                        ipa_parts.append(syl_ipa)
+                elif word.get('type') == 'special':
+                    ipa_parts.append(' ')  # Preserve spaces
         
-        # Get X-SAMPA from your system
-        # Note: You might need to adjust this based on your actual output
-        xsampa = result.get('x_sampa', result.get('ipa', ''))
-        print(f"  X-SAMPA: {xsampa}")
+        ipa = ''.join(ipa_parts)
+        
+        # Display your processing results
+        print(f"  Syllabification: {len(result.get('words', []))} words processed")
+        print(f"  IPA: {ipa if ipa else 'N/A'}")
+        
+        # For Polly: Use plain Arabic text (not IPA/X-SAMPA)
+        # Polly has its own phonetic engine for Arabic
+        # TODO: Future enhancement - convert IPA to X-SAMPA format for Polly
+        print(f"  Note: Using plain Arabic text for Polly (built-in pronunciation)")
         
         # Step 2: Generate audio with Polly (FR-015: comparison mode)
         print("\nStep 2: Generating audio with Amazon Polly...")
@@ -104,9 +118,10 @@ class PollyTestRunner:
             print("  ❌ Polly not available. Skipping Polly audio generation.")
         else:
             # Note: Zeina only supports 'standard' engine, not 'neural'
+            # Use empty X-SAMPA to let Polly use its own pronunciation
             polly_success, message = self.polly.generate_audio(
                 text=text,
-                xsampa=xsampa,
+                xsampa="",  # Empty - Polly will use built-in Arabic pronunciation
                 output_path=polly_path,
                 voice_id=voice_id,
                 engine='standard'
