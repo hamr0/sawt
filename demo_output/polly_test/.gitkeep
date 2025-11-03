@@ -1,0 +1,2 @@
+# This file ensures the demo_output/polly_test directory is tracked in git
+# Audio files (*.mp3, *.wav) are gitignored but the directory structure is preserved

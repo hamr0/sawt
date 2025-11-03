@@ -14,8 +14,9 @@
 - `docs/polly/AWS_SETUP_GUIDE.md` - Step-by-step AWS configuration instructions (CREATED)
 - `src/integrations/polly.py` - PollyTTS wrapper class following espeak.py pattern (CREATED - 123 lines)
 - `tests/unit/test_polly.py` - Unit tests for PollyTTS class (CREATED - 329 lines)
+- `demo_output/polly_test/README.md` - Explanation of output files and evaluation criteria (CREATED)
+- `demo_output/polly_test/.gitkeep` - Output directory for test audio files (CREATED)
 - `docs/polly/POLLY_USAGE_GUIDE.md` - Usage examples and API reference
-- `demo_output/polly_test/.gitkeep` - Output directory for test audio files
 
 ### Files to Modify
 - `requirements.txt` - Add boto3>=1.28.0 dependency
@@ -72,7 +73,7 @@
   - [x] 1.4 Document AWS credential configuration options in setup guide (environment variables vs ~/.aws/credentials)
   - [x] 1.5 Test boto3 import and AWS connection with simple script: `python -c "import boto3; print(boto3.__version__)"`
 
-- [ ] 2.0 Implement PollyTTS Wrapper Class
+- [x] 2.0 Implement PollyTTS Wrapper Class
   - [x] 2.1 Create `src/integrations/polly.py` with PollyTTS class structure (follow espeak.py pattern but keep minimal)
   - [x] 2.2 Implement `__init__(self, region='us-east-1')` method with boto3 client initialization and graceful error handling for missing credentials/imports
   - [x] 2.3 Implement `xsampa_to_ssml(self, xsampa: str, text: str) -> str` method to convert X-SAMPA to Polly SSML format with phoneme tags
@@ -83,13 +84,13 @@
   - [x] 2.8 Run unit tests and verify 100% pass rate: `pytest tests/unit/test_polly.py -v`
 
 - [ ] 3.0 Enhance POC Test Script
-  - [ ] 3.1 Refactor `scripts/test_polly_integration.py` to import and use PollyTTS class from `src.integrations.polly` (remove inline PollyIntegration class)
-  - [ ] 3.2 Define 5 test sentences in script covering: simple sentence, consonant clusters, tanween, long sentence (10-15 words), challenging phonemes (FR-013, Appendix A)
-  - [ ] 3.3 Implement comparison mode to generate both eSpeak and Polly audio for same input text (FR-015)
-  - [ ] 3.4 Update output file naming to: `test_polly_001_zeina_neural.mp3`, `test_polly_001_espeak.mp3` for clear identification (FR-014)
-  - [ ] 3.5 Create `demo_output/polly_test/` directory structure with README.md explaining output files
-  - [ ] 3.6 Add summary report generation: total tests, success/failure count, file sizes, estimated costs, next steps
-  - [ ] 3.7 Test the script end-to-end with mock AWS credentials (should fail gracefully) and document expected output
+  - [x] 3.1 Refactor `scripts/test_polly_integration.py` to import and use PollyTTS class from `src.integrations.polly` (remove inline PollyIntegration class)
+  - [x] 3.2 Define 5 test sentences in script covering: simple sentence, consonant clusters, tanween, long sentence (10-15 words), challenging phonemes (FR-013, Appendix A)
+  - [x] 3.3 Implement comparison mode to generate both eSpeak and Polly audio for same input text (FR-015)
+  - [x] 3.4 Update output file naming to: `test_polly_001_zeina_neural.mp3`, `test_polly_001_espeak.mp3` for clear identification (FR-014)
+  - [x] 3.5 Create `demo_output/polly_test/` directory structure with README.md explaining output files
+  - [x] 3.6 Add summary report generation: total tests, success/failure count, file sizes, estimated costs, next steps
+  - [x] 3.7 Test the script end-to-end with mock AWS credentials (should fail gracefully) and document expected output
 
 - [ ] 4.0 Create Documentation
   - [ ] 4.1 Create `docs/polly/AWS_SETUP_GUIDE.md` with step-by-step instructions: AWS account creation, IAM user setup, access key generation, credential configuration (FR-020)
