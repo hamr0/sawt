@@ -93,13 +93,13 @@
   - [x] 3.7 Test the script end-to-end with mock AWS credentials (should fail gracefully) and document expected output
 
 - [ ] 4.0 Create Documentation
-  - [ ] 4.1 Create `docs/polly/AWS_SETUP_GUIDE.md` with step-by-step instructions: AWS account creation, IAM user setup, access key generation, credential configuration (FR-020)
-  - [ ] 4.2 Add IAM policy requirements section to setup guide: minimal permissions needed (polly:SynthesizeSpeech, required for FR-002/003)
-  - [ ] 4.3 Create `docs/polly/POLLY_USAGE_GUIDE.md` with usage examples: basic usage, voice options (Zeina/Hala), engine options (neural/standard), error handling (FR-022)
-  - [ ] 4.4 Add "Troubleshooting" section to usage guide: common errors (credentials, network, permissions) and solutions
-  - [ ] 4.5 Document test execution procedure in usage guide: how to run test script, interpret results, listen to audio (FR-021)
-  - [ ] 4.6 Add code examples to usage guide: Python snippets showing integration with existing ArabicTTS pipeline
-  - [ ] 4.7 Review all documentation for clarity, completeness, and alignment with PRD requirements
+  - [x] 4.1 Create `docs/polly/AWS_SETUP_GUIDE.md` with step-by-step instructions: AWS account creation, IAM user setup, access key generation, credential configuration (FR-020) - Already created in task 1.4
+  - [x] 4.2 Add IAM policy requirements section to setup guide: minimal permissions needed (polly:SynthesizeSpeech, required for FR-002/003) - Already included in AWS_SETUP_GUIDE.md
+  - [x] 4.3 Create `docs/polly/POLLY_USAGE_GUIDE.md` with usage examples: basic usage, voice options (Zeina/Hala), engine options (neural/standard), error handling (FR-022)
+  - [x] 4.4 Add "Troubleshooting" section to usage guide: common errors (credentials, network, permissions) and solutions
+  - [x] 4.5 Document test execution procedure in usage guide: how to run test script, interpret results, listen to audio (FR-021)
+  - [x] 4.6 Add code examples to usage guide: Python snippets showing integration with existing ArabicTTS pipeline
+  - [x] 4.7 Review all documentation for clarity, completeness, and alignment with PRD requirements
 
 - [ ] 5.0 Execute POC Validation and Testing
   - [ ] 5.1 Run existing test suite to establish baseline: `pytest tests/ -v` (verify all 329 tests pass - SM-005)
