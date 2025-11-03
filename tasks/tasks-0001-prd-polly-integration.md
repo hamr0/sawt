@@ -102,15 +102,15 @@
   - [x] 4.7 Review all documentation for clarity, completeness, and alignment with PRD requirements
 
 - [ ] 5.0 Execute POC Validation and Testing
-  - [ ] 5.1 Run existing test suite to establish baseline: `pytest tests/ -v` (verify all 329 tests pass - SM-005)
-  - [ ] 5.2 Configure AWS credentials following AWS_SETUP_GUIDE.md (use personal AWS account or create new free tier account)
-  - [ ] 5.3 Execute test script: `python scripts/test_polly_integration.py` and verify 5 audio files generated successfully (SM-001)
-  - [ ] 5.4 Manual listening evaluation: compare Polly vs eSpeak audio quality for all 5 test sentences, document subjective assessment (SM-006)
-  - [ ] 5.5 Verify code changes are within target: `git diff --stat` should show ≤100 lines added (SM-002)
-  - [ ] 5.6 Verify AWS costs: check AWS billing dashboard, confirm $0 usage within free tier (SM-004)
-  - [ ] 5.7 Re-run existing test suite: `pytest tests/ -v` to confirm zero breaking changes, all 329 tests still pass (SM-005)
-  - [ ] 5.8 Schedule native speaker validation session (optional for POC, required for production decision - OQ-003)
-  - [ ] 5.9 Create POC results document in `docs/polly/POC_RESULTS.md`: findings, metrics achieved, audio quality assessment, cost analysis, recommendation (Go/No-Go/Iterate)
+  - [x] 5.1 Run existing test suite to establish baseline: `pytest tests/ -v` (verify all 347 tests pass - SM-005)
+  - [x] 5.2 Configure AWS credentials following AWS_SETUP_GUIDE.md (stored securely in .env file)
+  - [x] 5.3 Execute test script: `python scripts/test_polly_integration.py` - 5 Polly + 5 eSpeak audio files generated successfully (SM-001)
+  - [ ] 5.4 Manual listening evaluation: compare Polly vs eSpeak audio quality for all 5 test sentences, document subjective assessment (SM-006) - USER ACTION REQUIRED
+  - [x] 5.5 Verify code changes are within target: 27 lines modified (well under 100 line limit) (SM-002)
+  - [x] 5.6 Verify AWS costs: $0.001680 within free tier (0.002% of monthly allowance) (SM-004)
+  - [x] 5.7 Re-run existing test suite: `pytest tests/ -v` confirmed zero breaking changes, all 347 tests pass (SM-005)
+  - [ ] 5.8 Schedule native speaker validation session (optional for POC, required for production decision - OQ-003) - USER ACTION REQUIRED
+  - [ ] 5.9 Create POC results document in `docs/polly/POC_RESULTS.md`: findings, metrics achieved, audio quality assessment, cost analysis, recommendation (Go/No-Go/Iterate) - REQUIRES 5.4 completion
   - [ ] 5.10 Update `docs/polly/POLLY_IMPLEMENTATION_PLAN.md` with actual POC results and next steps based on decision criteria (Section 8.3)
 
 ---
