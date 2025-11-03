@@ -15,7 +15,7 @@ Compare audio quality between:
 test_polly_<number>_<voice>_<engine>.mp3
 ```
 
-**Example:** `test_polly_001_zeina_neural.mp3`
+**Example:** `test_polly_001_zeina_standard.mp3`
 
 - `<number>`: Test case number (001-005), zero-padded
 - `<voice>`: Polly voice ID (e.g., `zeina` for MSA, `hala` for Gulf)
@@ -64,16 +64,16 @@ After running the test script, you should have **10 audio files** (2 per test se
 ```
 demo_output/polly_test/
 ├── README.md (this file)
-├── test_polly_001_zeina_neural.mp3  # Polly - Test 1
-├── test_polly_001_espeak.wav        # eSpeak - Test 1
-├── test_polly_002_zeina_neural.mp3  # Polly - Test 2
-├── test_polly_002_espeak.wav        # eSpeak - Test 2
-├── test_polly_003_zeina_neural.mp3  # Polly - Test 3
-├── test_polly_003_espeak.wav        # eSpeak - Test 3
-├── test_polly_004_zeina_neural.mp3  # Polly - Test 4
-├── test_polly_004_espeak.wav        # eSpeak - Test 4
-├── test_polly_005_zeina_neural.mp3  # Polly - Test 5
-└── test_polly_005_espeak.wav        # eSpeak - Test 5
+├── test_polly_001_zeina_standard.mp3  # Polly - Test 1
+├── test_polly_001_espeak.wav          # eSpeak - Test 1
+├── test_polly_002_zeina_standard.mp3  # Polly - Test 2
+├── test_polly_002_espeak.wav          # eSpeak - Test 2
+├── test_polly_003_zeina_standard.mp3  # Polly - Test 3
+├── test_polly_003_espeak.wav          # eSpeak - Test 3
+├── test_polly_004_zeina_standard.mp3  # Polly - Test 4
+├── test_polly_004_espeak.wav          # eSpeak - Test 4
+├── test_polly_005_zeina_standard.mp3  # Polly - Test 5
+└── test_polly_005_espeak.wav          # eSpeak - Test 5
 ```
 
 ## Evaluation Criteria

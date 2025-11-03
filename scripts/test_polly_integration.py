@@ -89,7 +89,7 @@ class PollyTestRunner:
         
         # Step 2: Generate audio with Polly (FR-015: comparison mode)
         print("\nStep 2: Generating audio with Amazon Polly...")
-        polly_path = os.path.join(output_dir, f"test_polly_{test_num:03d}_zeina_neural.mp3")
+        polly_path = os.path.join(output_dir, f"test_polly_{test_num:03d}_zeina_standard.mp3")
         
         # Choose voice based on dialect
         voice_map = {
@@ -103,12 +103,13 @@ class PollyTestRunner:
         if not self.use_polly:
             print("  ❌ Polly not available. Skipping Polly audio generation.")
         else:
+            # Note: Zeina only supports 'standard' engine, not 'neural'
             polly_success, message = self.polly.generate_audio(
                 text=text,
                 xsampa=xsampa,
                 output_path=polly_path,
                 voice_id=voice_id,
-                engine='neural'
+                engine='standard'
             )
             
             if polly_success:
