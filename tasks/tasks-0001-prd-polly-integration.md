@@ -83,7 +83,7 @@
   - [x] 2.7 Write unit tests in `tests/unit/test_polly.py`: test initialization, SSML conversion, error handling (mock boto3 calls)
   - [x] 2.8 Run unit tests and verify 100% pass rate: `pytest tests/unit/test_polly.py -v`
 
-- [ ] 3.0 Enhance POC Test Script
+- [x] 3.0 Enhance POC Test Script (COMPLETED - Commit 43af1c3)
   - [x] 3.1 Refactor `scripts/test_polly_integration.py` to import and use PollyTTS class from `src.integrations.polly` (remove inline PollyIntegration class)
   - [x] 3.2 Define 5 test sentences in script covering: simple sentence, consonant clusters, tanween, long sentence (10-15 words), challenging phonemes (FR-013, Appendix A)
   - [x] 3.3 Implement comparison mode to generate both eSpeak and Polly audio for same input text (FR-015)
