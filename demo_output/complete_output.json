@@ -1,0 +1,180 @@
+{
+  "dialect": "EG",
+  "words": [
+    {
+      "type": "arabic_word",
+      "original": "صباح",
+      "syllables": [
+        {
+          "syllable": "صبا",
+          "pattern": "UNKNOWN",
+          "ipa": "sʕbɑ",
+          "has_gemination": false,
+          "sun_letter_assimilation": false,
+          "detected_position": "word-initial",
+          "allophone_position": "word-initial",
+          "has_positional_allophone": true,
+          "positional_chars": [
+            "ص",
+            "ب"
+          ],
+          "char_ipa_map": {
+            "ص": "[sʕ]",
+            "ب": "[b]",
+            "ا": "uː"
+          },
+          "generated_ipa": "sʕbuː",
+          "has_emphatic": true,
+          "emphatic_consonants": [
+            "ص"
+          ],
+          "pharyngealization_spread": true,
+          "pharyngealized_ipa": "sˁʕbɑ",
+          "original_ipa_before_emphatic": "sʕbɑ",
+          "position": "initial"
+        },
+        {
+          "syllable": "ح",
+          "pattern": "UNKNOWN",
+          "ipa": "ħ",
+          "has_gemination": false,
+          "sun_letter_assimilation": false,
+          "detected_position": "word-final",
+          "allophone_position": "word-final",
+          "has_positional_allophone": true,
+          "positional_chars": [
+            "ح"
+          ],
+          "char_ipa_map": {
+            "ح": "[ħ]"
+          },
+          "generated_ipa": "ħ",
+          "has_emphatic": false,
+          "pharyngealization_spread": false,
+          "position": "final"
+        }
+      ],
+      "chars": [
+        {
+          "char": "ص",
+          "position": "initial",
+          "type": "arabic"
+        },
+        {
+          "char": "ب",
+          "position": "medial",
+          "type": "arabic"
+        },
+        {
+          "char": "ا",
+          "position": "medial",
+          "type": "arabic"
+        },
+        {
+          "char": "ح",
+          "position": "final",
+          "type": "arabic"
+        }
+      ]
+    },
+    {
+      "type": "special",
+      "content": " ",
+      "position": "special"
+    },
+    {
+      "type": "arabic_word",
+      "original": "الخير",
+      "syllables": [
+        {
+          "syllable": "ا",
+          "pattern": "UNKNOWN",
+          "ipa": "ɑ",
+          "has_gemination": false,
+          "sun_letter_assimilation": false,
+          "detected_position": "word-initial",
+          "allophone_position": "word-initial",
+          "has_positional_allophone": false,
+          "positional_chars": [],
+          "char_ipa_map": {
+            "ا": "uː"
+          },
+          "generated_ipa": "uː",
+          "has_emphatic": false,
+          "pharyngealization_spread": false,
+          "position": "initial"
+        },
+        {
+          "syllable": "لخي",
+          "pattern": "UNKNOWN",
+          "ipa": "lxɪ",
+          "has_gemination": false,
+          "sun_letter_assimilation": false,
+          "detected_position": "word-medial",
+          "allophone_position": "word-medial",
+          "has_positional_allophone": true,
+          "positional_chars": [
+            "ل",
+            "خ"
+          ],
+          "char_ipa_map": {
+            "ل": "[l]",
+            "خ": "[x]",
+            "ي": "ej"
+          },
+          "generated_ipa": "lxej",
+          "has_emphatic": false,
+          "pharyngealization_spread": false,
+          "position": "medial"
+        },
+        {
+          "syllable": "ر",
+          "pattern": "UNKNOWN",
+          "ipa": "ɾ",
+          "has_gemination": false,
+          "sun_letter_assimilation": false,
+          "detected_position": "word-final",
+          "allophone_position": "word-final",
+          "has_positional_allophone": true,
+          "positional_chars": [
+            "ر"
+          ],
+          "char_ipa_map": {
+            "ر": "∅"
+          },
+          "generated_ipa": "",
+          "has_emphatic": false,
+          "pharyngealization_spread": false,
+          "position": "final"
+        }
+      ],
+      "chars": [
+        {
+          "char": "ا",
+          "position": "initial",
+          "type": "arabic"
+        },
+        {
+          "char": "ل",
+          "position": "medial",
+          "type": "arabic"
+        },
+        {
+          "char": "خ",
+          "position": "medial",
+          "type": "arabic"
+        },
+        {
+          "char": "ي",
+          "position": "medial",
+          "type": "arabic"
+        },
+        {
+          "char": "ر",
+          "position": "final",
+          "type": "arabic"
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,37 @@
 # Arabic TTS - Documentation Index
 
-**Version:** 1.0  
-**Last Updated:** October 30, 2025
+**Version:** 1.1
+**Last Updated:** November 14, 2025
 
 Welcome to the Arabic TTS documentation hub. All project documentation is organized here for easy navigation and reference.
+
+---
+
+## 🎯 Claude Code Context Files (NEW!)
+
+**For AI-assisted development with Claude Code:**
+
+- **[CLAUDE.md](../CLAUDE.md)** ⭐⭐⭐ - Auto-loaded lightweight context (~400 lines)
+  - Current project status and metrics
+  - Architecture overview and processing pipeline
+  - Common commands and workflows
+  - Critical notes and best practices
+  - Quick links to all documentation
+
+- **[KNOWLEDGE_BASE.md](../KNOWLEDGE_BASE.md)** ⭐⭐⭐ - Comprehensive reference (~1,500 lines)
+  - Complete project overview
+  - Detailed architecture & design
+  - Full technology stack documentation
+  - Source code structure and API reference
+  - Amazon Polly integration guide
+  - Testing framework documentation
+  - Development workflows
+  - Troubleshooting guide
+
+**Usage:**
+- `CLAUDE.md` is automatically loaded by Claude Code for optimal context
+- `KNOWLEDGE_BASE.md` provides on-demand comprehensive reference
+- Both files reference this INDEX.md and other documentation
 
 ---
 
@@ -22,7 +50,20 @@ Welcome to the Arabic TTS documentation hub. All project documentation is organi
 - [Business Analysis Report](business/BUSINESS_ANALYSIS_REPORT.md) - Market research, competitive analysis, strategy
 
 ### 🔧 Technical Documentation
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** ⭐ - HLA/HLD, complete system design (750 lines)
+- **[TECH_STACK.md](TECH_STACK.md)** ⭐ - Technology decisions and rationale (820 lines)
+- **[TESTING.md](TESTING.md)** - Complete testing guide (329 tests)
 - [Project Documentation](technical/PROJECT_DOCUMENTATION.md) - Architecture, components, technical details
+
+### 🎤 Amazon Polly Integration (NEW!)
+- **[Polly Documentation Hub](polly/README.md)** ⭐⭐⭐ - Complete Polly integration docs
+- [TTS Technology Research](polly/TTS_TECHNOLOGY_RESEARCH_2024.md) - 60+ sources, SOTA research (26 KB)
+- [Polly Integration Analysis](polly/POLLY_INTEGRATION_ANALYSIS.md) - Technical compatibility (8 KB)
+- [Collaborative Decision](polly/COLLABORATIVE_DECISION_POLLY.md) - Strategic rationale (16 KB)
+- [Implementation Plan](polly/POLLY_IMPLEMENTATION_PLAN.md) - Execution roadmap (14 KB)
+- [Quickstart Guide](polly/QUICKSTART_GUIDE.md) - Get started with Polly in 5 minutes
+- [AWS Setup Guide](polly/AWS_SETUP_GUIDE.md) - Complete AWS configuration
+- [Polly Usage Guide](polly/POLLY_USAGE_GUIDE.md) - Production best practices
 
 ### 📊 Reports & Progress
 - [Weekly Progress Reports](reports/) - Track progress week by week (created as you go)
@@ -32,22 +73,43 @@ Welcome to the Arabic TTS documentation hub. All project documentation is organi
 ## 📁 Documentation Structure
 
 ```
-docs/
-├── INDEX.md (this file)
+ArabicTTS/                            # Project root
+├── CLAUDE.md                         # ⭐⭐⭐ Auto-loaded AI context
+├── KNOWLEDGE_BASE.md                 # ⭐⭐⭐ Comprehensive reference
+├── README.md                         # Project overview (650 lines)
 │
-├── planning/
-│   ├── COMPLETE_ROADMAP.md           # ⭐ All phases roadmap
-│   └── MVP_IMPLEMENTATION_PLAN.md    # ⭐ Week-by-week MVP plan
-│
-├── business/
-│   └── BUSINESS_ANALYSIS_REPORT.md   # Market research & strategy
-│
-├── technical/
-│   └── PROJECT_DOCUMENTATION.md      # Technical architecture
-│
-├── guides/
-│   ├── QUICK_START.md                # 5-minute quick start
-│   ├── LOCALHOST_SETUP_GUIDE.md      # Detailed setup
+└── docs/                             # Documentation hub
+    ├── INDEX.md                      # This file - Documentation map
+    │
+    ├── ARCHITECTURE.md               # ⭐ HLA/HLD (750 lines)
+    ├── TECH_STACK.md                 # ⭐ Technology decisions (820 lines)
+    ├── TESTING.md                    # Testing guide (329 tests)
+    ├── DEMO_SUMMARY.md               # System demonstration
+    ├── DEMO_PRESENTATION.md          # 28-slide presentation
+    │
+    ├── polly/                        # ⭐⭐⭐ Polly integration (7 files, 65 KB)
+    │   ├── README.md                 # Polly docs overview
+    │   ├── TTS_TECHNOLOGY_RESEARCH_2024.md
+    │   ├── POLLY_INTEGRATION_ANALYSIS.md
+    │   ├── COLLABORATIVE_DECISION_POLLY.md
+    │   ├── POLLY_IMPLEMENTATION_PLAN.md
+    │   ├── QUICKSTART_GUIDE.md
+    │   ├── AWS_SETUP_GUIDE.md
+    │   └── POLLY_USAGE_GUIDE.md
+    │
+    ├── planning/
+    │   ├── COMPLETE_ROADMAP.md       # ⭐ All phases roadmap
+    │   └── MVP_IMPLEMENTATION_PLAN.md # ⭐ Week-by-week MVP plan
+    │
+    ├── business/
+    │   └── BUSINESS_ANALYSIS_REPORT.md # Market research & strategy
+    │
+    ├── technical/
+    │   └── PROJECT_DOCUMENTATION.md  # Technical architecture
+    │
+    ├── guides/
+    │   ├── QUICK_START.md            # 5-minute quick start
+    │   ├── LOCALHOST_SETUP_GUIDE.md  # Detailed setup
 │   └── README_LOCALHOST.md           # Localhost overview
 │
 └── reports/
@@ -60,10 +122,15 @@ docs/
 
 ## 🎯 Documentation by Purpose
 
+### For AI-Assisted Development (Claude Code)
+1. **Auto-loaded context:** [CLAUDE.md](../CLAUDE.md) - Always available, lightweight (~400 lines)
+2. **Comprehensive reference:** [KNOWLEDGE_BASE.md](../KNOWLEDGE_BASE.md) - Full project knowledge (~1,500 lines)
+3. **This index:** [INDEX.md](INDEX.md) - Navigate all documentation
+
 ### For First-Time Setup
 1. Start here: [Quick Start Guide](guides/QUICK_START.md)
 2. Detailed setup: [Localhost Setup Guide](guides/LOCALHOST_SETUP_GUIDE.md)
-3. Understand the project: [Project Documentation](technical/PROJECT_DOCUMENTATION.md)
+3. Understand the project: [ARCHITECTURE.md](ARCHITECTURE.md) + [TECH_STACK.md](TECH_STACK.md)
 
 ### For Planning Next Steps
 1. **Current phase:** [MVP Implementation Plan](planning/MVP_IMPLEMENTATION_PLAN.md)
@@ -75,9 +142,18 @@ docs/
 2. [Complete Roadmap](planning/COMPLETE_ROADMAP.md) - See revenue projections (Section 9)
 
 ### For Technical Implementation
-1. [MVP Implementation Plan](planning/MVP_IMPLEMENTATION_PLAN.md) - Week-by-week tasks
-2. [Project Documentation](technical/PROJECT_DOCUMENTATION.md) - Architecture details
-3. [Complete Roadmap](planning/COMPLETE_ROADMAP.md) - Technology evolution (Section 7)
+1. [ARCHITECTURE.md](ARCHITECTURE.md) - HLA/HLD, complete system design
+2. [TECH_STACK.md](TECH_STACK.md) - Technology decisions and rationale
+3. [TESTING.md](TESTING.md) - Complete testing guide (329 tests)
+4. [MVP Implementation Plan](planning/MVP_IMPLEMENTATION_PLAN.md) - Week-by-week tasks
+
+### For Amazon Polly Integration
+1. **Start here:** [Polly README](polly/README.md) - Overview and navigation
+2. **Quick start:** [Quickstart Guide](polly/QUICKSTART_GUIDE.md) - Get running in 5 minutes
+3. **Deep dive:** [TTS Technology Research](polly/TTS_TECHNOLOGY_RESEARCH_2024.md) - Understand the landscape
+4. **Technical details:** [Polly Integration Analysis](polly/POLLY_INTEGRATION_ANALYSIS.md) - Compatibility analysis
+5. **Strategic context:** [Collaborative Decision](polly/COLLABORATIVE_DECISION_POLLY.md) - Why Polly?
+6. **Implementation:** [Implementation Plan](polly/POLLY_IMPLEMENTATION_PLAN.md) - Step-by-step guide
 
 ---
 
@@ -245,14 +321,25 @@ Create progress reports in `reports/` as you go:
 
 ## 📖 Reading Order for New Team Members
 
+### For Human Team Members
 If someone joins the project, have them read in this order:
 
-1. **Day 1:** [Quick Start Guide](guides/QUICK_START.md) - Get oriented
-2. **Day 1:** [Project Documentation](technical/PROJECT_DOCUMENTATION.md) - Understand what we're building
-3. **Day 2:** [Business Analysis Report](business/BUSINESS_ANALYSIS_REPORT.md) - Understand why
-4. **Day 2:** [Complete Roadmap](planning/COMPLETE_ROADMAP.md) - Understand the journey
-5. **Day 3:** [MVP Implementation Plan](planning/MVP_IMPLEMENTATION_PLAN.md) - Understand current work
-6. **Day 3:** Latest weekly progress reports - Understand current status
+1. **Day 1:** [README.md](../README.md) - Project overview and status
+2. **Day 1:** [Quick Start Guide](guides/QUICK_START.md) - Get oriented and set up
+3. **Day 1:** [ARCHITECTURE.md](ARCHITECTURE.md) - Understand system design
+4. **Day 2:** [TECH_STACK.md](TECH_STACK.md) - Understand technology choices
+5. **Day 2:** [Business Analysis Report](business/BUSINESS_ANALYSIS_REPORT.md) - Understand why
+6. **Day 2:** [Complete Roadmap](planning/COMPLETE_ROADMAP.md) - Understand the journey
+7. **Day 3:** [Polly Integration Docs](polly/README.md) - Current active work
+8. **Day 3:** [TESTING.md](TESTING.md) - Understand testing framework
+
+### For AI Assistants (Claude Code)
+If using Claude Code for AI-assisted development:
+
+1. **Auto-loaded:** [CLAUDE.md](../CLAUDE.md) - Lightweight context, always available
+2. **On-demand:** [KNOWLEDGE_BASE.md](../KNOWLEDGE_BASE.md) - Comprehensive reference
+3. **Navigation:** [INDEX.md](INDEX.md) - This file, navigate all docs
+4. **Deep dives:** Use @ references to access specific docs as needed
 
 ---
 
@@ -260,10 +347,16 @@ If someone joins the project, have them read in this order:
 
 | Document | Status | Last Updated | Next Review |
 |----------|--------|--------------|-------------|
+| **CLAUDE.md** | ✅ Complete | Nov 14, 2025 | As project evolves |
+| **KNOWLEDGE_BASE.md** | ✅ Complete | Nov 14, 2025 | As project evolves |
+| **INDEX.md** | ✅ Updated | Nov 14, 2025 | As needed |
+| ARCHITECTURE.md | ✅ Complete | Oct 30, 2025 | As needed |
+| TECH_STACK.md | ✅ Complete | Oct 30, 2025 | As needed |
+| TESTING.md | ✅ Complete | Oct 30, 2025 | As needed |
+| Polly Integration Docs | ✅ Complete | Nov 3, 2025 | As Polly work progresses |
 | Complete Roadmap | ✅ Complete | Oct 30, 2025 | End of MVP |
 | MVP Implementation Plan | ✅ Complete | Oct 30, 2025 | Weekly |
 | Business Analysis Report | ✅ Complete | Oct 30, 2025 | Monthly |
-| Project Documentation | ✅ Complete | Oct 30, 2025 | As needed |
 | Quick Start Guide | ✅ Complete | Oct 30, 2025 | As needed |
 | Localhost Setup Guide | ✅ Complete | Oct 30, 2025 | As needed |
 | Weekly Progress Reports | 🔴 Not Started | N/A | Create weekly |
