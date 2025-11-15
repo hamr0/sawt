@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabic TTS Interactive Demo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        .input-section {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            font-family: 'Arial Unicode MS', Arial, sans-serif;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        select {
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            min-width: 120px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            min-height: 44px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .demo-section {
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+        }
+
+        .demo-section h3 {
+            margin-top: 0;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-icon {
+            margin-right: 8px;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .collapsible-content {
+            display: block;
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .loading {
+            color: #007bff;
+            font-style: italic;
+        }
+
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .success {
+            border-left: 4px solid #28a745;
+        }
+
+        input[type="file"] {
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            background-color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #e9ecef;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Arabic TTS Interactive Demo</h1>
+
+        <div class="input-section">
+            <label for="demoArabicText">Enter Arabic Text:</label>
+            <textarea
+                id="demoArabicText"
+                placeholder="أدخل النص العربي هنا... (e.g., السلام عليكم)"
+                dir="rtl"
+            ></textarea>
+
+            <label for="fileUpload">Or upload a text file:</label>
+            <input type="file" id="fileUpload" accept=".txt">
+
+            <div class="controls">
+                <label for="demoDialect">Dialect:</label>
+                <select id="demoDialect">
+                    <option value="MSA">MSA</option>
+                    <option value="EG">Egyptian</option>
+                    <option value="Gulf">Gulf</option>
+                    <option value="Levantine">Levantine</option>
+                    <option value="Maghrebi">Maghrebi</option>
+                </select>
+
+                <button id="demoProcessBtn" onclick="processDemoText()">Process Text</button>
+            </div>
+        </div>
+
+        <div id="outputSections"></div>
+    </div>
+
+    <script>
+        let currentDemoData = null;
+
+        // File upload handler
+        document.getElementById('fileUpload').addEventListener('change', handleFileUpload);
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            if (!file.name.endsWith('.txt')) {
+                alert('Please select a .txt file');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                document.getElementById('demoArabicText').value = e.target.result;
+            };
+
+            reader.onerror = function() {
+                alert('Error reading file. Please try again.');
+            };
+
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        async function processDemoText() {
+            const text = document.getElementById('demoArabicText').value.trim();
+            const dialect = document.getElementById('demoDialect').value;
+            const processBtn = document.getElementById('demoProcessBtn');
+            const outputSections = document.getElementById('outputSections');
+
+            // Validation
+            if (!text) {
+                outputSections.innerHTML = '<div class="error">Please enter some Arabic text.</div>';
+                return;
+            }
+
+            // Check for Arabic characters
+            if (!/[\u0600-\u06FF]/.test(text)) {
+                outputSections.innerHTML = '<div class="error">Warning: No Arabic characters detected</div>';
+            }
+
+            // Show loading state
+            processBtn.disabled = true;
+            processBtn.textContent = 'Processing...';
+            outputSections.innerHTML = '<div class="loading">Processing...</div>';
+
+            try {
+                const response = await fetch('/parse', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        dialect: dialect
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    currentDemoData = result;
+                    displayPipelineResults(result);
+                } else {
+                    outputSections.innerHTML = `<div class="error">Error: ${result.error || 'Failed to process text. Please try again.'}</div>`;
+                    currentDemoData = null;
+                }
+            } catch (error) {
+                outputSections.innerHTML = `<div class="error">Network Error: Cannot connect to server. Check your connection.</div>`;
+                console.error('Processing error:', error);
+                currentDemoData = null;
+            } finally {
+                processBtn.disabled = false;
+                processBtn.textContent = 'Process Text';
+            }
+        }
+
+        function displayPipelineResults(result) {
+            const outputSections = document.getElementById('outputSections');
+
+            let html = '';
+
+            // Section 1: Diacritization
+            html += createSection('demo-step-1-diacritization', 'Step 1: Diacritization',
+                `<div class="original-text" dir="rtl" style="font-size: 18px; margin-bottom: 10px;">
+                    <strong>Original:</strong> ${result.original_text || 'N/A'}
+                </div>
+                <div class="diacritized-text" dir="rtl" style="font-size: 18px;">
+                    <strong>Diacritized:</strong> ${result.diacritized_text || 'N/A'}
+                </div>`
+            );
+
+            // Section 2: Syllabification
+            html += createSection('demo-step-2-syllabification', 'Step 2: Syllabification',
+                `<pre class="json-output">${JSON.stringify(result.syllables || {}, null, 2)}</pre>`
+            );
+
+            // Section 3: Phonological Processing
+            html += createSection('demo-step-3-phonology', 'Step 3: Phonological Processing',
+                `<pre class="json-output">${JSON.stringify(result.phonology || {}, null, 2)}</pre>`
+            );
+
+            // Section 4: IPA Generation
+            html += createSection('demo-step-4-ipa', 'Step 4: IPA Generation',
+                `<pre class="json-output">${JSON.stringify(result.ipa || {}, null, 2)}</pre>`
+            );
+
+            // Section 5: X-SAMPA Conversion
+            html += createSection('demo-step-5-xsampa', 'Step 5: X-SAMPA Conversion',
+                `<pre class="json-output">${JSON.stringify(result.xsampa || {}, null, 2)}</pre>`
+            );
+
+            // Section 6: Word Comparison Table
+            if (result.words && Array.isArray(result.words)) {
+                const tableHtml = createComparisonTable(result.words);
+                html += createSection('demo-step-comparison', 'Word-by-Word Comparison', tableHtml);
+            }
+
+            html += '<hr>';
+            html += '<button onclick="downloadDemoJson()">Download JSON</button>';
+            html += '<button onclick="downloadDemoCSV()">Download CSV</button>';
+
+            // Audio Generation Section
+            html += '<hr>';
+            html += '<div id="audioSection">';
+            html += '<h3>Step 6: Audio Generation</h3>';
+            html += '<div id="audioStatus" style="display:none;"></div>';
+            html += '<audio id="demoAudioPlayer" controls style="display:none;"></audio>';
+            html += '<div style="margin-top: 10px;">';
+            html += '<button id="generateAudioBtn" onclick="generateAudio()">Generate Audio</button>';
+            html += '<button id="downloadAudioBtn" onclick="downloadAudio()" style="display:none;">Download Audio (WAV)</button>';
+            html += '</div>';
+            html += '</div>';
+
+            outputSections.innerHTML = html;
+        }
+
+        function createSection(id, title, content) {
+            return `
+                <div class="demo-section" id="${id}">
+                    <h3 onclick="toggleSection('${id}')">
+                        <span class="toggle-icon">▼</span>${title}
+                    </h3>
+                    <div class="collapsible-content">
+                        ${content}
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const content = section.querySelector('.collapsible-content');
+            const icon = section.querySelector('.toggle-icon');
+
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        }
+
+        function createComparisonTable(words) {
+            let html = '<table><thead><tr><th>Original</th><th>Diacritized</th><th>X-SAMPA</th></tr></thead><tbody>';
+
+            words.forEach(word => {
+                html += `<tr>
+                    <td dir="rtl">${word.original || 'N/A'}</td>
+                    <td dir="rtl">${word.diacritized || 'N/A'}</td>
+                    <td>${word.xsampa || 'N/A'}</td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function downloadDemoJson() {
+            if (!currentDemoData) {
+                alert('Please process some text first.');
+                return;
+            }
+
+            const jsonStr = JSON.stringify(currentDemoData, null, 2);
+            const blob = new Blob([jsonStr], {type: 'application/json'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            const dialect = document.getElementById('demoDialect').value.toLowerCase();
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            a.download = `demo_tts_output_${dialect}_${timestamp}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        function downloadDemoCSV() {
+            if (!currentDemoData || !currentDemoData.words) {
+                alert('Please process some text first.');
+                return;
+            }
+
+            let csv = 'Original,Diacritized,X-SAMPA\n';
+
+            currentDemoData.words.forEach(word => {
+                const original = (word.original || '').replace(/"/g, '""');
+                const diacritized = (word.diacritized || '').replace(/"/g, '""');
+                const xsampa = (word.xsampa || '').replace(/"/g, '""');
+                csv += `"${original}","${diacritized}","${xsampa}"\n`;
+            });
+
+            const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            a.download = `demo_comparison_${timestamp}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        async function generateAudio() {
+            if (!currentDemoData) {
+                alert('Please process some text first.');
+                return;
+            }
+
+            const audioStatus = document.getElementById('audioStatus');
+            const audioPlayer = document.getElementById('demoAudioPlayer');
+            const generateBtn = document.getElementById('generateAudioBtn');
+            const downloadBtn = document.getElementById('downloadAudioBtn');
+
+            // Show loading state
+            audioStatus.style.display = 'block';
+            audioStatus.className = 'loading';
+            audioStatus.textContent = 'Generating audio...';
+            generateBtn.disabled = true;
+            downloadBtn.style.display = 'none';
+            audioPlayer.style.display = 'none';
+
+            try {
+                const response = await fetch('/generate_audio', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: document.getElementById('demoArabicText').value,
+                        dialect: document.getElementById('demoDialect').value,
+                        speed: 150,
+                        pitch: 50,
+                        use_ipa: false
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    audioPlayer.src = result.audio_url;
+                    audioPlayer.style.display = 'block';
+                    downloadBtn.style.display = 'inline-block';
+                    audioStatus.className = 'success';
+                    audioStatus.textContent = 'Audio ready';
+                    currentDemoData.audio_url = result.audio_url;
+                } else {
+                    audioStatus.className = 'error';
+                    audioStatus.textContent = `Error: ${result.message || 'Failed to generate audio'}`;
+                }
+            } catch (error) {
+                audioStatus.className = 'error';
+                audioStatus.textContent = 'Network error: Cannot connect to server';
+                console.error('Audio generation error:', error);
+            } finally {
+                generateBtn.disabled = false;
+            }
+        }
+
+        async function downloadAudio() {
+            if (!currentDemoData || !currentDemoData.audio_url) {
+                alert('Please generate audio first.');
+                return;
+            }
+
+            try {
+                const response = await fetch(currentDemoData.audio_url);
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    a.download = `demo_audio_${timestamp}.wav`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Error downloading audio file');
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+                console.error('Download error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
