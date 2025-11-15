@@ -19,7 +19,38 @@ python3 app.py
 
 ## 🎯 What You Can Do
 
-### Web Interface
+### Interactive TTS Demo Page (NEW!)
+**URL:** http://localhost:5000/demo
+
+A complete interactive demo showing the full TTS processing pipeline:
+
+1. **Input Arabic text** - Type or upload .txt file
+2. **Select dialect** - MSA, EG, Gulf, Levantine, Maghreb
+3. **Process text** - Click "Process Text" button
+4. **View pipeline stages:**
+   - Stage 1: Diacritization (before/after)
+   - Stage 2: Syllabification (syllable breakdown)
+   - Stage 3: Phonological Processing (4 processors)
+   - Stage 4: IPA Generation (phonetic transcription)
+   - Stage 5: X-SAMPA Conversion (ASCII phonetics)
+   - Stage 6: Audio Synthesis (playback + download)
+5. **Listen to audio** - Inline HTML5 player
+6. **Download outputs:**
+   - JSON (complete pipeline data)
+   - CSV (word comparison table)
+   - WAV audio file
+
+**Features:**
+- Word-by-word comparison table (Original | Diacritized | X-SAMPA)
+- Collapsible sections for each pipeline stage
+- File upload support for batch processing
+- Real-time audio generation and playback
+- Comprehensive error handling
+
+### Basic Web Interface
+**URL:** http://localhost:5000
+
+Simple interface for quick testing:
 1. Enter Arabic text
 2. Select dialect (MSA, EG, Gulf, Levantine, Maghreb)
 3. Click "Parse Text"
