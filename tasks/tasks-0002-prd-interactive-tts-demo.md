@@ -1,0 +1,379 @@
+# Task List: Interactive TTS Demo Page
+
+**Based on PRD:** `/tasks/0002-prd-interactive-tts-demo.md`
+**Implementation Focus:** Simple, lightweight HTML interface for localhost debugging
+**Status:** Complete - All MVP Tasks Implemented
+
+---
+
+## Relevant Files
+
+### Existing Files to Reference
+- `templates/index.html` - Current simple interface pattern (styling, structure)
+- `app.py` - Existing Flask endpoints: `/parse`, `/generate_audio`, `/download/dictionary/csv`
+- `src/integrations/espeak.py` - eSpeak audio generation
+- `src/integrations/polly.py` - Amazon Polly integration (optional)
+- `data/dictionaries/masterTTS.json` - Phonetic dictionary
+
+### New File to Create
+- `templates/demo.html` - New interactive demo page
+
+### Notes
+
+**Implementation Guidelines:**
+- Follow the simple, minimal style of existing `templates/index.html`
+- Use vanilla JavaScript (no frameworks)
+- Minimal CSS - basic spacing and layout only
+- Leverage existing Flask endpoints without modification
+- Focus on debugging functionality: see processing steps, download outputs, test audio
+- Internal tool for localhost use (not production-ready interface)
+
+**Key User Requirement:**
+> "simple light html interface, blank, lightweight and simplified as much as possible that will run on localhost"
+
+**Processing Pipeline to Display:**
+1. Input Arabic text → Diacritization
+2. Syllabification
+3. Phonological Processing (4 processors: Gemination, Sun Letters, Allophones, Emphatic)
+4. IPA Generation
+5. X-SAMPA Conversion
+6. Audio Synthesis
+
+---
+
+## Tasks
+
+- [x] 1.0 Create Simple HTML Interface with Input Form
+  - [x] 1.1 Create `templates/demo.html` file with basic HTML5 structure
+    - Use `<!DOCTYPE html>` with UTF-8 charset
+    - Add `<meta name="viewport">` for responsive design
+    - Title: "Arabic TTS Interactive Demo"
+    - Link minimal CSS inline (follow `index.html` pattern, lines 8-234)
+    - Estimate: 1 hour
+
+  - [x] 1.2 Add Arabic text input textarea with RTL support
+    - Create `<textarea id="demoArabicText" dir="rtl">` element
+    - Set height to 120px, width 100%
+    - Add placeholder: "أدخل النص العربي هنا... (e.g., السلام عليكم)"
+    - Apply styling from `index.html` lines 49-59
+    - Estimate: 30 minutes
+
+  - [x] 1.3 Add dialect selection dropdown
+    - Create `<select id="demoDialect">` element
+    - Add options: MSA, EG, Gulf, Levantine, Maghrebi
+    - Default to "MSA"
+    - Style from `index.html` lines 61-70
+    - Estimate: 30 minutes
+
+  - [x] 1.4 Add "Process" button with loading state handling
+    - Create `<button id="demoProcessBtn" onclick="processDemoText()">Process Text</button>`
+    - Implement disabled state during processing
+    - Change text to "Processing..." when active
+    - Style from `index.html` lines 72-93
+    - Estimate: 45 minutes
+
+  - [x] 1.5 Add minimal CSS for layout and spacing
+    - Copy base styles from `index.html` lines 9-20 (body, container)
+    - Add `.demo-section` class for each pipeline step output
+    - Add `.demo-label` class for section labels
+    - Add status classes: `.loading`, `.error`, `.success` (lines 138-154)
+    - Keep total CSS under 200 lines
+    - Estimate: 1 hour
+
+  - [x] 1.6 Write vanilla JavaScript initialization
+    - Create `processDemoText()` async function (pattern from `index.html` lines 304-358)
+    - Add form validation (check for empty text)
+    - Store result in `let currentDemoData = null`
+    - Add Enter key handler (optional, pattern from lines 421-426)
+    - Estimate: 1 hour
+
+  - [x] 1.7 Add file upload input for loading Arabic text files
+    - Create `<input type="file" id="fileUpload" accept=".txt">` element
+    - Add label: "Or upload a text file:"
+    - Position below or next to textarea
+    - Implement `handleFileUpload(event)` function
+    - Use FileReader API: `reader.readAsText(file, 'UTF-8')`
+    - Populate `demoArabicText` textarea with file content on load
+    - Handle file read errors gracefully (alert on failure)
+    - Validate file type is .txt before reading
+    - Follow minimal styling from existing input elements (lines 49-70)
+    - No server upload needed (client-side only)
+    - Estimate: 1 hour
+
+- [x] 2.0 Display Processing Pipeline Outputs
+  - [x] 2.1 Create HTML structure for pipeline step sections
+    - Add 6 `<div class="demo-section">` elements with IDs:
+      - `id="demo-step-1-diacritization"`
+      - `id="demo-step-2-syllabification"`
+      - `id="demo-step-3-phonology"`
+      - `id="demo-step-4-ipa"`
+      - `id="demo-step-5-xsampa"`
+      - `id="demo-step-6-audio"`
+    - Each section has `<h3>` label and `<div class="output">` container
+    - Estimate: 45 minutes
+
+  - [x] 2.2 Implement displayPipelineResults() function to populate sections
+    - Accept `result` object from `/parse` endpoint
+    - Extract data: `result.words`, `result.syllables`, `result.ipa`, etc.
+    - Clear previous results before displaying new ones
+    - Handle missing data gracefully (show "N/A" or skip)
+    - Estimate: 1.5 hours
+
+  - [x] 2.3 Display JSON outputs in `<pre>` tags for each step
+    - Use `JSON.stringify(data, null, 2)` for formatting
+    - Wrap in `<pre class="json-output">` element
+    - Add simple border and padding (5-10px)
+    - No syntax highlighting needed (keep it simple)
+    - Estimate: 45 minutes
+
+  - [x] 2.4 Show before/after diacritization in plain text
+    - Display original text: `<div class="original-text">{originalText}</div>`
+    - Display diacritized text: `<div class="diacritized-text">{diacritizedText}</div>`
+    - Use larger font size (16-18px) for readability
+    - Apply RTL direction for Arabic text
+    - Estimate: 30 minutes
+
+  - [x] 2.5 Create word-by-word comparison table (Original | Diacritized | X-SAMPA)
+    - Build HTML `<table>` dynamically in JavaScript
+    - Headers: "Original", "Diacritized", "X-SAMPA"
+    - Iterate through `result.words` array
+    - Extract: `word.original`, `word.diacritized`, `word.xsampa`
+    - Add simple table borders and padding
+    - Estimate: 1.5 hours
+
+  - [x] 2.6 Apply clean formatting and spacing between sections
+    - Add `margin-bottom: 20px` to each `.demo-section`
+    - Add horizontal separator `<hr>` between major sections
+    - Use simple `font-family: 'Segoe UI', Arial, sans-serif`
+    - Keep background white, text dark gray
+    - Estimate: 30 minutes
+
+  - [x] 2.7 Implement collapsible toggle for pipeline sections
+    - Add `<span class="toggle-icon">▼</span>` to each section `<h3>` header
+    - Wrap output content in `<div class="collapsible-content">` container
+    - Implement `toggleSection(sectionId)` JavaScript function
+    - Toggle logic: `content.style.display = isCollapsed ? 'block' : 'none'`
+    - Update icon: ▼ when expanded, ▶ when collapsed
+    - All sections expanded by default
+    - Add CSS: `.demo-section h3 { cursor: pointer; user-select: none; }`
+    - Add click handler to each `<h3>` element
+    - Simple show/hide (no animations for lightweight implementation)
+    - Estimate: 1.5 hours
+
+- [x] 3.0 Implement Download Functionality
+  - [x] 3.1 Add "Download JSON" button for complete processing result
+    - Create `<button id="downloadJsonBtn" onclick="downloadDemoJson()">Download JSON</button>`
+    - Position below pipeline results section
+    - Enable only after successful processing
+    - Style as secondary action (green background, pattern from `index.html` lines 100-106)
+    - Estimate: 30 minutes
+
+  - [x] 3.2 Implement downloadDemoJson() function using Blob API
+    - Check if `currentDemoData` exists
+    - Convert to JSON string: `JSON.stringify(currentDemoData, null, 2)`
+    - Create Blob: `new Blob([jsonStr], {type: 'application/json'})`
+    - Generate download link and trigger click
+    - Follow exact pattern from `index.html` lines 360-395
+    - Filename: `demo_tts_output_{dialect}_{timestamp}.json`
+    - Estimate: 1 hour
+
+  - [x] 3.3 Add "Download CSV" button for diacritization comparison table
+    - Create `<button id="downloadCsvBtn" onclick="downloadDemoCSV()">Download CSV</button>`
+    - Enable only after table is generated
+    - Position next to "Download JSON" button
+    - Estimate: 30 minutes
+
+  - [x] 3.4 Implement downloadDemoCSV() function to generate CSV format
+    - Generate CSV string with headers: "Original,Diacritized,X-SAMPA"
+    - Iterate through `currentDemoData.words` array
+    - Escape commas and quotes in Arabic text
+    - Create Blob with `type: 'text/csv;charset=utf-8'`
+    - Trigger download with filename: `demo_comparison_{timestamp}.csv`
+    - Use Blob API pattern from task 3.2
+    - Test with Excel/Google Sheets to verify format
+    - Estimate: 1.5 hours
+
+- [x] 4.0 Add Audio Generation and Playback
+  - [x] 4.1 Call `/generate_audio` endpoint after processing completes
+    - Add checkbox: `<input type="checkbox" id="autoGenerateAudio">` (optional)
+    - In `processDemoText()`, after `/parse` succeeds, call `/generate_audio`
+    - Send: `{text, dialect, speed: 150, pitch: 50, use_ipa: false}`
+    - Handle response: `{success, audio_url, ipa, message}`
+    - Show loading indicator during audio generation
+    - Estimate: 1.5 hours
+
+  - [x] 4.2 Display HTML5 `<audio>` player for inline playback
+    - Create `<audio id="demoAudioPlayer" controls>` element
+    - Initially hidden (`display: none`)
+    - Set `src` attribute when audio URL received: `audioPlayer.src = result.audio_url`
+    - Show player after successful generation: `audioPlayer.style.display = 'block'`
+    - Add simple label above player: "Generated Audio:"
+    - Estimate: 45 minutes
+
+  - [x] 4.3 Add "Download Audio" button
+    - Create `<button id="downloadAudioBtn">Download Audio (WAV)</button>`
+    - Enable only after audio generation succeeds
+    - Use `<a>` tag with `href={audio_url}` and `download` attribute
+    - Alternative: Fetch audio blob and trigger download (more reliable)
+    - Estimate: 45 minutes
+
+  - [x] 4.4 Show audio generation status indicators
+    - Add `<div id="audioStatus">` element
+    - States: "Generating audio...", "Audio ready", "Error: {message}"
+    - Apply `.loading`, `.success`, `.error` classes
+    - Clear status when starting new processing
+    - Estimate: 30 minutes
+
+  - [x] 4.5 Optional: Add Polly toggle checkbox
+    - Create `<input type="checkbox" id="usePolly">` with label "Use Amazon Polly"
+    - Send `use_polly: true` parameter to `/generate_audio` if checked
+    - Note: Requires AWS credentials configured (defer to future if not available)
+    - Add help text: "Requires AWS Polly configuration"
+    - Estimate: 1 hour (if implementing), 15 minutes (if deferring)
+
+- [x] 5.0 Implement Basic Error Handling
+  - [x] 5.1 Show clear error messages for API failures
+    - Catch errors in `try/catch` blocks for all `fetch()` calls
+    - Display error in `<div id="errorDisplay" class="error">` element
+    - Extract error message from response: `result.error` or `error.message`
+    - Show user-friendly message: "Failed to process text. Please try again."
+    - Pattern from `index.html` lines 343-353
+    - Estimate: 1 hour
+
+  - [x] 5.2 Display validation errors for empty/invalid input
+    - Check if `arabicText.value.trim() === ''` before processing
+    - Show validation message: "Please enter some Arabic text."
+    - Check if text contains Arabic characters (regex: `/[\u0600-\u06FF]/`)
+    - Warn if no Arabic detected: "Warning: No Arabic characters detected"
+    - Clear validation errors when user types
+    - Estimate: 45 minutes
+
+  - [x] 5.3 Handle partial processing results gracefully
+    - Check if `result.words` array exists and has items
+    - If pipeline step data is missing, show "N/A" instead of crashing
+    - Log missing data to console for debugging: `console.warn('Missing:', key)`
+    - Continue rendering other available sections
+    - Estimate: 1 hour
+
+  - [x] 5.4 Add simple status indicators (processing/success/error)
+    - Create `<div id="statusIndicator">` element
+    - Show icon or colored dot: 🔄 processing, ✅ success, ❌ error
+    - Position in top-right of demo container
+    - Update status throughout processing lifecycle
+    - Clear status when starting new processing
+    - Estimate: 45 minutes
+
+  - [x] 5.5 Provide user-friendly error messages in plain text
+    - Map technical errors to user-friendly messages:
+      - 400 → "Invalid input. Please check your text."
+      - 500 → "Server error. Please try again later."
+      - Network error → "Cannot connect to server. Check your connection."
+    - No technical jargon or stack traces shown to user
+    - Log full error to console for debugging
+    - Estimate: 30 minutes
+
+  - [x] 5.6 Follow error handling pattern from existing `parseText()` function
+    - Study `index.html` lines 304-358 for reference pattern
+    - Use same structure: loading state → try/catch → finally reset
+    - Disable buttons during processing to prevent double-submission
+    - Re-enable buttons in `finally` block
+    - Test error scenarios: empty input, network failure, server error
+    - Estimate: 1 hour
+
+---
+
+## Implementation Priority
+
+**Must Have (MVP):**
+- Tasks 1.0, 2.0, 3.0, 4.0, 5.0
+
+**Nice to Have (Future Enhancement):**
+- Progress bar animations (defer from PRD FR-2.2-2.5)
+- Drag-and-drop file upload (defer from PRD design)
+- Syntax highlighting for JSON (defer from PRD FR-3.4)
+
+---
+
+## Testing Checklist
+
+**Manual Testing (After Implementation):**
+- [x] Load `templates/demo.html` in browser at `http://localhost:5000/demo`
+- [x] Enter Arabic text and verify RTL display
+- [x] Select different dialects and verify processing
+- [x] Verify all 6 pipeline sections populate with data
+- [x] Check word-by-word comparison table accuracy
+- [x] Download JSON and verify file format
+- [x] Download CSV and open in Excel/Sheets
+- [x] Generate audio and verify playback
+- [x] Download audio file and verify WAV format
+- [x] Test empty input error handling
+- [x] Test network error handling (disconnect internet)
+- [x] Test with long text (500+ words)
+- [x] Test with mixed Arabic/English text
+- [x] Verify all buttons enable/disable correctly
+- [x] Upload .txt file and verify textarea population
+- [x] Upload non-.txt file and verify error handling
+- [x] Test file upload error handling (file read failures)
+- [x] Toggle collapsible sections and verify show/hide behavior
+- [x] Verify all pipeline sections expanded by default
+- [x] Verify toggle icons change correctly (▼ ↔ ▶)
+- [x] Check console for JavaScript errors
+
+**Cross-Browser Testing:**
+- [x] Chrome/Chromium
+- [x] Firefox
+- [x] Safari (if available)
+
+---
+
+## Notes for Implementation
+
+**Flask Route Setup:**
+- Add new route in `app.py`:
+```python
+@app.route('/demo')
+def demo():
+    return render_template('demo.html')
+```
+
+**Recommended Development Order:**
+1. Start with Task 1.0 (HTML structure + basic CSS)
+2. Implement Task 2.0 (display pipeline - core functionality)
+3. Add Task 5.0 (error handling - make it robust)
+4. Add Task 4.0 (audio generation)
+5. Add Task 3.0 (downloads last - nice-to-have)
+
+**Key Implementation Patterns:**
+- Async/await for all API calls
+- Try/catch/finally for error handling
+- Loading states before API calls
+- Success/error visual feedback
+- Defensive programming (check if data exists before accessing)
+
+**Performance Considerations:**
+- Keep DOM updates minimal (batch changes where possible)
+- Clear previous results before rendering new ones
+- Don't create new audio player each time (reuse existing)
+- Debounce rapid button clicks (disable during processing)
+
+**Accessibility Considerations (Optional for MVP):**
+- Add `aria-label` to buttons
+- Add `role="status"` to status indicators
+- Ensure keyboard navigation works
+- Add focus styles for keyboard users
+
+---
+
+## Completion Criteria
+
+- [x] All 5 parent tasks completed
+- [x] `templates/demo.html` file created and functional
+- [x] Can process Arabic text and display all 6 pipeline steps
+- [x] Downloads (JSON + CSV) working
+- [x] Audio generation and playback working
+- [x] Error handling prevents crashes
+- [x] File upload functionality working and tested
+- [x] Collapsible sections functionality working correctly
+- [x] Manual testing checklist completed
+- [x] No console errors in browser
+- [x] Interface matches "simple, lightweight" requirement
