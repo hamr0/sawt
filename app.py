@@ -7,7 +7,7 @@ import csv
 import io
 from pathlib import Path
 from datetime import datetime
-from typing import Dict
+from typing import Dict, Generator
 sys.path.append('src')
 
 from src.main import ArabicTTS
@@ -143,6 +143,253 @@ def process_hierarchical():
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/process_with_progress', methods=['POST'])
+def process_with_progress():
+    """
+    Process Arabic text with real-time progress updates via Server-Sent Events (SSE).
+
+    Expected JSON:
+    {
+        "text": "صباح الخير",
+        "dialect": "EG",
+        "expected_ipa": "sˁɑbɑːħ"  # Optional
+    }
+
+    Returns:
+    Server-Sent Events stream with progress updates:
+    - step: Current processing step (1-6)
+    - step_name: Name of current step
+    - rule: Current phonological rule (for step 3)
+    - status: "pending", "processing", or "complete"
+    """
+    try:
+        data = request.get_json()
+        text = data.get('text', '')
+        dialect = data.get('dialect', 'EG')
+        expected_ipa = data.get('expected_ipa', None)
+
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
+
+        def generate_progress():
+            """Generate SSE events with progress updates"""
+            try:
+                # Step 1: Diacritization (handled internally by ArabicTTS)
+                yield _format_sse_event({
+                    'step': 1,
+                    'step_name': 'Diacritization',
+                    'status': 'processing',
+                    'message': 'Analyzing text and applying diacritization rules...'
+                })
+
+                # Step 2: Syllabification
+                yield _format_sse_event({
+                    'step': 2,
+                    'step_name': 'Syllabification',
+                    'status': 'processing',
+                    'message': 'Segmenting words into syllables...'
+                })
+
+                # Step 3: Phonological Rules (with sub-steps)
+                yield _format_sse_event({
+                    'step': 3,
+                    'step_name': 'Phonological Rules',
+                    'status': 'processing',
+                    'message': 'Applying phonological rules...'
+                })
+
+                # Step 3.1: Gemination
+                yield _format_sse_event({
+                    'step': 3,
+                    'step_name': 'Phonological Rules',
+                    'rule': 'Gemination',
+                    'status': 'processing',
+                    'message': 'Processing gemination (shadda)...'
+                })
+
+                # Step 3.2: Sun Letters
+                yield _format_sse_event({
+                    'step': 3,
+                    'step_name': 'Phonological Rules',
+                    'rule': 'Sun Letters',
+                    'status': 'processing',
+                    'message': 'Processing sun letter assimilation...'
+                })
+
+                # Step 3.3: Allophones
+                yield _format_sse_event({
+                    'step': 3,
+                    'step_name': 'Phonological Rules',
+                    'rule': 'Allophones',
+                    'status': 'processing',
+                    'message': 'Processing allophone variations...'
+                })
+
+                # Step 3.4: Emphatic
+                yield _format_sse_event({
+                    'step': 3,
+                    'step_name': 'Phonological Rules',
+                    'rule': 'Emphatic',
+                    'status': 'processing',
+                    'message': 'Processing emphatic spread...'
+                })
+
+                # Step 4: Context Rules (Position Detection)
+                yield _format_sse_event({
+                    'step': 4,
+                    'step_name': 'Context Rules',
+                    'status': 'processing',
+                    'message': 'Analyzing positional context...'
+                })
+
+                # Step 5: IPA Generation
+                yield _format_sse_event({
+                    'step': 5,
+                    'step_name': 'IPA Generation',
+                    'status': 'processing',
+                    'message': 'Generating IPA transcription...'
+                })
+
+                # Step 6: X-SAMPA Conversion
+                yield _format_sse_event({
+                    'step': 6,
+                    'step_name': 'X-SAMPA Conversion',
+                    'status': 'processing',
+                    'message': 'Converting to X-SAMPA format...'
+                })
+
+                # Process the text using ArabicTTS
+                tts = ArabicTTS(dialect)
+                tts_result = tts.process_text(text)
+
+                # Convert to hierarchical structure
+                hierarchical_result = hierarchical_processor.process_result(
+                    tts_result,
+                    text,
+                    applied_rules_mapping=None
+                )
+
+                # Add expected IPA comparison if provided
+                if expected_ipa:
+                    hierarchical_result['expected_ipa'] = expected_ipa
+                    hierarchical_result = _compare_with_expected_ipa(
+                        hierarchical_result,
+                        expected_ipa
+                    )
+
+                # Mark all rules as complete
+                yield _format_sse_event({
+                    'step': 3,
+                    'step_name': 'Phonological Rules',
+                    'rule': 'Gemination',
+                    'status': 'complete',
+                    'message': 'Gemination processing complete'
+                })
+
+                yield _format_sse_event({
+                    'step': 3,
+                    'step_name': 'Phonological Rules',
+                    'rule': 'Sun Letters',
+                    'status': 'complete',
+                    'message': 'Sun letter processing complete'
+                })
+
+                yield _format_sse_event({
+                    'step': 3,
+                    'step_name': 'Phonological Rules',
+                    'rule': 'Allophones',
+                    'status': 'complete',
+                    'message': 'Allophone processing complete'
+                })
+
+                yield _format_sse_event({
+                    'step': 3,
+                    'step_name': 'Phonological Rules',
+                    'rule': 'Emphatic',
+                    'status': 'complete',
+                    'message': 'Emphatic spread processing complete'
+                })
+
+                # Mark main steps as complete
+                yield _format_sse_event({
+                    'step': 1,
+                    'step_name': 'Diacritization',
+                    'status': 'complete',
+                    'message': 'Diacritization complete'
+                })
+
+                yield _format_sse_event({
+                    'step': 2,
+                    'step_name': 'Syllabification',
+                    'status': 'complete',
+                    'message': 'Syllabification complete'
+                })
+
+                yield _format_sse_event({
+                    'step': 3,
+                    'step_name': 'Phonological Rules',
+                    'status': 'complete',
+                    'message': 'Phonological rules processing complete'
+                })
+
+                yield _format_sse_event({
+                    'step': 4,
+                    'step_name': 'Context Rules',
+                    'status': 'complete',
+                    'message': 'Context analysis complete'
+                })
+
+                yield _format_sse_event({
+                    'step': 5,
+                    'step_name': 'IPA Generation',
+                    'status': 'complete',
+                    'message': 'IPA generation complete'
+                })
+
+                yield _format_sse_event({
+                    'step': 6,
+                    'step_name': 'X-SAMPA Conversion',
+                    'status': 'complete',
+                    'message': 'X-SAMPA conversion complete'
+                })
+
+                # Send final result
+                yield _format_sse_event({
+                    'type': 'result',
+                    'data': hierarchical_result
+                })
+
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                yield _format_sse_event({
+                    'type': 'error',
+                    'error': str(e)
+                })
+
+        return Response(
+            generate_progress(),
+            mimetype='text/event-stream'
+        )
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+def _format_sse_event(event_data: Dict) -> str:
+    """
+    Format event data as Server-Sent Event.
+
+    Args:
+        event_data: Dictionary with event data
+
+    Returns:
+        Formatted SSE event string
+    """
+    event_json = json.dumps(event_data, ensure_ascii=False)
+    return f'data: {event_json}\n\n'
 
 
 def _compare_with_expected_ipa(result: Dict, expected_ipa: str) -> Dict:

@@ -306,6 +306,132 @@
             border-top: 1px solid #e9ecef;
             margin: 20px 0;
         }
+
+        .progress-section {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .progress-section.visible {
+            display: block;
+        }
+
+        .progress-section h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .progress-bar-container {
+            background-color: #e9ecef;
+            border-radius: 5px;
+            height: 25px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background-color: #28a745;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .progress-steps {
+            margin-top: 15px;
+        }
+
+        .step-item {
+            margin-bottom: 12px;
+            padding: 8px;
+            background-color: #fff;
+            border-left: 3px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .step-item.complete {
+            border-left-color: #28a745;
+            background-color: #f0f8f4;
+        }
+
+        .step-item.processing {
+            border-left-color: #ffc107;
+            background-color: #fffbf0;
+        }
+
+        .step-item.pending {
+            border-left-color: #ddd;
+            background-color: #fff;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .step-status {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .step-name {
+            flex-grow: 1;
+        }
+
+        .step-message {
+            font-size: 0.85rem;
+            color: #666;
+            margin-left: 28px;
+        }
+
+        .rules-list {
+            margin-left: 28px;
+            margin-top: 8px;
+            padding-left: 12px;
+            border-left: 2px solid #e0e0e0;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .rule-status {
+            display: inline-block;
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -345,6 +471,18 @@
                 >
                 <small style="color: #666; display: block; margin-top: 5px;">Leave empty to skip IPA comparison. Enter expected IPA for the first word to highlight matches/differences.</small>
             </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div id="progressSection" class="progress-section">
+            <h3>Processing Progress</h3>
+            <div class="progress-bar-container">
+                <div id="progressBarFill" class="progress-bar-fill" style="width: 0%;">0%</div>
+            </div>
+            <div class="progress-text">
+                <span id="progressCurrentStep">Step 0/6:</span> <span id="progressStepName">Initializing...</span>
+            </div>
+            <div id="progressStepsContainer" class="progress-steps"></div>
         </div>
 
         <div id="outputSections"></div>
@@ -387,6 +525,7 @@
             const expectedIPA = document.getElementById('expectedIPA').value.trim();
             const processBtn = document.getElementById('demoProcessBtn');
             const outputSections = document.getElementById('outputSections');
+            const progressSection = document.getElementById('progressSection');
 
             // Validation
             if (!text) {
@@ -399,13 +538,16 @@
                 outputSections.innerHTML = '<div class="error">Warning: No Arabic characters detected</div>';
             }
 
-            // Show loading state
+            // Show loading state and progress
             processBtn.disabled = true;
             processBtn.textContent = 'Processing...';
             outputSections.innerHTML = '<div class="loading">Processing...</div>';
+            progressSection.classList.add('visible');
+            initializeProgressDisplay();
 
             try {
-                const response = await fetch('/process', {
+                // Use SSE endpoint for progress updates
+                const response = await fetch('/process_with_progress', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -417,16 +559,48 @@
                     })
                 });
 
-                const result = await response.json();
+                // Handle SSE stream
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let resultData = null;
 
-                if (response.ok) {
-                    currentMatrixData = result;
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const eventData = JSON.parse(line.slice(6));
+
+                                if (eventData.type === 'result') {
+                                    resultData = eventData.data;
+                                } else if (eventData.type === 'error') {
+                                    throw new Error(eventData.error);
+                                } else {
+                                    // Update progress display
+                                    updateProgressDisplay(eventData);
+                                }
+                            } catch (e) {
+                                console.error('Error parsing SSE event:', e);
+                            }
+                        }
+                    }
+                }
+
+                // Display results after processing completes
+                if (resultData) {
+                    currentMatrixData = resultData;
                     currentViewFilter = 'all';
-                    displayMatrixResults(result, expectedIPA);
+                    displayMatrixResults(resultData, expectedIPA);
                 } else {
-                    outputSections.innerHTML = `<div class="error">Error: ${result.error || 'Failed to process text. Please try again.'}</div>`;
+                    outputSections.innerHTML = '<div class="error">Failed to process text. Please try again.</div>';
                     currentMatrixData = null;
                 }
+
             } catch (error) {
                 outputSections.innerHTML = `<div class="error">Network Error: Cannot connect to server. Check your connection.</div>`;
                 console.error('Processing error:', error);
@@ -434,6 +608,118 @@
             } finally {
                 processBtn.disabled = false;
                 processBtn.textContent = 'Process Text';
+                setTimeout(() => {
+                    progressSection.classList.remove('visible');
+                }, 1000);
+            }
+        }
+
+        function initializeProgressDisplay() {
+            const container = document.getElementById('progressStepsContainer');
+            container.innerHTML = '';
+
+            const steps = [
+                { step: 1, name: 'Diacritization' },
+                { step: 2, name: 'Syllabification' },
+                { step: 3, name: 'Phonological Rules' },
+                { step: 4, name: 'Context Rules' },
+                { step: 5, name: 'IPA Generation' },
+                { step: 6, name: 'X-SAMPA Conversion' }
+            ];
+
+            steps.forEach(s => {
+                const stepEl = document.createElement('div');
+                stepEl.className = 'step-item pending';
+                stepEl.id = `step-${s.step}`;
+                stepEl.innerHTML = `
+                    <div class="step-header">
+                        <span class="step-status" id="status-${s.step}">○</span>
+                        <span class="step-name">Step ${s.step}: ${s.name}</span>
+                    </div>
+                    <div id="rules-${s.step}" class="rules-list" style="display: none;"></div>
+                `;
+                container.appendChild(stepEl);
+            });
+        }
+
+        function updateProgressDisplay(eventData) {
+            const step = eventData.step;
+            const status = eventData.status;
+            const rule = eventData.rule;
+            const message = eventData.message || '';
+
+            // Update progress bar
+            const progressPercent = (step / 6) * 100;
+            const progressBar = document.getElementById('progressBarFill');
+            progressBar.style.width = progressPercent + '%';
+            progressBar.textContent = Math.round(progressPercent) + '%';
+
+            // Update step indicator text
+            document.getElementById('progressCurrentStep').textContent = `Step ${step}/6:`;
+            document.getElementById('progressStepName').textContent = eventData.step_name || '';
+
+            // Update step item styling
+            const stepEl = document.getElementById(`step-${step}`);
+            if (stepEl) {
+                stepEl.classList.remove('pending', 'processing', 'complete');
+                stepEl.classList.add(status);
+
+                // Update status indicator
+                const statusIcon = document.getElementById(`status-${step}`);
+                if (statusIcon) {
+                    if (status === 'complete') {
+                        statusIcon.textContent = '✓';
+                    } else if (status === 'processing') {
+                        statusIcon.textContent = '⏳';
+                    } else {
+                        statusIcon.textContent = '○';
+                    }
+                }
+
+                // Add message if present
+                const messageEl = stepEl.querySelector('.step-message');
+                if (message && !messageEl) {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'step-message';
+                    msgDiv.textContent = message;
+                    stepEl.appendChild(msgDiv);
+                }
+            }
+
+            // Handle phonological rules sub-steps
+            if (step === 3 && rule) {
+                const rulesContainer = document.getElementById('rules-3');
+                if (rulesContainer) {
+                    rulesContainer.style.display = 'block';
+
+                    // Find or create rule item
+                    let ruleItem = document.getElementById(`rule-${rule}`);
+                    if (!ruleItem) {
+                        ruleItem = document.createElement('div');
+                        ruleItem.className = 'rule-item';
+                        ruleItem.id = `rule-${rule}`;
+                        ruleItem.innerHTML = `
+                            <span class="rule-status" id="rule-status-${rule}">○</span>
+                            <span id="rule-name-${rule}">${rule}</span>
+                        `;
+                        rulesContainer.appendChild(ruleItem);
+                    }
+
+                    // Update rule status
+                    const ruleStatus = document.getElementById(`rule-status-${rule}`);
+                    if (ruleStatus) {
+                        if (status === 'complete') {
+                            ruleStatus.textContent = '✓';
+                            ruleItem.style.color = '#28a745';
+                        } else if (status === 'processing') {
+                            ruleStatus.textContent = '⏳';
+                            ruleItem.style.color = '#ffc107';
+                        } else {
+                            ruleStatus.textContent = '○';
+                            ruleItem.style.color = '#555';
+                        }
+                    }
+                }
             }
         }
 
