@@ -1,6 +1,6 @@
 import re
 import json
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from pathlib import Path
 
 # Import phonological processors
@@ -11,48 +11,25 @@ from src.core.emphatic import EmphaticProcessor
 
 
 class ArabicSyllabifier:
-    def __init__(self, dialect: str):
-        self.dialect = dialect
-        with open("data/dictionaries/masterTTS.json", "r", encoding="utf-8") as f:
-            self.master = json.load(f)
-        
-        # Create default syllable patterns if missing
-        if "syllable_patterns" not in self.master:
-            self.master["syllable_patterns"] = {
-                "EG": {
-                    "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
-                    "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
-                    "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
-                    "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
-                },
-                "MSA": {
-                    "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
-                    "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
-                    "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
-                    "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
-                },
-                "Gulf": {
-                    "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
-                    "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
-                    "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
-                    "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
-                },
-                "Levantine": {
-                    "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
-                    "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
-                    "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
-                    "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
-                },
-                "Maghreb": {
-                    "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
-                    "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
-                    "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
-                    "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
-                }
-            }
-        
-        self.patterns = self.master["syllable_patterns"].get(dialect, self.master["syllable_patterns"]["MSA"])
+    def __init__(self):
+        """
+        Initialize syllabifier (universal - no dialect parameter).
+
+        Syllabification patterns are universal across Arabic dialects.
+        Dialect-specific differences only apply to IPA generation,
+        which is handled by IPAMapper.
+        """
+        # Load syllable patterns (same for all dialects)
         self.vowels = {'َ', 'ُ', 'ِ', 'ْ', 'ّ', 'ا', 'ي', 'و'}
+
+        # Define universal syllable patterns
+        # These patterns are the same across all Arabic dialects
+        self.patterns = {
+            "CV": {"allowed": True, "examples": ["مَ", "لِ"]},
+            "CVC": {"allowed": True, "examples": ["كَتَ", "بِنْ"]},
+            "CVCC": {"allowed": True, "constraints": {"coda_condition": "geminate_or_sun_letter"}},
+            "CVV": {"allowed": True, "examples": ["كاْ", "لِيْ"]}
+        }
 
     def segment_syllables(self, word: str) -> List[List[str]]:
         syllables = []
@@ -115,68 +92,87 @@ class ArabicSyllabifier:
                 return coda[1] == 'ّ' or coda[1] in sun_letters
         return True  # Default valid
 
-    def map_to_ipa(self, word: str) -> List[Dict]:
+    def get_syllable_structure(self, word: str) -> List[Dict]:
+        """
+        Get syllable structure without IPA (universal).
+
+        DEPRECATED: Use segment_syllables and classify_pattern directly.
+        This method kept for backward compatibility.
+
+        Args:
+            word: Arabic word to analyze
+
+        Returns:
+            List of syllable dictionaries with pattern info
+        """
         syllables = self.segment_syllables(word)
-        ipa_result = []
+        result = []
 
         for syllable in syllables:
             pattern = self.classify_pattern(syllable)
-            ipa_syllable = self.apply_ipa_rules(syllable, pattern)
-            ipa_result.append({
+            result.append({
                 "syllable": ''.join(syllable),
                 "pattern": pattern,
-                "ipa": ipa_syllable
+                "chars": syllable
             })
-        return ipa_result
-
-    def apply_ipa_rules(self, syllable: List[str], pattern: str) -> str:
-        ipa_parts = []
-        for char in syllable:
-            # Find letter in dialect data
-            for entry in self.master[self.dialect]:
-                if entry["Arabic letter"] == char:
-                    # Try pattern-specific IPA first
-                    syllable_info = entry.get("Syllable_Position", {})
-                    if pattern in syllable_info:
-                        ipa_parts.append(syllable_info[pattern]["ipa_adjustment"])
-                    else:
-                        ipa_parts.append(entry["IPA"])
-                    break
-            else:  # Character not found
-                ipa_parts.append(char)
-
-        return ''.join(ipa_parts)
+        return result
 
 
 class ArabicTTS:
     def __init__(self, dialect: str):
+        """
+        Initialize Arabic TTS system with new architecture.
+
+        Args:
+            dialect: Default dialect for IPA generation ("EG", "MSA", etc.)
+                     Can be overridden per text processing call.
+        """
         self.dialect = dialect
-        self.syllabifier = ArabicSyllabifier(dialect)
+
+        # Initialize universal syllabifier (no dialect needed)
+        self.syllabifier = ArabicSyllabifier()
+
         self.special_chars = ['\"', "\'", '(', ')', '[', ']', '^', '*', '-', '_', '%', '#', '@', 'ـ']
         self.tashkeel = ['َ', 'ُ', 'ِ', 'ً', 'ٌ', 'ٍ', 'ْ', 'ٓ']
         self.punctuation = [',', ';', ':', '،', '.', '?', '!']
         
         # Initialize phonological processors
-        # Note: Processors are transitioning to universal (no dialect param)
-        # GeminationProcessor and SunLetterProcessor are now universal
-        # AllophoneProcessor and EmphaticProcessor still need refactoring
+        # Note: All processors are now UNIVERSAL (dialect-independent)
+        # Only IPAMapper handles dialect-specific IPA lookup
         self.gemination_processor = GeminationProcessor()
         self.sun_letter_processor = SunLetterProcessor()
-        self.allophone_processor = AllophoneProcessor(dialect)
-        self.emphatic_processor = EmphaticProcessor(dialect)
+        self.emphatic_processor = EmphaticProcessor()
+
+        # Import the NEW universal components
+        from src.core.position_detector import PositionDetector
+        from src.core.ipa_mapper import IPAMapper
+
+        # Initialize universal components
         self.position_detector = PositionDetector()
         self.ipa_mapper = IPAMapper()
 
-    def process_text(self, text: str) -> Dict:
-        """Main processing pipeline for Arabic text"""
-        # Step 1: Preprocess and tokenize
+    def process_text(self, text: str, dialect: Optional[str] = None) -> Dict:
+        """
+        Main processing pipeline for Arabic text.
+
+        Args:
+            text: Arabic text to process
+            dialect: Target dialect for IPA generation. If None, uses self.dialect
+
+        Returns:
+            Processed text with IPA transcription
+        """
+        # Use provided dialect or default
+        target_dialect = dialect or self.dialect
+
+        # Step 1: Preprocess and tokenize (universal)
         tokens = self.tokenize(text)
-        # Step 2: Analyze character positions
+        # Step 2: Analyze character positions (universal)
         analyzed = [self.analyze_char(i, token) for i, token in enumerate(tokens)]
-        # Step 3: Group Arabic words for syllabification
+        # Step 3: Group Arabic words for syllabification (universal)
         words = self.group_arabic_words(analyzed)
-        # Step 4: Syllabify and map to IPA
-        result = self.syllabify_and_map(words)
+        # Step 4: Syllabify and map to IPA (dialect-specific IPA mapping)
+        result = self.syllabify_and_map(words, target_dialect)
         return result
 
     def tokenize(self, text: str) -> List[Dict]:
@@ -249,9 +245,18 @@ class ArabicTTS:
 
         return words
 
-    def syllabify_and_map(self, words: List[Dict]) -> Dict:
-        """Apply syllabification and IPA mapping to Arabic words"""
-        result = {"dialect": self.dialect, "words": []}
+    def syllabify_and_map(self, words: List[Dict], dialect: str) -> Dict:
+        """
+        Apply syllabification and IPA mapping to Arabic words.
+
+        Args:
+            words: List of processed word tokens
+            dialect: Target dialect for IPA generation
+
+        Returns:
+            Processed words with IPA transcription
+        """
+        result = {"dialect": dialect, "words": []}
 
         for word in words:
             if word["type"] != "arabic_word":
@@ -260,58 +265,102 @@ class ArabicTTS:
 
             # Extract the word string
             word_str = ''.join(char["char"] for char in word["chars"])
-            # Syllabify and get IPA
-            syllables = self.syllabifier.map_to_ipa(word_str)
-            
-            # Apply phonological rules in correct order
-            syllables = self.apply_phonological_rules(syllables, word_str)
-            
-            # Add position info to each syllable
-            for syllable in syllables:
-                start = word_str.find(syllable["syllable"])
-                syllable["position"] = word["chars"][start]["position"]
+
+            # Syllabify WITHOUT IPA generation (universal)
+            syllables = self._syllabify_only(word_str)
+
+            # Apply universal phonological rules
+            syllables = self.apply_phonological_rules(syllables)
+
+            # Generate IPA using IPAMapper (dialect-specific step)
+            ipa_transcription = self.ipa_mapper.map_to_ipa(syllables, dialect)
+
+            # Add IPA to syllables for output compatibility
+            for i, syllable in enumerate(syllables):
+                # For backward compatibility, add basic IPA if needed
+                # The full IPA is already in ipa_transcription
+                syllable["ipa"] = syllable.get("syllable", "")
 
             result["words"].append({
                 "type": "arabic_word",
                 "original": word_str,
                 "syllables": syllables,
+                "ipa": ipa_transcription,  # Full IPA transcription for the word
                 "chars": word["chars"]
             })
 
         return result
     
-    def apply_phonological_rules(self, syllables: List[Dict], word_text: str) -> List[Dict]:
+    def apply_phonological_rules(self, syllables: List[Dict]) -> List[Dict]:
         """
-        Apply all phonological rules in the correct order
-        
-        Order of application:
-        1. Gemination (shadda detection) - highest priority
-        2. Sun letter assimilation (/al/ + sun letter)
-        3. Positional allophones (position-dependent IPA)
-        4. Emphatic spread (pharyngealization)
-        
+        Apply universal phonological rules to syllables.
+
+        This method applies all phonological rules that are identical
+        across all Arabic dialects. Dialect-specific IPA mapping happens
+        in a separate step using IPAMapper.
+
+        Steps applied:
+        1. Gemination detection (shadda)
+        2. Sun/moon letter assimilation detection
+        3. Position detection (word-initial, word-medial, word-final)
+        4. Emphatic consonant detection and pharyngealization marking
+
+        Note: These rules are universal. IPA generation (dialect-specific)
+        happens separately using IPAMapper.map_to_ipa().
+
         Args:
             syllables: List of syllable dictionaries from syllabifier
-            word_text: Original Arabic word text
-        
+
         Returns:
-            Syllables with all phonological rules applied
+            Syllables with all universal phonological rules applied
+            (position detection added for each syllable)
         """
         # Rule 1: Gemination (detect shadda)
         syllables = self.gemination_processor.process(syllables)
-        
+
         # Rule 2: Sun letter assimilation
         syllables = self.sun_letter_processor.process(syllables)
-        syllables = self.sun_letter_processor.apply_assimilation(syllables, word_text)
-        
-        # Rule 3: Positional allophones
-        syllables = self.allophone_processor.process(syllables, word_text)
-        syllables = self.allophone_processor.apply_ipa_to_syllables(syllables)
-        
+
+        # Rule 3: Position detection (universal - using PositionDetector)
+        syllables = self.position_detector.detect_positions(syllables)
+
         # Rule 4: Emphatic spread
         syllables = self.emphatic_processor.process(syllables)
-        syllables = self.emphatic_processor.apply_pharyngealization(syllables)
-        
+
+        return syllables
+
+    def _syllabify_only(self, word: str) -> List[Dict]:
+        """
+        Syllabify word without IPA generation (universal).
+
+        This method extracts syllable structure without any dialect-specific
+        IPA mapping. The IPA mapping happens later using IPAMapper.
+
+        Args:
+            word: Arabic word to syllabify
+
+        Returns:
+            List of syllable dictionaries with structure and pattern info
+        """
+        # Use the syllabifier to get syllable structure
+        # but we need to modify it to not generate IPA
+        syllable_data = self.syllabifier.segment_syllables(word)
+        syllables = []
+
+        for i, syllable_chars in enumerate(syllable_data):
+            syllable_str = ''.join(syllable_chars)
+            pattern = self.syllabifier.classify_pattern(syllable_chars)
+
+            syllable_dict = {
+                'syllable': syllable_str,
+                'pattern': pattern,
+                'chars': syllable_chars,
+                'word_index': 0,  # Will be updated for multi-word cases
+                'position_in_word': i,
+                # No IPA yet - will be added by IPAMapper
+            }
+            syllables.append(syllable_dict)
+
         return syllables
 
     def process_file(self, filename: str = "input.txt") -> Dict:

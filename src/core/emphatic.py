@@ -25,19 +25,23 @@ from typing import List, Dict, Set
 class EmphaticProcessor:
     """
     Processes emphatic (pharyngealized) consonant effects on adjacent vowels
-    
+
     Emphatic consonants cause pharyngealization to spread to nearby vowels,
     resulting in a "darker" or "backed" pronunciation quality.
+
+    ARCHITECTURE NOTE: This is a UNIVERSAL component with NO dialect parameter.
+    Emphatic consonant detection and pharyngealization spreading is identical
+    across all Arabic dialects. Dialect selection happens later in the IPAMapper
+    component during final IPA generation.
     """
-    
-    def __init__(self, dialect: str):
+
+    def __init__(self):
         """
         Initialize emphatic spread processor
-        
-        Args:
-            dialect: Arabic dialect code (e.g., "EG" for Egyptian Arabic)
+
+        Note: No dialect parameter needed - emphatic detection is universal
+        and independent of dialect selection.
         """
-        self.dialect = dialect
         
         # Define emphatic consonants
         # These are the Arabic letters that trigger pharyngealization
@@ -294,7 +298,7 @@ class EmphaticProcessor:
 
 if __name__ == "__main__":
     # Quick test
-    processor = EmphaticProcessor("EG")
+    processor = EmphaticProcessor()
     
     print("Testing Emphatic Spread Processor")
     print("=" * 70)

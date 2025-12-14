@@ -1,0 +1,47 @@
+{
+    "permissions": {
+        "allow": [
+            "Read",
+            "Grep",
+            "Glob",
+            "Edit",
+            "Write",
+            "Bash(cat:*)",
+            "Bash(git fetch:*)",
+            "Bash(git reset:*)",
+            "Bash(git clean:*)",
+            "Bash(ls:*)",
+            "Bash(python3:*)",
+            "Bash(git add:*)",
+            "Bash(git commit:*)",
+            "WebFetch",
+            "WebSearch"
+        ],
+        "deny": [
+            "Bash(rm:*)",
+            "Bash(sudo:*)"
+        ]
+    },
+    "exclude_patterns": [
+        "*.md",
+        "**/*.md",
+        "docs/**",
+        "tasks/**",
+        "reports/**",
+        "demo_output/**",
+        ".git/**",
+        ".pytest_cache/**",
+        "__pycache__/**",
+        "*.pyc",
+        "*.pyo",
+        "venv/**",
+        ".env*",
+        "*.log",
+        "*.tmp"
+    ],
+    "alwaysInclude": [
+        "CLAUDE.md",
+        "README.md",
+        "src/main.py"
+    ]
+}

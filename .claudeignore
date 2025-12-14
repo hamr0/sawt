@@ -1,0 +1,22 @@
+# Exclude ALL markdown files and documentation from Claude context
+**/*.md
+docs/
+tasks/
+reports/
+demo_output/
+.claudeignore
+.git/
+.gitignore
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# Keep only essential files for development
+CLAUDE.md
+README.md
+src/
+tests/
+data/dictionaries/
+scripts/
+requirements.txt

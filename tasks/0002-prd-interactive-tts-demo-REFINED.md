@@ -209,6 +209,11 @@ CHAR,الخير,1-initial,ا,ا,"-",1,onset,"-",a,a
 
 **FR-5.3** System MUST allow dialect selection (EG, MSA, Gulf, Levantine, Maghrebi)
 
+**FR-5.3a** System MUST require dialect selection BEFORE processing (mandatory, not optional)
+- Default dialect: "EG"
+- [Process] button MUST be disabled until dialect is explicitly selected
+- Dialect dropdown MUST be positioned prominently at the top of the form
+
 **FR-5.4** System MUST process multiple words/sentences in single request
 
 ### 4.6 Processing Progress UI (FINALIZED)

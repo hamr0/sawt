@@ -9,8 +9,8 @@ from src.core.emphatic import EmphaticProcessor
 
 @pytest.fixture
 def emphatic_processor():
-    """Egyptian Arabic emphatic processor"""
-    return EmphaticProcessor("EG")
+    """Universal emphatic processor (dialect-independent)"""
+    return EmphaticProcessor()
 
 
 class TestEmphaticConsonantDetection:
@@ -366,7 +366,7 @@ class TestEmphaticConsonantSet:
 # Test statistics
 def test_emphatic_detection_accuracy():
     """Calculate overall emphatic detection accuracy"""
-    processor = EmphaticProcessor("EG")
+    processor = EmphaticProcessor()
     
     # Words with emphatic consonants (5 words)
     emphatic_words = ["صباح", "ضوء", "طعام", "ظل", "قمر"]
@@ -395,7 +395,7 @@ def test_emphatic_detection_accuracy():
 
 def test_pharyngealization_application_accuracy():
     """Calculate pharyngealization application accuracy"""
-    processor = EmphaticProcessor("EG")
+    processor = EmphaticProcessor()
     
     test_cases = [
         ('ص', 'sa', 'sˁɑ'),

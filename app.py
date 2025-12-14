@@ -11,11 +11,15 @@ sys.path.append('src')
 
 from src.main import ArabicTTS
 from src.integrations.espeak import ESpeakTTS
+from src.core.hierarchical_processor import HierarchicalProcessor
 
 app = Flask(__name__)
 
 # Initialize eSpeak TTS
 espeak_tts = ESpeakTTS()
+
+# Initialize hierarchical processor
+hierarchical_processor = HierarchicalProcessor()
 
 # Ensure static/audio directory exists
 AUDIO_DIR = Path(__file__).parent / "static" / "audio"
@@ -35,18 +39,134 @@ def parse_text():
         data = request.get_json()
         text = data.get('text', '')
         dialect = data.get('dialect', 'MSA')
-        
+
         if not text:
             return jsonify({'error': 'No text provided'}), 400
-        
+
         # Process the text using ArabicTTS
         tts = ArabicTTS(dialect)
         result = tts.process_text(text)
-        
+
         return jsonify(result)
-    
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/process', methods=['POST'])
+def process_hierarchical():
+    """
+    Process Arabic text and return hierarchical data structure (WORD + CHAR levels).
+
+    This endpoint returns data in the format required for the matrix display:
+    - WORD-level rows: One row per word with full word analysis
+    - CHAR-level rows: Multiple rows per word, one for each character with role detection
+
+    Expected JSON:
+    {
+        "text": "صباح الخير",
+        "dialect": "EG",          # Optional, default: "EG"
+        "expected_ipa": "sˁɑbɑːħ"  # Optional, for comparison highlighting
+    }
+
+    Returns:
+    {
+        "original_text": "صباح الخير",
+        "dialect": "EG",
+        "words": [
+            {
+                "type": "WORD",
+                "word": "صباح",
+                "position": "-",
+                "original": "صباح",
+                "diacritized": "صَبَاح",
+                "syllable_pattern": "CV.CV",
+                "syllable_index": "-",
+                "syllable_role": "-",
+                "phonology_rules": ["emphatic_spread"],
+                "ipa": "sˁɑbɑːħ",
+                "xsampa": "s_?Aba:X\\",
+                "characters": [
+                    {
+                        "type": "CHAR",
+                        "word": "صباح",
+                        "position": "1-initial",
+                        "original": "ص",
+                        "diacritized": "صَ",
+                        "syllable_pattern": "-",
+                        "syllable_index": "1",
+                        "syllable_role": "onset",
+                        "phonology_rules": ["emphatic_spread"],
+                        "ipa": "sˁ",
+                        "xsampa": "s_?"
+                    },
+                    ...
+                ]
+            },
+            ...
+        ]
+    }
+    """
+    try:
+        data = request.get_json()
+        text = data.get('text', '')
+        dialect = data.get('dialect', 'EG')
+        expected_ipa = data.get('expected_ipa', None)
+
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
+
+        # Step 1: Process the text using standard ArabicTTS pipeline
+        tts = ArabicTTS(dialect)
+        tts_result = tts.process_text(text)
+
+        # Step 2: Convert to hierarchical structure with character-level analysis
+        hierarchical_result = hierarchical_processor.process_result(
+            tts_result,
+            text,
+            applied_rules_mapping=None  # Can be enhanced later
+        )
+
+        # Step 3: Add expected IPA comparison if provided
+        if expected_ipa:
+            hierarchical_result['expected_ipa'] = expected_ipa
+            # Mark which words/chars match expected IPA
+            hierarchical_result = _compare_with_expected_ipa(
+                hierarchical_result,
+                expected_ipa
+            )
+
+        return jsonify(hierarchical_result)
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+def _compare_with_expected_ipa(result: Dict, expected_ipa: str) -> Dict:
+    """
+    Add comparison results with expected IPA.
+
+    Args:
+        result: Hierarchical processing result
+        expected_ipa: Expected IPA for comparison
+
+    Returns:
+        Result with added comparison data
+    """
+    # Extract actual IPA from first word
+    actual_ipa = ""
+    for word in result.get('words', []):
+        if word.get('type') == 'WORD':
+            actual_ipa = word.get('ipa', '')
+            break
+
+    # Add comparison flag
+    result['ipa_matches_expected'] = actual_ipa == expected_ipa
+    result['actual_ipa'] = actual_ipa
+
+    return result
 
 @app.route('/download/json', methods=['POST'])
 def download_json():
