@@ -12,12 +12,20 @@ sys.path.append('src')
 
 from src.main import ArabicTTS
 from src.integrations.espeak import ESpeakTTS
+from src.integrations.polly import PollyTTS
 from src.core.hierarchical_processor import HierarchicalProcessor
 
 app = Flask(__name__)
 
 # Initialize eSpeak TTS
 espeak_tts = ESpeakTTS()
+
+# Initialize Polly TTS (graceful degradation if AWS credentials not available)
+polly_tts = None
+try:
+    polly_tts = PollyTTS()
+except (ImportError, RuntimeError) as e:
+    print(f"[INFO] Polly not available: {e}")
 
 # Initialize hierarchical processor
 hierarchical_processor = HierarchicalProcessor()
@@ -445,17 +453,18 @@ def download_json():
 @app.route('/generate_audio', methods=['POST'])
 def generate_audio():
     """
-    Generate audio from Arabic text
-    
+    Generate audio from Arabic text using eSpeak or Polly
+
     Expected JSON:
     {
         "text": "السلام عليكم",
-        "dialect": "EG",  # Optional, default: "MSA"
-        "speed": 150,     # Optional, default: 150
-        "pitch": 50,      # Optional, default: 50
-        "use_ipa": true   # Optional, default: false (uses Arabic text directly)
+        "dialect": "EG",           # Optional, default: "MSA"
+        "engine": "espeak",        # Optional, "espeak" or "polly", default: "espeak"
+        "speed": 150,              # Optional, default: 150 (eSpeak only)
+        "pitch": 50,               # Optional, default: 50 (eSpeak only)
+        "use_ipa": false           # Optional, default: false (uses Arabic text directly)
     }
-    
+
     Returns:
     {
         "success": true,
@@ -468,74 +477,126 @@ def generate_audio():
         data = request.get_json()
         text = data.get('text', '')
         dialect = data.get('dialect', 'MSA')
+        engine = data.get('engine', 'espeak').lower()
         speed = data.get('speed', 150)
         pitch = data.get('pitch', 50)
         use_ipa = data.get('use_ipa', False)
-        
+
         if not text:
             return jsonify({'error': 'No text provided'}), 400
-        
-        # Generate unique filename
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
-        filename = f"output_{dialect}_{timestamp}.wav"
-        output_path = str(AUDIO_DIR / filename)
-        
+
+        if engine not in ['espeak', 'polly']:
+            return jsonify({'error': f'Invalid engine: {engine}. Must be "espeak" or "polly"'}), 400
+
         # Process text through ArabicTTS pipeline
         tts = ArabicTTS(dialect)
         result = tts.process_text(text)
-        
+
         # Extract IPA from syllables
         ipa_parts = []
+        xsampa_parts = []
         for word in result.get('words', []):
             if word.get('type') == 'arabic_word':
                 for syllable in word.get('syllables', []):
                     # Try to get IPA from different sources
                     # Priority: pharyngealized_ipa > generated_ipa > ipa
                     syl_ipa = (
-                        syllable.get('pharyngealized_ipa') or 
-                        syllable.get('generated_ipa') or 
+                        syllable.get('pharyngealized_ipa') or
+                        syllable.get('generated_ipa') or
                         syllable.get('ipa', '')
                     )
                     if syl_ipa:
                         ipa_parts.append(syl_ipa)
-        
-        # Combine IPA parts
+
+                    # Also extract X-SAMPA
+                    syl_xsampa = syllable.get('xsampa', '')
+                    if syl_xsampa:
+                        xsampa_parts.append(syl_xsampa)
+
+        # Combine IPA and X-SAMPA parts
         full_ipa = ' '.join(ipa_parts) if ipa_parts else text
-        
-        # Generate audio
-        if use_ipa and ipa_parts:
-            # Use IPA input
-            success, message = espeak_tts.generate_audio(
-                full_ipa,
-                output_path,
-                speed=speed,
-                pitch=pitch
+        full_xsampa = ' '.join(xsampa_parts) if xsampa_parts else ''
+
+        if engine == 'espeak':
+            # Generate eSpeak audio
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+            filename = f"output_{dialect}_{timestamp}.wav"
+            output_path = str(AUDIO_DIR / filename)
+
+            # Generate audio
+            if use_ipa and ipa_parts:
+                # Use IPA input
+                success, message = espeak_tts.generate_audio(
+                    full_ipa,
+                    output_path,
+                    speed=speed,
+                    pitch=pitch
+                )
+            else:
+                # Use Arabic text directly
+                success, message = espeak_tts.generate_audio_from_text(
+                    text,
+                    output_path,
+                    speed=speed,
+                    pitch=pitch
+                )
+
+            if success:
+                audio_url = f"/static/audio/{filename}"
+                return jsonify({
+                    'success': True,
+                    'audio_url': audio_url,
+                    'ipa': full_ipa,
+                    'message': message,
+                    'engine': 'eSpeak',
+                    'processing_result': result
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': message,
+                    'engine': 'eSpeak'
+                }), 500
+
+        elif engine == 'polly':
+            # Generate Polly audio
+            if polly_tts is None:
+                return jsonify({
+                    'success': False,
+                    'error': 'Polly is not available. AWS credentials not configured or boto3 not installed.',
+                    'engine': 'Polly'
+                }), 503
+
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+            filename = f"output_{dialect}_{timestamp}.mp3"
+            output_path = str(AUDIO_DIR / filename)
+
+            # Generate audio using Polly
+            success, message = polly_tts.generate_audio(
+                text=text,
+                xsampa=full_xsampa,
+                output_path=output_path,
+                voice_id='Zeina' if dialect in ['MSA', 'EG'] else 'Zeina',
+                engine='neural'
             )
-        else:
-            # Use Arabic text directly
-            success, message = espeak_tts.generate_audio_from_text(
-                text,
-                output_path,
-                speed=speed,
-                pitch=pitch
-            )
-        
-        if success:
-            # Return relative URL for audio file
-            audio_url = f"/static/audio/{filename}"
-            return jsonify({
-                'success': True,
-                'audio_url': audio_url,
-                'ipa': full_ipa,
-                'message': message,
-                'processing_result': result
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'error': message
-            }), 500
-    
+
+            if success:
+                audio_url = f"/static/audio/{filename}"
+                return jsonify({
+                    'success': True,
+                    'audio_url': audio_url,
+                    'ipa': full_ipa,
+                    'message': message,
+                    'engine': 'AWS Polly',
+                    'processing_result': result
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': message,
+                    'engine': 'AWS Polly'
+                }), 500
+
     except Exception as e:
         return jsonify({
             'success': False,
