@@ -411,11 +411,13 @@ class HierarchicalProcessor:
 
         syllable = syllables[syll_idx]
 
-        # Try to extract character IPA from syllable IPA
+        # Get the syllable IPA (now properly populated by IPAMapper)
         syllable_ipa = syllable.get('ipa', '')
+        syllable_text = syllable.get('syllable', '')
 
-        # For now, return syllable IPA (full implementation would map char to IPA)
-        # This is a simplified version that returns the syllable IPA
+        # For now, return full syllable IPA
+        # Full char-by-char IPA extraction would require complex phonetic analysis
+        # This is acceptable for the matrix view as it shows per-syllable IPA
         return syllable_ipa
 
     def _extract_char_rules(
@@ -467,14 +469,16 @@ class HierarchicalProcessor:
 
         # Extract from each syllable if available
         for syll in syllables:
-            # Check for rule tracking in syllable data
+            # Check for rule tracking in syllable data (supports multiple field names)
             if 'applied_rules' in syll:
                 rules.update(syll['applied_rules'])
-            elif 'gemination' in syll and syll['gemination']:
+
+            # Check for phonology rule flags
+            if syll.get('has_gemination'):
                 rules.add('gemination')
-            elif 'sun_letter' in syll and syll['sun_letter']:
+            if syll.get('sun_letter_assimilation'):
                 rules.add('sun_letters')
-            elif 'emphatic' in syll and syll['emphatic']:
+            if syll.get('has_emphatic'):
                 rules.add('emphatic_spread')
 
         return rules

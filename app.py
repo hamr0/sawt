@@ -36,7 +36,7 @@ AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('demo.html')
 
 @app.route('/demo')
 def demo():

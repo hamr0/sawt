@@ -273,13 +273,8 @@ class ArabicTTS:
             syllables = self.apply_phonological_rules(syllables)
 
             # Generate IPA using IPAMapper (dialect-specific step)
+            # NOTE: map_to_ipa also populates syllable["ipa"] with per-syllable IPA
             ipa_transcription = self.ipa_mapper.map_to_ipa(syllables, dialect)
-
-            # Add IPA to syllables for output compatibility
-            for i, syllable in enumerate(syllables):
-                # For backward compatibility, add basic IPA if needed
-                # The full IPA is already in ipa_transcription
-                syllable["ipa"] = syllable.get("syllable", "")
 
             result["words"].append({
                 "type": "arabic_word",

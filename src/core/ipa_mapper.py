@@ -213,6 +213,9 @@ class IPAMapper:
                 position,
                 context
             )
+
+            # IMPORTANT: Store the IPA back in the syllable for hierarchical processor
+            syllable_dict['ipa'] = syllable_ipa
             ipa_parts.append(syllable_ipa)
 
         return ''.join(ipa_parts)
