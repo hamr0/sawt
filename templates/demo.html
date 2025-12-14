@@ -181,6 +181,121 @@
             font-weight: bold;
         }
 
+        .matrix-section {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .view-toggle {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .view-toggle label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+            margin-bottom: 0;
+            gap: 8px;
+        }
+
+        .view-toggle input[type="radio"] {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .matrix-table-wrapper {
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        .matrix-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .matrix-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            word-break: break-word;
+        }
+
+        .matrix-table tr:nth-child(odd) {
+            background-color: #fafafa;
+        }
+
+        .matrix-table tr:nth-child(even) {
+            background-color: white;
+        }
+
+        .matrix-table tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        .row-type-WORD {
+            font-weight: bold;
+            background-color: #e8f4f8;
+        }
+
+        .row-type-CHAR {
+            font-size: 0.95rem;
+        }
+
+        .rtl-text {
+            direction: rtl;
+            text-align: right;
+            font-family: 'Arial Unicode MS', Arial, sans-serif;
+        }
+
+        .ipa-match {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .ipa-mismatch {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .expected-ipa-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .expected-ipa-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .expected-ipa-section input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
         audio {
             width: 100%;
             margin-top: 10px;
@@ -211,14 +326,24 @@
             <div class="controls">
                 <label for="demoDialect">Dialect:</label>
                 <select id="demoDialect">
+                    <option value="EG" selected>EG (Egyptian)</option>
                     <option value="MSA">MSA</option>
-                    <option value="EG">Egyptian</option>
                     <option value="Gulf">Gulf</option>
                     <option value="Levantine">Levantine</option>
                     <option value="Maghrebi">Maghrebi</option>
                 </select>
 
-                <button id="demoProcessBtn" onclick="processDemoText()">Process Text</button>
+                <button id="demoProcessBtn" onclick="processMatrixText()">Process Text</button>
+            </div>
+
+            <div class="expected-ipa-section">
+                <label for="expectedIPA">Expected IPA (Optional - for comparison):</label>
+                <input
+                    type="text"
+                    id="expectedIPA"
+                    placeholder="e.g., sˁɑbɑːħ"
+                >
+                <small style="color: #666; display: block; margin-top: 5px;">Leave empty to skip IPA comparison. Enter expected IPA for the first word to highlight matches/differences.</small>
             </div>
         </div>
 
@@ -226,7 +351,8 @@
     </div>
 
     <script>
-        let currentDemoData = null;
+        let currentMatrixData = null;
+        let currentViewFilter = 'all'; // all, words, characters
 
         // File upload handler
         document.getElementById('fileUpload').addEventListener('change', handleFileUpload);
@@ -255,9 +381,10 @@
             reader.readAsText(file, 'UTF-8');
         }
 
-        async function processDemoText() {
+        async function processMatrixText() {
             const text = document.getElementById('demoArabicText').value.trim();
             const dialect = document.getElementById('demoDialect').value;
+            const expectedIPA = document.getElementById('expectedIPA').value.trim();
             const processBtn = document.getElementById('demoProcessBtn');
             const outputSections = document.getElementById('outputSections');
 
@@ -278,271 +405,278 @@
             outputSections.innerHTML = '<div class="loading">Processing...</div>';
 
             try {
-                const response = await fetch('/parse', {
+                const response = await fetch('/process', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         text: text,
-                        dialect: dialect
+                        dialect: dialect,
+                        expected_ipa: expectedIPA || null
                     })
                 });
 
                 const result = await response.json();
 
                 if (response.ok) {
-                    currentDemoData = result;
-                    displayPipelineResults(result);
+                    currentMatrixData = result;
+                    currentViewFilter = 'all';
+                    displayMatrixResults(result, expectedIPA);
                 } else {
                     outputSections.innerHTML = `<div class="error">Error: ${result.error || 'Failed to process text. Please try again.'}</div>`;
-                    currentDemoData = null;
+                    currentMatrixData = null;
                 }
             } catch (error) {
                 outputSections.innerHTML = `<div class="error">Network Error: Cannot connect to server. Check your connection.</div>`;
                 console.error('Processing error:', error);
-                currentDemoData = null;
+                currentMatrixData = null;
             } finally {
                 processBtn.disabled = false;
                 processBtn.textContent = 'Process Text';
             }
         }
 
-        function displayPipelineResults(result) {
+        function displayMatrixResults(result, expectedIPA) {
             const outputSections = document.getElementById('outputSections');
-
             let html = '';
 
-            // Section 1: Diacritization
-            html += createSection('demo-step-1-diacritization', 'Step 1: Diacritization',
-                `<div class="original-text" dir="rtl" style="font-size: 18px; margin-bottom: 10px;">
-                    <strong>Original:</strong> ${result.original_text || 'N/A'}
-                </div>
-                <div class="diacritized-text" dir="rtl" style="font-size: 18px;">
-                    <strong>Diacritized:</strong> ${result.diacritized_text || 'N/A'}
-                </div>`
-            );
+            // Matrix Display Section
+            html += '<div class="matrix-section">';
+            html += '<h2>Matrix View - Hierarchical Processing Results</h2>';
 
-            // Section 2: Syllabification
-            html += createSection('demo-step-2-syllabification', 'Step 2: Syllabification',
-                `<pre class="json-output">${JSON.stringify(result.syllables || {}, null, 2)}</pre>`
-            );
-
-            // Section 3: Phonological Processing
-            html += createSection('demo-step-3-phonology', 'Step 3: Phonological Processing',
-                `<pre class="json-output">${JSON.stringify(result.phonology || {}, null, 2)}</pre>`
-            );
-
-            // Section 4: IPA Generation
-            html += createSection('demo-step-4-ipa', 'Step 4: IPA Generation',
-                `<pre class="json-output">${JSON.stringify(result.ipa || {}, null, 2)}</pre>`
-            );
-
-            // Section 5: X-SAMPA Conversion
-            html += createSection('demo-step-5-xsampa', 'Step 5: X-SAMPA Conversion',
-                `<pre class="json-output">${JSON.stringify(result.xsampa || {}, null, 2)}</pre>`
-            );
-
-            // Section 6: Word Comparison Table
-            if (result.words && Array.isArray(result.words)) {
-                const tableHtml = createComparisonTable(result.words);
-                html += createSection('demo-step-comparison', 'Word-by-Word Comparison', tableHtml);
-            }
-
-            html += '<hr>';
-            html += '<button onclick="downloadDemoJson()">Download JSON</button>';
-            html += '<button onclick="downloadDemoCSV()">Download CSV</button>';
-
-            // Audio Generation Section
-            html += '<hr>';
-            html += '<div id="audioSection">';
-            html += '<h3>Step 6: Audio Generation</h3>';
-            html += '<div id="audioStatus" style="display:none;"></div>';
-            html += '<audio id="demoAudioPlayer" controls style="display:none;"></audio>';
-            html += '<div style="margin-top: 10px;">';
-            html += '<button id="generateAudioBtn" onclick="generateAudio()">Generate Audio</button>';
-            html += '<button id="downloadAudioBtn" onclick="downloadAudio()" style="display:none;">Download Audio (WAV)</button>';
+            // View Toggle Controls
+            html += '<div class="view-toggle">';
+            html += '<span style="font-weight: bold;">View:</span>';
+            html += '<label>';
+            html += '<input type="radio" name="viewFilter" value="all" checked onchange="setViewFilter(\'all\')">';
+            html += 'All (Words + Characters)';
+            html += '</label>';
+            html += '<label>';
+            html += '<input type="radio" name="viewFilter" value="words" onchange="setViewFilter(\'words\')">';
+            html += 'Words Only';
+            html += '</label>';
+            html += '<label>';
+            html += '<input type="radio" name="viewFilter" value="characters" onchange="setViewFilter(\'characters\')">';
+            html += 'Characters Only';
+            html += '</label>';
             html += '</div>';
-            html += '</div>';
+
+            // Matrix Table
+            html += createMatrixTable(result, expectedIPA);
+
+            html += '</div>'; // End matrix-section
+
+            // Controls
+            html += '<hr>';
+            html += '<button onclick="downloadMatrixCSV()">Download CSV (Hierarchical)</button>';
+            html += '<button onclick="downloadMatrixJSON()">Download JSON</button>';
 
             outputSections.innerHTML = html;
         }
 
-        function createSection(id, title, content) {
-            return `
-                <div class="demo-section" id="${id}">
-                    <h3 onclick="toggleSection('${id}')">
-                        <span class="toggle-icon">▼</span>${title}
-                    </h3>
-                    <div class="collapsible-content">
-                        ${content}
-                    </div>
-                </div>
-            `;
-        }
+        function createMatrixTable(result, expectedIPA) {
+            const rows = flattenMatrixRows(result);
 
-        function toggleSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            const content = section.querySelector('.collapsible-content');
-            const icon = section.querySelector('.toggle-icon');
+            let html = '<div class="matrix-table-wrapper">';
+            html += '<table class="matrix-table">';
 
-            if (content.style.display === 'none') {
-                content.style.display = 'block';
-                icon.textContent = '▼';
-            } else {
-                content.style.display = 'none';
-                icon.textContent = '▶';
-            }
-        }
+            // Table Headers
+            html += '<thead><tr>';
+            html += '<th>Type</th>';
+            html += '<th>Word</th>';
+            html += '<th>Position</th>';
+            html += '<th>Original</th>';
+            html += '<th>Diacritized</th>';
+            html += '<th>Syllable_Pattern</th>';
+            html += '<th>Syllable_Index</th>';
+            html += '<th>Syllable_Role</th>';
+            html += '<th>Phonology_Rules</th>';
+            html += '<th>IPA</th>';
+            html += '<th>X-SAMPA</th>';
+            html += '</tr></thead>';
 
-        function createComparisonTable(words) {
-            let html = '<table><thead><tr><th>Original</th><th>Diacritized</th><th>X-SAMPA</th></tr></thead><tbody>';
+            // Table Body
+            html += '<tbody>';
+            rows.forEach((row, index) => {
+                if (!shouldShowRow(row, currentViewFilter)) {
+                    return;
+                }
 
-            words.forEach(word => {
-                html += `<tr>
-                    <td dir="rtl">${word.original || 'N/A'}</td>
-                    <td dir="rtl">${word.diacritized || 'N/A'}</td>
-                    <td>${word.xsampa || 'N/A'}</td>
-                </tr>`;
+                const isWordRow = row.type === 'WORD';
+                const rowClass = isWordRow ? 'row-type-WORD' : 'row-type-CHAR';
+
+                // Check IPA comparison
+                let ipaClass = '';
+                if (expectedIPA && row.type === 'WORD') {
+                    ipaClass = row.ipa === expectedIPA ? 'ipa-match' : 'ipa-mismatch';
+                }
+
+                html += `<tr class="${rowClass}">`;
+                html += `<td>${row.type}</td>`;
+                html += `<td class="rtl-text">${row.word}</td>`;
+                html += `<td>${row.position}</td>`;
+                html += `<td class="rtl-text">${row.original}</td>`;
+                html += `<td class="rtl-text">${row.diacritized}</td>`;
+                html += `<td>${row.syllable_pattern}</td>`;
+                html += `<td>${row.syllable_index}</td>`;
+                html += `<td>${row.syllable_role}</td>`;
+                html += `<td>${Array.isArray(row.phonology_rules) ? row.phonology_rules.join(', ') : row.phonology_rules || '-'}</td>`;
+                html += `<td class="${ipaClass}">${row.ipa}</td>`;
+                html += `<td>${row.xsampa}</td>`;
+                html += '</tr>';
             });
 
-            html += '</tbody></table>';
+            html += '</tbody>';
+            html += '</table>';
+            html += '</div>';
+
             return html;
         }
 
-        function downloadDemoJson() {
-            if (!currentDemoData) {
-                alert('Please process some text first.');
-                return;
+        function flattenMatrixRows(result) {
+            const rows = [];
+
+            if (!result.words || !Array.isArray(result.words)) {
+                return rows;
             }
 
-            const jsonStr = JSON.stringify(currentDemoData, null, 2);
-            const blob = new Blob([jsonStr], {type: 'application/json'});
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            const dialect = document.getElementById('demoDialect').value.toLowerCase();
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            a.download = `demo_tts_output_${dialect}_${timestamp}.json`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        }
+            result.words.forEach(wordObj => {
+                // Add WORD-level row
+                rows.push({
+                    type: wordObj.type,
+                    word: wordObj.word,
+                    position: wordObj.position || '-',
+                    original: wordObj.original || '',
+                    diacritized: wordObj.diacritized || '',
+                    syllable_pattern: wordObj.syllable_pattern || '-',
+                    syllable_index: wordObj.syllable_index || '-',
+                    syllable_role: wordObj.syllable_role || '-',
+                    phonology_rules: wordObj.phonology_rules || [],
+                    ipa: wordObj.ipa || '',
+                    xsampa: wordObj.xsampa || ''
+                });
 
-        function downloadDemoCSV() {
-            if (!currentDemoData || !currentDemoData.words) {
-                alert('Please process some text first.');
-                return;
-            }
-
-            let csv = 'Original,Diacritized,X-SAMPA\n';
-
-            currentDemoData.words.forEach(word => {
-                const original = (word.original || '').replace(/"/g, '""');
-                const diacritized = (word.diacritized || '').replace(/"/g, '""');
-                const xsampa = (word.xsampa || '').replace(/"/g, '""');
-                csv += `"${original}","${diacritized}","${xsampa}"\n`;
+                // Add CHAR-level rows (children)
+                if (wordObj.characters && Array.isArray(wordObj.characters)) {
+                    wordObj.characters.forEach(charObj => {
+                        rows.push({
+                            type: charObj.type,
+                            word: charObj.word || wordObj.word,
+                            position: charObj.position || '-',
+                            original: charObj.original || '',
+                            diacritized: charObj.diacritized || '',
+                            syllable_pattern: charObj.syllable_pattern || '-',
+                            syllable_index: charObj.syllable_index || '-',
+                            syllable_role: charObj.syllable_role || '-',
+                            phonology_rules: charObj.phonology_rules || [],
+                            ipa: charObj.ipa || '',
+                            xsampa: charObj.xsampa || ''
+                        });
+                    });
+                }
             });
 
-            const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-            a.download = `demo_comparison_${timestamp}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+            return rows;
         }
 
-        async function generateAudio() {
-            if (!currentDemoData) {
+        function shouldShowRow(row, filter) {
+            if (filter === 'all') return true;
+            if (filter === 'words') return row.type === 'WORD';
+            if (filter === 'characters') return row.type === 'CHAR';
+            return true;
+        }
+
+        function setViewFilter(filter) {
+            currentViewFilter = filter;
+            if (currentMatrixData) {
+                const expectedIPA = document.getElementById('expectedIPA').value.trim();
+                displayMatrixResults(currentMatrixData, expectedIPA);
+            }
+        }
+
+        async function downloadMatrixCSV() {
+            if (!currentMatrixData || !currentMatrixData.words) {
                 alert('Please process some text first.');
                 return;
             }
 
-            const audioStatus = document.getElementById('audioStatus');
-            const audioPlayer = document.getElementById('demoAudioPlayer');
-            const generateBtn = document.getElementById('generateAudioBtn');
-            const downloadBtn = document.getElementById('downloadAudioBtn');
-
-            // Show loading state
-            audioStatus.style.display = 'block';
-            audioStatus.className = 'loading';
-            audioStatus.textContent = 'Generating audio...';
-            generateBtn.disabled = true;
-            downloadBtn.style.display = 'none';
-            audioPlayer.style.display = 'none';
+            const text = document.getElementById('demoArabicText').value.trim();
+            const dialect = document.getElementById('demoDialect').value;
+            const expectedIPA = document.getElementById('expectedIPA').value.trim();
 
             try {
-                const response = await fetch('/generate_audio', {
+                // Call backend to generate CSV
+                const response = await fetch('/download/csv', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        text: document.getElementById('demoArabicText').value,
-                        dialect: document.getElementById('demoDialect').value,
-                        speed: 150,
-                        pitch: 50,
-                        use_ipa: false
+                        text: text,
+                        dialect: dialect,
+                        expected_ipa: expectedIPA || null
                     })
                 });
 
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    audioPlayer.src = result.audio_url;
-                    audioPlayer.style.display = 'block';
-                    downloadBtn.style.display = 'inline-block';
-                    audioStatus.className = 'success';
-                    audioStatus.textContent = 'Audio ready';
-                    currentDemoData.audio_url = result.audio_url;
-                } else {
-                    audioStatus.className = 'error';
-                    audioStatus.textContent = `Error: ${result.message || 'Failed to generate audio'}`;
+                if (!response.ok) {
+                    const error = await response.json();
+                    alert('Error generating CSV: ' + (error.error || 'Unknown error'));
+                    return;
                 }
+
+                // Get the CSV content as blob
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+
+                // Extract filename from Content-Disposition header or use default
+                const contentDisposition = response.headers.get('content-disposition');
+                let filename = 'matrix_output.csv';
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename=([^;]+)/);
+                    if (filenameMatch && filenameMatch[1]) {
+                        filename = filenameMatch[1].replace(/"/g, '');
+                    }
+                }
+
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
             } catch (error) {
-                audioStatus.className = 'error';
-                audioStatus.textContent = 'Network error: Cannot connect to server';
-                console.error('Audio generation error:', error);
-            } finally {
-                generateBtn.disabled = false;
+                alert('Error downloading CSV: ' + error.message);
+                console.error('CSV download error:', error);
             }
         }
 
-        async function downloadAudio() {
-            if (!currentDemoData || !currentDemoData.audio_url) {
-                alert('Please generate audio first.');
+        function downloadMatrixJSON() {
+            if (!currentMatrixData) {
+                alert('Please process some text first.');
                 return;
             }
 
-            try {
-                const response = await fetch(currentDemoData.audio_url);
+            const jsonStr = JSON.stringify(currentMatrixData, null, 2);
+            downloadFile(jsonStr, 'application/json', 'matrix_output');
+        }
 
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                    a.download = `demo_audio_${timestamp}.wav`;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                } else {
-                    alert('Error downloading audio file');
-                }
-            } catch (error) {
-                alert('Network error: ' + error.message);
-                console.error('Download error:', error);
-            }
+        function downloadFile(content, mimeType, baseName) {
+            const blob = new Blob([content], {type: mimeType});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            const dialect = document.getElementById('demoDialect').value.toLowerCase();
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+            const ext = mimeType.includes('json') ? 'json' : 'csv';
+            a.download = `tts_${baseName}_${dialect}_${timestamp}.${ext}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
         }
     </script>
 </body>

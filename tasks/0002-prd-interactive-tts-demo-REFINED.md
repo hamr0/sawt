@@ -446,11 +446,12 @@ Processing Progress:
 
 ### Must Have (Non-Negotiable)
 
-- [ ] Hierarchical matrix table displays all 6 processing layers with WORD and CHAR rows
-- [ ] View toggle works (All / Words Only / Characters Only)
+- [x] Backend: Hierarchical data structure with WORD and CHAR rows ✅ COMPLETED
+- [x] Hierarchical matrix table displays all 6 processing layers with WORD and CHAR rows ✅ COMPLETED
+- [x] View toggle works (All / Words Only / Characters Only) ✅ COMPLETED
+- [x] Expected IPA comparison highlights differences ✅ COMPLETED
+- [x] CSV export works in hierarchical format (filterable in Excel) ✅ COMPLETED
 - [ ] Processing progress displays step and phonological rule status
-- [ ] Expected IPA comparison highlights differences
-- [ ] CSV export works in hierarchical format (filterable in Excel)
 - [ ] eSpeak audio generation works
 - [ ] Polly button available with cost warning modal
 - [ ] Runs on localhost

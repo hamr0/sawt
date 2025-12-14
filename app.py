@@ -7,6 +7,7 @@ import csv
 import io
 from pathlib import Path
 from datetime import datetime
+from typing import Dict
 sys.path.append('src')
 
 from src.main import ArabicTTS
@@ -321,6 +322,183 @@ def download_audio(filename):
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/download/csv', methods=['POST'])
+def download_matrix_csv():
+    """
+    Download hierarchical matrix data as CSV.
+
+    Expected JSON:
+    {
+        "text": "صباح الخير",
+        "dialect": "EG",
+        "expected_ipa": "sˁɑbɑːħ"  # Optional
+    }
+
+    Returns:
+    CSV file with columns:
+    Type, Word, Position, Original, Diacritized, Syllable_Pattern, Syllable_Index,
+    Syllable_Role, Phonology_Rules, IPA, X-SAMPA
+
+    Filename format: tts_matrix_YYYYMMDD_HHMMSS.csv
+    """
+    try:
+        data = request.get_json()
+        text = data.get('text', '')
+        dialect = data.get('dialect', 'EG')
+        expected_ipa = data.get('expected_ipa', None)
+
+        if not text:
+            return jsonify({'error': 'No text provided'}), 400
+
+        # Step 1: Process the text using standard ArabicTTS pipeline
+        tts = ArabicTTS(dialect)
+        tts_result = tts.process_text(text)
+
+        # Step 2: Convert to hierarchical structure with character-level analysis
+        hierarchical_result = hierarchical_processor.process_result(
+            tts_result,
+            text,
+            applied_rules_mapping=None
+        )
+
+        # Step 3: Generate CSV from hierarchical data
+        csv_content = _generate_hierarchical_csv(hierarchical_result)
+
+        # Step 4: Create response with proper headers
+        # Add UTF-8 BOM for Excel compatibility
+        response_content = '\ufeff' + csv_content
+
+        response = make_response(response_content)
+
+        # Generate timestamp for filename
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'tts_matrix_{timestamp}.csv'
+
+        response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+        response.headers['Content-Type'] = 'text/csv; charset=utf-8'
+
+        return response
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+def _generate_hierarchical_csv(result: Dict) -> str:
+    """
+    Generate hierarchical CSV content from processing result.
+
+    CSV format with 11 columns:
+    Type, Word, Position, Original, Diacritized, Syllable_Pattern, Syllable_Index,
+    Syllable_Role, Phonology_Rules, IPA, X-SAMPA
+
+    Args:
+        result: Hierarchical processing result from HierarchicalProcessor
+
+    Returns:
+        CSV content as string with proper escaping and UTF-8 support
+    """
+    output = io.StringIO()
+    writer = csv.writer(output, quoting=csv.QUOTE_MINIMAL)
+
+    # Write CSV headers
+    headers = [
+        'Type', 'Word', 'Position', 'Original', 'Diacritized',
+        'Syllable_Pattern', 'Syllable_Index', 'Syllable_Role',
+        'Phonology_Rules', 'IPA', 'X-SAMPA'
+    ]
+    writer.writerow(headers)
+
+    # Extract and flatten rows from hierarchical data
+    rows = _flatten_matrix_rows(result)
+
+    # Write data rows with proper escaping
+    for row in rows:
+        phonology_rules = row.get('phonology_rules', [])
+        if isinstance(phonology_rules, list):
+            phonology_rules_str = ';'.join(phonology_rules) if phonology_rules else '-'
+        else:
+            phonology_rules_str = str(phonology_rules) if phonology_rules else '-'
+
+        csv_row = [
+            row.get('type', ''),
+            row.get('word', ''),
+            row.get('position', '-'),
+            row.get('original', ''),
+            row.get('diacritized', ''),
+            row.get('syllable_pattern', '-'),
+            row.get('syllable_index', '-'),
+            row.get('syllable_role', '-'),
+            phonology_rules_str,
+            row.get('ipa', ''),
+            row.get('xsampa', '')
+        ]
+
+        writer.writerow(csv_row)
+
+    csv_content = output.getvalue()
+    output.close()
+
+    return csv_content
+
+
+def _flatten_matrix_rows(result: Dict) -> list:
+    """
+    Flatten hierarchical data structure into rows for CSV export.
+
+    Converts nested WORD/CHAR structure into flat list of rows,
+    maintaining hierarchy through Word column for CHAR rows.
+
+    Args:
+        result: Hierarchical processing result
+
+    Returns:
+        List of row dictionaries ready for CSV serialization
+    """
+    rows = []
+
+    if not result.get('words') or not isinstance(result['words'], list):
+        return rows
+
+    for word_obj in result['words']:
+        # Add WORD-level row
+        word_row = {
+            'type': word_obj.get('type', 'WORD'),
+            'word': word_obj.get('word', ''),
+            'position': '-',
+            'original': word_obj.get('original', ''),
+            'diacritized': word_obj.get('diacritized', ''),
+            'syllable_pattern': word_obj.get('syllable_pattern', '-'),
+            'syllable_index': '-',
+            'syllable_role': '-',
+            'phonology_rules': word_obj.get('phonology_rules', []),
+            'ipa': word_obj.get('ipa', ''),
+            'xsampa': word_obj.get('xsampa', '')
+        }
+        rows.append(word_row)
+
+        # Add CHAR-level rows (children of this word)
+        if word_obj.get('characters') and isinstance(word_obj['characters'], list):
+            for char_obj in word_obj['characters']:
+                char_row = {
+                    'type': char_obj.get('type', 'CHAR'),
+                    'word': char_obj.get('word', word_obj.get('word', '')),
+                    'position': char_obj.get('position', '-'),
+                    'original': char_obj.get('original', ''),
+                    'diacritized': char_obj.get('diacritized', ''),
+                    'syllable_pattern': '-',
+                    'syllable_index': char_obj.get('syllable_index', '-'),
+                    'syllable_role': char_obj.get('syllable_role', '-'),
+                    'phonology_rules': char_obj.get('phonology_rules', []),
+                    'ipa': char_obj.get('ipa', ''),
+                    'xsampa': char_obj.get('xsampa', '')
+                }
+                rows.append(char_row)
+
+    return rows
 
 
 @app.route('/download/dictionary/csv')
