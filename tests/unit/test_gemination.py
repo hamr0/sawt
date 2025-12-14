@@ -9,8 +9,8 @@ from src.core.gemination import GeminationProcessor
 
 @pytest.fixture
 def gemination_processor():
-    """Egyptian Arabic gemination processor"""
-    return GeminationProcessor("EG")
+    """Universal gemination processor (dialect-independent)"""
+    return GeminationProcessor()
 
 
 class TestGeminationDetection:
@@ -229,7 +229,7 @@ class TestGeminationConsistency:
 # Test statistics
 def test_gemination_accuracy():
     """Calculate overall gemination detection accuracy"""
-    processor = GeminationProcessor("EG")
+    processor = GeminationProcessor()
     
     # 6 words with gemination
     geminated_words = ["مُدَرِّس", "كُلّ", "شَدّ", "مُهِمّ", "حَتّى", "جَنّة"]

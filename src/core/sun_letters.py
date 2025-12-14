@@ -23,20 +23,23 @@ from typing import List, Dict
 class SunLetterProcessor:
     """
     Processes sun letter assimilation in Arabic definite article ال (al-)
-    
+
+    ARCHITECTURE NOTE: This is a UNIVERSAL component with NO dialect parameter.
+    Sun letter assimilation detection is identical across all Arabic dialects.
+    Dialect selection happens later in the IPAMapper component.
+
     Sun letter assimilation is a critical phonological rule in Arabic where
     the /l/ sound of the definite article assimilates with the following
     consonant if it's a "sun letter", causing gemination.
     """
-    
-    def __init__(self, dialect: str):
+
+    def __init__(self):
         """
         Initialize sun letter processor
-        
-        Args:
-            dialect: Arabic dialect code (e.g., "EG" for Egyptian Arabic)
+
+        Note: No dialect parameter needed - sun letter detection is universal
+        and independent of dialect selection.
         """
-        self.dialect = dialect
         
         # Define sun letters (14 consonants)
         self.sun_letters = {
@@ -261,7 +264,7 @@ class SunLetterProcessor:
 
 if __name__ == "__main__":
     # Quick test
-    processor = SunLetterProcessor("EG")
+    processor = SunLetterProcessor()
     
     test_words = [
         ("الشمس", "ash-shams", "the sun - sun letter ش"),

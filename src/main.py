@@ -157,10 +157,15 @@ class ArabicTTS:
         self.punctuation = [',', ';', ':', '،', '.', '?', '!']
         
         # Initialize phonological processors
-        self.gemination_processor = GeminationProcessor(dialect)
-        self.sun_letter_processor = SunLetterProcessor(dialect)
+        # Note: Processors are transitioning to universal (no dialect param)
+        # GeminationProcessor and SunLetterProcessor are now universal
+        # AllophoneProcessor and EmphaticProcessor still need refactoring
+        self.gemination_processor = GeminationProcessor()
+        self.sun_letter_processor = SunLetterProcessor()
         self.allophone_processor = AllophoneProcessor(dialect)
         self.emphatic_processor = EmphaticProcessor(dialect)
+        self.position_detector = PositionDetector()
+        self.ipa_mapper = IPAMapper()
 
     def process_text(self, text: str) -> Dict:
         """Main processing pipeline for Arabic text"""

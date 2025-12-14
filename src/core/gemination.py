@@ -14,19 +14,20 @@ from typing import List, Dict
 class GeminationProcessor:
     """
     Processes gemination (consonant doubling) marked by shadda (ّ)
-    
+
+    ARCHITECTURE NOTE: This is a UNIVERSAL component with NO dialect parameter.
+    Gemination detection is identical across all Arabic dialects.
     This is the first phonological rule in the processing pipeline.
     Must be applied before sun letter assimilation, allophones, and emphatic spread.
     """
-    
-    def __init__(self, dialect: str):
+
+    def __init__(self):
         """
         Initialize gemination processor
-        
-        Args:
-            dialect: Arabic dialect code (e.g., "EG" for Egyptian Arabic)
+
+        Note: No dialect parameter needed - gemination detection is universal
+        and independent of dialect selection.
         """
-        self.dialect = dialect
         self.shadda = 'ّ'  # Gemination marker
     
     def process(self, syllables: List[Dict]) -> List[Dict]:
@@ -135,7 +136,7 @@ class GeminationProcessor:
 
 if __name__ == "__main__":
     # Quick test
-    processor = GeminationProcessor("EG")
+    processor = GeminationProcessor()
     
     test_syllable = {
         "syllable": "مُدَرِّس",

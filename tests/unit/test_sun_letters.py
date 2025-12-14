@@ -9,8 +9,8 @@ from src.core.sun_letters import SunLetterProcessor
 
 @pytest.fixture
 def sun_processor():
-    """Egyptian Arabic sun letter processor"""
-    return SunLetterProcessor("EG")
+    """Universal sun letter processor (dialect-independent)"""
+    return SunLetterProcessor()
 
 
 class TestSunLetterDetection:
@@ -315,7 +315,7 @@ class TestRealWorldExamples:
 # Test statistics
 def test_sun_letter_accuracy():
     """Calculate overall sun letter detection accuracy"""
-    processor = SunLetterProcessor("EG")
+    processor = SunLetterProcessor()
     
     # 8 sun letter words
     sun_words = ["الشمس", "الدرس", "الرجل", "النور", "الصباح", "الطعام", "السماء", "الليل"]
