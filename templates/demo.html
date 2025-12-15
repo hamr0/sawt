@@ -717,21 +717,30 @@
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let resultData = null;
+                let buffer = ''; // Buffer to handle incomplete lines across chunks
 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
 
                     const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
+                    buffer += chunk; // Add chunk to buffer
+                    const lines = buffer.split('\n');
 
-                    for (const line of lines) {
+                    // Keep last potentially incomplete line in buffer
+                    buffer = lines[lines.length - 1];
+
+                    // Process all complete lines
+                    for (let i = 0; i < lines.length - 1; i++) {
+                        const line = lines[i];
                         if (line.startsWith('data: ')) {
                             try {
                                 const eventData = JSON.parse(line.slice(6));
+                                console.log('SSE Event received:', eventData);
 
                                 if (eventData.type === 'result') {
                                     resultData = eventData.data;
+                                    console.log('Result data received:', resultData);
                                 } else if (eventData.type === 'error') {
                                     throw new Error(eventData.error);
                                 } else {
@@ -739,9 +748,23 @@
                                     updateProgressDisplay(eventData);
                                 }
                             } catch (e) {
-                                console.error('Error parsing SSE event:', e);
+                                console.error('Error parsing SSE event:', e, 'Line:', line);
                             }
                         }
+                    }
+                }
+
+                // Handle any remaining data in buffer (last chunk)
+                if (buffer && buffer.startsWith('data: ')) {
+                    try {
+                        const eventData = JSON.parse(buffer.slice(6));
+                        console.log('SSE Event from buffer:', eventData);
+                        if (eventData.type === 'result') {
+                            resultData = eventData.data;
+                            console.log('Result data from buffer:', resultData);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing final SSE event:', e);
                     }
                 }
 

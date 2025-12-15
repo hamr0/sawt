@@ -103,6 +103,34 @@ class IPAMapper:
 
         return data
 
+    def _normalize_arabic_char(self, char: str) -> str:
+        """
+        Normalize Arabic character variants to standard forms.
+
+        This handles common variants that should be treated identically:
+        - Alef maksura (ى) -> Regular alef (ا) for vowel lookup
+        - Hamza variants -> Standard forms
+
+        Args:
+            char: Arabic character to normalize
+
+        Returns:
+            Normalized character
+        """
+        # Map alef maksura to regular alef (common vowel variant)
+        if char == 'ى':  # ARABIC LETTER ALEF MAKSURA
+            return 'ا'   # ARABIC LETTER ALEF
+
+        # Map hamza variants
+        if char == 'إ':  # ARABIC LETTER ALEF WITH HAMZA BELOW
+            return 'أ'   # ARABIC LETTER ALEF WITH HAMZA ABOVE
+
+        if char == 'آ':  # ARABIC LETTER ALEF WITH MADDA ABOVE
+            return 'ا'   # ARABIC LETTER ALEF
+
+        # No normalization needed
+        return char
+
     def _build_lookup_table(self, dialect: str) -> Dict[str, Dict[str, str]]:
         """
         Build efficient lookup structure for a dialect.
@@ -293,8 +321,11 @@ class IPAMapper:
 
         lookup = self.lookup_tables[dialect]
 
+        # Normalize character variants before lookup
+        normalized_char = self._normalize_arabic_char(char)
+
         # Try to find character in lookup table
-        if char not in lookup:
+        if normalized_char not in lookup:
             # Character not in dialect data
             # Try fallback strategies
             if char.isspace() or char in '.,!?;:':
@@ -305,7 +336,7 @@ class IPAMapper:
                 # In production, might raise KeyError instead
                 return char
 
-        char_ipa_map = lookup[char]
+        char_ipa_map = lookup[normalized_char]
 
         # Try position-specific lookup first
         if position in char_ipa_map:

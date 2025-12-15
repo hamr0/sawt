@@ -32,10 +32,22 @@ class ArabicSyllabifier:
         }
 
     def segment_syllables(self, word: str) -> List[List[str]]:
+        """
+        Segment word into syllables with special handling for definite article.
+
+        Rules:
+        - Definite article ال at word beginning is kept together as CV syllable
+        - Other syllables end at vowels
+        """
         syllables = []
-        current = []
         i = 0
 
+        # Special handling for definite article ال at word start
+        if len(word) >= 2 and word[0] == 'ا' and word[1] == 'ل':
+            syllables.append(['ا', 'ل'])
+            i = 2
+
+        current = []
         while i < len(word):
             char = word[i]
             current.append(char)

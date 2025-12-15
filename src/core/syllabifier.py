@@ -29,17 +29,25 @@ class ArabicSyllabifier:
     def segment(self, word: str) -> List[List[str]]:
         """
         Improved syllable segmentation using onset-nucleus-coda analysis.
-        
+
         Fixed Rules (v2):
         - Each syllable: onset (C) + nucleus (V) + optional coda (C)
         - Sukun (ْ) marks that PREVIOUS consonant is in coda (has no vowel)
         - Shadda (ّ) doubles previous consonant: one in coda, one in next onset
         - Long vowels: short_vowel + matching long_marker (َا, ُو, ِي)
         - Diphthongs: َيْ (ay), َوْ (aw)
+        - Special handling: definite article ال is kept together as CV syllable
         """
+        # Special handling for definite article at word beginning
         syllables = []
         i = 0
-        
+
+        # Check if word starts with definite article ال (alef + lam)
+        if len(word) >= 2 and word[0] == 'ا' and word[1] == 'ل':
+            # Keep ال together as first syllable (CV pattern)
+            syllables.append(['ا', 'ل'])
+            i = 2
+
         while i < len(word):
             current_syl = []
             

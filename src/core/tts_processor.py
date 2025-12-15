@@ -1,3 +1,4 @@
+from typing import Dict, List
 from .syllabifier import ArabicSyllabifier
 from .ipa_mapper import IPAMapper
 from src.dialects import get_dialect_processor
