@@ -94,6 +94,8 @@ class ArabicSyllabifier:
             if self.validate_cvcc(syllable):
                 return 'CVCC'
             return 'CVC'  # Downgrade invalid clusters
+        elif pattern_str == 'CCV':  # Onset cluster (two consonants before vowel)
+            return 'CCV'
         elif 'VV' in pattern_str:
             return 'CVV'
         elif pattern_str == 'VC':  # Can occur with definite article
