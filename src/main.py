@@ -179,6 +179,27 @@ class ArabicTTS:
         self.position_detector = PositionDetector()
         self.ipa_mapper = IPAMapper()
 
+        # Initialize diacritizer as None (lazy-load on first use)
+        self._diacritizer = None
+
+    @property
+    def diacritizer(self):
+        """
+        Lazy-load Mishkal diacritizer (expensive initialization).
+
+        Returns:
+            TashkeelClass instance for text diacritization
+        """
+        if self._diacritizer is None:
+            try:
+                from mishkal.tashkeel import TashkeelClass
+                self._diacritizer = TashkeelClass()
+            except ImportError:
+                raise ImportError(
+                    "Mishkal library not found. Install with: pip install mishkal"
+                )
+        return self._diacritizer
+
     def process_text(self, text: str, dialect: Optional[str] = None) -> Dict:
         """
         Main processing pipeline for Arabic text.
@@ -195,8 +216,10 @@ class ArabicTTS:
 
         # Step 1: Preprocess and tokenize (universal)
         tokens = self.tokenize(text)
+        # Step 1.5: Diacritize text BEFORE syllabification (NEW)
+        diacritized_tokens = self.apply_diacritization(tokens)
         # Step 2: Analyze character positions (universal)
-        analyzed = [self.analyze_char(i, token) for i, token in enumerate(tokens)]
+        analyzed = [self.analyze_char(i, token) for i, token in enumerate(diacritized_tokens)]
         # Step 3: Group Arabic words for syllabification (universal)
         words = self.group_arabic_words(analyzed)
         # Step 4: Syllabify and map to IPA (dialect-specific IPA mapping)
@@ -218,6 +241,39 @@ class ArabicTTS:
                 current += char
         if current:
             tokens.append({"type": "word", "content": current})
+        return tokens
+
+    def apply_diacritization(self, tokens: List[Dict]) -> List[Dict]:
+        """
+        Apply automatic diacritization to Arabic tokens using Mishkal.
+
+        This is Step 1 of preprocessing (per NOTCLAUDE.md architecture).
+        Only processes tokens with Arabic text.
+
+        Args:
+            tokens: List of token dicts from tokenize()
+
+        Returns:
+            Tokens with diacritized content, original field preserved
+        """
+        for token in tokens:
+            if token["type"] == "word":
+                original = token["content"]
+                # Check if contains Arabic characters
+                if any('\u0600' <= char <= '\u06FF' for char in original):
+                    try:
+                        # Apply Mishkal diacritization
+                        diacritized = self.diacritizer.tashkeel(original)
+                        # Mishkal sometimes adds leading/trailing spaces, strip them
+                        diacritized = diacritized.strip()
+                        token["content"] = diacritized
+                        token["original"] = original  # Preserve original undiacritized
+                    except Exception as e:
+                        # If diacritization fails, keep original but don't crash
+                        # Log the error but continue processing
+                        import sys
+                        print(f"Warning: Diacritization failed for '{original}': {e}", file=sys.stderr)
+                        token["original"] = original
         return tokens
 
     def analyze_char(self, index: int, token: Dict) -> Dict:
@@ -258,18 +314,29 @@ class ArabicTTS:
         """Group consecutive Arabic characters into words"""
         words = []
         current_word = []
+        current_original = None
 
         for token in tokens:
             if token["type"] == "word" and any(char["type"] == "arabic" for char in token["chars"]):
                 current_word.extend(token["chars"])
+                # Preserve the original undiacritized text if available
+                if current_original is None and "original" in token:
+                    current_original = token["original"]
             else:
                 if current_word:
-                    words.append({"type": "arabic_word", "chars": current_word})
+                    word_entry = {"type": "arabic_word", "chars": current_word}
+                    if current_original:
+                        word_entry["original"] = current_original
+                    words.append(word_entry)
                     current_word = []
+                    current_original = None
                 words.append(token)
 
         if current_word:
-            words.append({"type": "arabic_word", "chars": current_word})
+            word_entry = {"type": "arabic_word", "chars": current_word}
+            if current_original:
+                word_entry["original"] = current_original
+            words.append(word_entry)
 
         return words
 
@@ -304,9 +371,12 @@ class ArabicTTS:
             # NOTE: map_to_ipa also populates syllable["ipa"] with per-syllable IPA
             ipa_transcription = self.ipa_mapper.map_to_ipa(syllables, dialect)
 
+            # Use original undiacritized text if available, else use the diacritized word_str
+            original_text = word.get("original", word_str)
+
             result["words"].append({
                 "type": "arabic_word",
-                "original": word_str,
+                "original": original_text,
                 "syllables": syllables,
                 "ipa": ipa_transcription,  # Full IPA transcription for the word
                 "chars": word["chars"]
