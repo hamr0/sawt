@@ -246,7 +246,7 @@ class HierarchicalProcessor:
             syllables: List of syllables from processing
 
         Returns:
-            Dict mapping char index to syllable index
+            Dict mapping char index to syllable index (1-based for display)
         """
         mapping = {}
         char_pos = 0
@@ -255,7 +255,8 @@ class HierarchicalProcessor:
             syllable_text = syllable.get('syllable', '')
             for j in range(len(syllable_text)):
                 if char_pos < len(word):
-                    mapping[char_pos] = syll_idx
+                    # Use 1-based indexing for display (not 0-based)
+                    mapping[char_pos] = syll_idx + 1
                     char_pos += 1
 
         return mapping

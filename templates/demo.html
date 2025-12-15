@@ -272,6 +272,22 @@
             font-size: 0.95rem;
         }
 
+        /* Word-level processing status indicators */
+        .word-status-success {
+            border-left: 5px solid #28a745;
+            background-color: #f1f9f6;
+        }
+
+        .word-status-warning {
+            border-left: 5px solid #ffc107;
+            background-color: #fffbf0;
+        }
+
+        .word-status-error {
+            border-left: 5px solid #dc3545;
+            background-color: #fff5f5;
+        }
+
         .rtl-text {
             direction: rtl;
             text-align: right;
@@ -984,6 +1000,33 @@
             outputSections.innerHTML = html;
         }
 
+        function getWordStatus(wordRow) {
+            /**
+             * Determine processing status for a word based on quality indicators:
+             * - success (green): All fields populated, no UNKNOWN patterns, all IPA converted
+             * - warning (orange): Some issues (UNKNOWN pattern, partial processing)
+             * - error (red): Major issues (missing IPA, raw Arabic in output)
+             */
+            if (!wordRow) return '';
+
+            // Check for error conditions: IPA empty or contains untranslated Arabic
+            if (!wordRow.ipa || wordRow.ipa === '' || /[\u0600-\u06FF]/.test(wordRow.ipa)) {
+                return 'word-status-error';
+            }
+
+            // Check for warning conditions: UNKNOWN pattern or missing phonology rules
+            if (wordRow.syllable_pattern && wordRow.syllable_pattern.includes('UNKNOWN')) {
+                return 'word-status-warning';
+            }
+
+            if (!wordRow.phonology_rules || (Array.isArray(wordRow.phonology_rules) && wordRow.phonology_rules.length === 0)) {
+                return 'word-status-warning';
+            }
+
+            // Success - word processed cleanly
+            return 'word-status-success';
+        }
+
         function createMatrixTable(result, expectedIPA) {
             const rows = flattenMatrixRows(result);
 
@@ -1013,7 +1056,15 @@
                 }
 
                 const isWordRow = row.type === 'WORD';
-                const rowClass = isWordRow ? 'row-type-WORD' : 'row-type-CHAR';
+                let rowClass = isWordRow ? 'row-type-WORD' : 'row-type-CHAR';
+
+                // Add word-level processing status indicator for WORD rows
+                if (isWordRow) {
+                    const statusClass = getWordStatus(row);
+                    if (statusClass) {
+                        rowClass += ` ${statusClass}`;
+                    }
+                }
 
                 // Check IPA comparison
                 let ipaClass = '';
