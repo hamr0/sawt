@@ -4407,6 +4407,56 @@
       "Comments": "Taa Marbuta is always at word-final position in Egyptian Arabic.",
       "Notes": "",
       "Type": "Consonants"
+    },
+    {
+      "Arabic letter": "ء",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "شيء /ʃajʔ/ (thing)",
+      "Sub-Dialect": "",
+      "Letter name": "hamza",
+      "Type": "Consonants"
+    },
+    {
+      "Arabic letter": "ؤ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "سؤال /suʔaːl/ (question)",
+      "Sub-Dialect": "",
+      "Letter name": "hamza on waw",
+      "Type": "Consonants"
+    },
+    {
+      "Arabic letter": "ئ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "شاطئ /ʃaːtiʔ/ (beach)",
+      "Sub-Dialect": "",
+      "Letter name": "hamza on yaa",
+      "Type": "Consonants"
+    },
+    {
+      "Arabic letter": "ث",
+      "IPA": "t",
+      "X-SAMPA": "t",
+      "Position": "default",
+      "Example": "ثلاثة /talaːta/ (three)",
+      "Sub-Dialect": "",
+      "Letter name": "tha",
+      "Type": "Consonants"
+    },
+    {
+      "Arabic letter": "ذ",
+      "IPA": "d",
+      "X-SAMPA": "d",
+      "Position": "default",
+      "Example": "ذهب /dahab/ (gold)",
+      "Sub-Dialect": "",
+      "Letter name": "dhal",
+      "Type": "Consonants"
     }
   ],
   "Gulf": [
