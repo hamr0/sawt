@@ -19,8 +19,21 @@ class ArabicSyllabifier:
         Dialect-specific differences only apply to IPA generation,
         which is handled by IPAMapper.
         """
-        # Load syllable patterns (same for all dialects)
-        self.vowels = {'َ', 'ُ', 'ِ', 'ْ', 'ّ', 'ا', 'ي', 'و'}
+        # Separate vowel types for correct syllable boundary detection
+        # Short vowels mark syllable boundaries
+        self.short_vowels = {'َ', 'ُ', 'ِ'}  # fatha, damma, kasra
+
+        # Long vowel markers (context-dependent, part of nucleus when following short vowel)
+        self.long_vowel_markers = {'ا', 'ي', 'و'}  # alef, yaa, waw
+
+        # Diacritical marks (not part of pattern)
+        self.diacritics = {'ْ', 'ّ', 'ٰ', 'ً', 'ٌ', 'ٍ', 'ٓ'}  # sukun, shadda, superalef, etc.
+
+        # All vowel-related characters
+        self.all_vowels = self.short_vowels | self.long_vowel_markers
+
+        # Legacy vowels for backward compatibility in classify_pattern
+        self.vowels = self.all_vowels  # Keep for API compatibility
 
         # Define universal syllable patterns
         # These patterns are the same across all Arabic dialects
@@ -36,26 +49,42 @@ class ArabicSyllabifier:
         Segment word into syllables with special handling for definite article.
 
         Rules:
-        - Definite article ال at word beginning is kept together as CV syllable
-        - Other syllables end at vowels
+        - Definite article ال at word beginning is kept separate
+        - Syllables end at SHORT vowels (َ ُ ِ), not diacritics or long vowel markers
+        - Long vowel markers (ا ي و) are included in current syllable nucleus
         """
         syllables = []
         i = 0
 
         # Special handling for definite article ال at word start
         if len(word) >= 2 and word[0] == 'ا' and word[1] == 'ل':
-            syllables.append(['ا', 'ل'])
+            al_syllable = ['ا', 'ل']
+            # Include any diacritics after the lam
             i = 2
+            while i < len(word) and word[i] in self.diacritics:
+                al_syllable.append(word[i])
+                i += 1
+            syllables.append(al_syllable)
 
         current = []
         while i < len(word):
             char = word[i]
             current.append(char)
 
-            # Syllable ends at vowel or word boundary
-            if char in self.vowels or i == len(word) - 1:
+            # Syllable ends at SHORT VOWEL (actual vowel markers, not diacritics)
+            if char in self.short_vowels:
+                # Look ahead for long vowel marker to include in same syllable
+                if i + 1 < len(word) and word[i + 1] in self.long_vowel_markers:
+                    current.append(word[i + 1])
+                    i += 1
+
                 syllables.append(current)
                 current = []
+            # End of word: add current syllable if non-empty
+            elif i == len(word) - 1:
+                syllables.append(current)
+                current = []
+
             i += 1
 
         # Handle trailing consonants
@@ -67,47 +96,131 @@ class ArabicSyllabifier:
 
         return syllables
 
+    def resyllabify(self, syllables: List[List[str]]) -> List[List[str]]:
+        """
+        Post-process syllables to merge invalid patterns into valid ones.
+
+        This method fixes patterns like:
+        - V (standalone vowel) → merge with adjacent syllable
+        - C, CC (standalone consonants) → merge with adjacent syllable (except initial definitie article)
+        - UNKNOWN patterns → attempt to merge intelligently
+
+        Args:
+            syllables: List of syllable character lists
+
+        Returns:
+            Corrected syllables with only valid patterns
+        """
+        if not syllables:
+            return syllables
+
+        corrected = []
+        i = 0
+
+        while i < len(syllables):
+            current = syllables[i]
+            pattern = self.classify_pattern(current)
+
+            # Special case: keep the definite article ال if it's first syllable
+            if i == 0 and len(current) >= 2 and current[0] == 'ا' and current[1] == 'ل':
+                # Keep the definite article even if pattern is CC
+                corrected.append(current)
+                i += 1
+                continue
+
+            # Rule 1: Merge standalone vowels with previous syllable
+            if pattern == 'V':
+                if corrected:
+                    # Add to previous syllable's coda
+                    corrected[-1].extend(current)
+                elif i + 1 < len(syllables):
+                    # Add to next syllable's onset
+                    syllables[i + 1] = current + syllables[i + 1]
+                i += 1
+                continue
+
+            # Rule 2: Merge standalone consonants (except definite article)
+            if pattern in ['C', 'CC']:
+                if corrected:
+                    # Add to previous syllable's coda
+                    corrected[-1].extend(current)
+                elif i + 1 < len(syllables):
+                    # Add to next syllable's onset
+                    syllables[i + 1] = current + syllables[i + 1]
+                i += 1
+                continue
+
+            # Rule 3: Handle UNKNOWN patterns - try to merge if possible
+            if 'UNKNOWN' in pattern:
+                if corrected:
+                    # Try merging with previous
+                    corrected[-1].extend(current)
+                elif i + 1 < len(syllables):
+                    # Try merging with next
+                    syllables[i + 1] = current + syllables[i + 1]
+                i += 1
+                continue
+
+            # Valid pattern - keep it
+            corrected.append(current)
+            i += 1
+
+        return corrected
+
     def classify_pattern(self, syllable: List[str]) -> str:
         pattern = []
         for char in syllable:
-            # Skip silent markers (sukun ْ) - they don't contribute to pattern
-            if char == 'ْ':
+            # Skip diacritical marks - they don't contribute to syllable pattern
+            if char in self.diacritics:
                 continue
-            # Vowels (except markers)
-            elif char in {'َ', 'ُ', 'ِ', 'ّ', 'ا', 'ي', 'و'}:
-                if char == 'ّ':
-                    pattern.append('C')  # Gemination marker is like a consonant
-                else:
+            # Short vowels (َ ُ ِ)
+            elif char in self.short_vowels:
+                pattern.append('V')
+            # Long vowel markers when in nucleus context
+            elif char in self.long_vowel_markers:
+                # If previous was a vowel, this is part of long vowel (still V)
+                # Otherwise it's a consonant
+                if pattern and pattern[-1] == 'V':
                     pattern.append('V')
+                else:
+                    pattern.append('C')
+            # Shadda (ّ) marks gemination - adds extra consonant
+            elif char == 'ّ':
+                # Shadda doubles the previous consonant, so add extra C
+                if pattern and pattern[-1] == 'C':
+                    pattern.append('C')
             # Any other character is a consonant
             else:
                 pattern.append('C')
 
         pattern_str = ''.join(pattern)
 
-        # Apply dialect-specific pattern rules
-        if pattern_str == 'CV':
-            return 'CV'
-        elif pattern_str == 'CVC':
-            return 'CVC'
+        # Pattern matching (order matters - longest first)
+        if pattern_str == 'CVVC':
+            return 'CVVC'
         elif pattern_str == 'CVCC':
             if self.validate_cvcc(syllable):
                 return 'CVCC'
             return 'CVC'  # Downgrade invalid clusters
+        elif pattern_str == 'CVV':
+            return 'CVV'
+        elif pattern_str == 'CVC':
+            return 'CVC'
         elif pattern_str == 'CCV':  # Onset cluster (two consonants before vowel)
             return 'CCV'
-        elif 'VV' in pattern_str:
-            return 'CVV'
-        elif pattern_str == 'VC':  # Can occur with definite article
-            return 'VC'
-        elif pattern_str == 'V':  # Standalone vowel
-            return 'V'
-        elif pattern_str == 'C':  # Standalone consonant (rare)
-            return 'C'
-        elif pattern_str == 'CC':  # Consonant cluster (gemination)
-            return 'CC'
+        elif pattern_str == 'CV':
+            return 'CV'
+        # Additional patterns that may occur
+        elif pattern_str == 'V':
+            return 'V'  # Vowel-only (rare, word-initial)
+        elif pattern_str == 'VC':
+            return 'VC'  # Vowel + consonant
+        elif pattern_str == 'CC':
+            return 'CC'  # Consonant cluster (standalone gemination)
+        elif pattern_str == 'C':
+            return 'C'  # Single consonant (standalone)
         else:
-            return 'UNKNOWN'
+            return f'UNKNOWN({pattern_str})'
 
     def validate_cvcc(self, syllable: List[str]) -> bool:
         """Check if CVCC cluster is valid for dialect"""
@@ -436,8 +549,11 @@ class ArabicTTS:
             List of syllable dictionaries with structure and pattern info
         """
         # Use the syllabifier to get syllable structure
-        # but we need to modify it to not generate IPA
         syllable_data = self.syllabifier.segment_syllables(word)
+
+        # Apply resyllabification to fix invalid patterns
+        syllable_data = self.syllabifier.resyllabify(syllable_data)
+
         syllables = []
 
         for i, syllable_chars in enumerate(syllable_data):
