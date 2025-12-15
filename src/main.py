@@ -70,11 +70,17 @@ class ArabicSyllabifier:
     def classify_pattern(self, syllable: List[str]) -> str:
         pattern = []
         for char in syllable:
-            if char in self.vowels - {'ْ', 'ّ'}:
-                pattern.append('V')
-            elif char == 'ّ':
-                pattern.append('C')  # Gemination marker
-            elif char not in {'ْ', 'ّ'}:
+            # Skip silent markers (sukun ْ) - they don't contribute to pattern
+            if char == 'ْ':
+                continue
+            # Vowels (except markers)
+            elif char in {'َ', 'ُ', 'ِ', 'ّ', 'ا', 'ي', 'و'}:
+                if char == 'ّ':
+                    pattern.append('C')  # Gemination marker is like a consonant
+                else:
+                    pattern.append('V')
+            # Any other character is a consonant
+            else:
                 pattern.append('C')
 
         pattern_str = ''.join(pattern)
@@ -90,6 +96,14 @@ class ArabicSyllabifier:
             return 'CVC'  # Downgrade invalid clusters
         elif 'VV' in pattern_str:
             return 'CVV'
+        elif pattern_str == 'VC':  # Can occur with definite article
+            return 'VC'
+        elif pattern_str == 'V':  # Standalone vowel
+            return 'V'
+        elif pattern_str == 'C':  # Standalone consonant (rare)
+            return 'C'
+        elif pattern_str == 'CC':  # Consonant cluster (gemination)
+            return 'CC'
         else:
             return 'UNKNOWN'
 

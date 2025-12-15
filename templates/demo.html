@@ -99,6 +99,22 @@
             margin-top: 15px;
         }
 
+        .controls-above-matrix {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+
+        .controls-above-matrix button {
+            flex: 1;
+            min-width: 150px;
+        }
+
         .demo-section {
             margin-bottom: 20px;
             border: 1px solid #e9ecef;
@@ -576,6 +592,7 @@
 
             <label for="fileUpload">Or upload a text file:</label>
             <input type="file" id="fileUpload" accept=".txt">
+            <small style="color: #666; display: block; margin-bottom: 15px;">*File upload takes precedence over text box input when both are present</small>
 
             <div class="controls">
                 <label for="demoDialect">Dialect:</label>
@@ -597,7 +614,14 @@
                     id="expectedIPA"
                     placeholder="e.g., sˁɑbɑːħ"
                 >
-                <small style="color: #666; display: block; margin-top: 5px;">Leave empty to skip IPA comparison. Enter expected IPA for the first word to highlight matches/differences.</small>
+                <small style="color: #666; display: block; margin-top: 8px;">
+                    <strong>How it works:</strong><br>
+                    • Leave empty to skip IPA comparison<br>
+                    • Enter the expected IPA pronunciation for the <strong>first word only</strong><br>
+                    • Rows matching the expected IPA will be highlighted in <span style="background-color: #d4edda; padding: 2px 5px; border-radius: 3px;"><strong>green</strong></span><br>
+                    • Rows differing from expected IPA will be highlighted in <span style="background-color: #f8d7da; padding: 2px 5px; border-radius: 3px;"><strong>red</strong></span><br>
+                    • Example: For "صباح", enter "sˁɑbɑːħ" to compare
+                </small>
             </div>
         </div>
 
@@ -647,34 +671,50 @@
         let currentViewFilter = 'all'; // all, words, characters
 
         // File upload handler
+        // Track if file was uploaded (for precedence)
+        let uploadedFileContent = null;
+
         document.getElementById('fileUpload').addEventListener('change', handleFileUpload);
 
         function handleFileUpload(event) {
             const file = event.target.files[0];
-            if (!file) return;
+            if (!file) {
+                uploadedFileContent = null;
+                return;
+            }
 
             // Validate file type
             if (!file.name.endsWith('.txt')) {
                 alert('Please select a .txt file');
                 event.target.value = '';
+                uploadedFileContent = null;
                 return;
             }
 
             const reader = new FileReader();
 
             reader.onload = function(e) {
-                document.getElementById('demoArabicText').value = e.target.result;
+                uploadedFileContent = e.target.result;
+                document.getElementById('demoArabicText').value = uploadedFileContent;
             };
 
             reader.onerror = function() {
                 alert('Error reading file. Please try again.');
+                uploadedFileContent = null;
             };
 
             reader.readAsText(file, 'UTF-8');
         }
 
         async function processMatrixText() {
-            const text = document.getElementById('demoArabicText').value.trim();
+            // FILE UPLOAD TAKES PRECEDENCE: Use uploaded file if available
+            let text;
+            if (uploadedFileContent) {
+                text = uploadedFileContent.trim();
+            } else {
+                text = document.getElementById('demoArabicText').value.trim();
+            }
+
             const dialect = document.getElementById('demoDialect').value;
             const expectedIPA = document.getElementById('expectedIPA').value.trim();
             const processBtn = document.getElementById('demoProcessBtn');
@@ -683,7 +723,7 @@
 
             // Validation
             if (!text) {
-                outputSections.innerHTML = '<div class="error">Please enter some Arabic text.</div>';
+                outputSections.innerHTML = '<div class="error">Please enter some Arabic text or upload a file.</div>';
                 return;
             }
 
@@ -785,9 +825,8 @@
             } finally {
                 processBtn.disabled = false;
                 processBtn.textContent = 'Process Text';
-                setTimeout(() => {
-                    progressSection.classList.remove('visible');
-                }, 1000);
+                // KEEP progress section visible to show persistent status (green/complete for all steps)
+                // User can see which steps completed successfully
             }
         }
 
@@ -925,24 +964,22 @@
             html += '</label>';
             html += '</div>';
 
+            html += '</div>'; // End matrix-section
+
+            // Controls - Single line above matrix
+            html += '<div class="controls-above-matrix">';
+            html += '<button onclick="downloadMatrixCSV()">📊 Download CSV</button>';
+            html += '<button onclick="downloadMatrixJSON()">📋 Download JSON</button>';
+            html += '<button onclick="generateEspeakAudio()">🔊 Generate Audio (eSpeak)</button>';
+            html += '<button onclick="showPollyWarning()">💰 Generate with Polly</button>';
+            html += '</div>';
+
             // Matrix Table
             html += createMatrixTable(result, expectedIPA);
 
-            html += '</div>'; // End matrix-section
-
-            // Controls
-            html += '<hr>';
-            html += '<button onclick="downloadMatrixCSV()">Download CSV (Hierarchical)</button>';
-            html += '<button onclick="downloadMatrixJSON()">Download JSON</button>';
-
-            // Audio Section
-            html += '<div class="audio-section">';
-            html += '<h4>🔊 Audio Generation</h4>';
-            html += '<button onclick="generateEspeakAudio()">🔊 Generate Audio (eSpeak)</button>';
-            html += '<div id="espeakAudioContainer"></div>';
-            html += '<button onclick="showPollyWarning()">💰 Generate with Polly</button>';
-            html += '<div id="pollyAudioContainer"></div>';
-            html += '</div>';
+            // Audio containers (hidden by default, appear below matrix)
+            html += '<div id="espeakAudioContainer" style="margin-top: 15px;"></div>';
+            html += '<div id="pollyAudioContainer" style="margin-top: 10px;"></div>';
 
             outputSections.innerHTML = html;
         }
