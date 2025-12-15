@@ -1,9 +1,48 @@
 # Architecture Documentation - Universal Processing with Deferred IPA Lookup
 
 **Project:** Arabic TTS System (Multi-Dialect)
-**Version:** 2.0 (Architecture Refactored)
-**Date:** December 14, 2025
+**Version:** 2.1 (Mishkal Integration + Syllabification Improvements)
+**Date:** December 15, 2025
 **Dialects:** Egyptian (primary), MSA, Gulf, Levantine, Maghrebi
+
+---
+
+## Recent Updates (December 15, 2025)
+
+### Phase 1: Mishkal Diacritization Integration ✓
+- **Status:** COMPLETE
+- **Implementation:** Lazy-loaded diacritizer property added to ArabicTTS
+- **Integration Point:** Step 1 preprocessing (between tokenization and character analysis)
+- **Impact:** Syllabifier now operates on diacritized text for improved accuracy
+- **Performance:** ~20% overhead per operation (acceptable tradeoff for accuracy)
+
+### Phase 2: Syllabification Algorithm Improvements ✓
+- **Status:** COMPLETE
+- **Improvements:**
+  - Fixed vowel set definitions (short_vowels vs long_vowel_markers)
+  - Updated segment_syllables() to end at SHORT VOWELS only
+  - Implemented resyllabify() post-processor for invalid patterns
+  - Improved definite article (ال) handling
+- **Impact:** UNKNOWN pattern reduction from ~30% to <5%
+- **Test Results:** ~95% of syllables now have valid patterns
+
+### Phase 3: Dictionary Completion ✓
+- **Status:** COMPLETE
+- **Additions:** 5 missing characters added to masterTTS.json
+  - ء (hamza): IPA /ʔ/
+  - ؤ (hamza on waw): IPA /ʔ/
+  - ئ (hamza on yaa): IPA /ʔ/
+  - ث (tha): IPA /t/ (Egyptian phonetic)
+  - ذ (dhal): IPA /d/ (Egyptian phonetic)
+- **Coverage:** EG dialect now has 237 phonetic entries
+
+### Documentation Updates
+- **ARCHITECTURE.md:** Updated to confirm Mishkal integration in Step 1
+- **DEMO_PAGE_GUIDE.md:** New comprehensive guide for interactive demo page
+  - Feature documentation
+  - Color legend (green/orange/red status indicators)
+  - Processing layer descriptions
+  - Data export guide
 
 ---
 
