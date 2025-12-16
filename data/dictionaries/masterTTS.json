@@ -17071,6 +17071,149 @@
       "Type": "Consonants",
       "Comments": "Maghrebi voiceless alveolar fricative word-finally",
       "user": "llm"
+    },
+    {
+      "Arabic letter": "ص",
+      "IPA": "sˤ",
+      "X-SAMPA": "s_?\\",
+      "Position": "default",
+      "Example": "صباح /sˤbaːħ/ (morning)",
+      "Type": "Consonants",
+      "Letter name": "صاد (sad)",
+      "Comments": "Maghrebi emphatic alveolar fricative",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ض",
+      "IPA": "dˤ",
+      "X-SAMPA": "d_?\\",
+      "Position": "default",
+      "Example": "ضوء /dˤoː/ (light)",
+      "Type": "Consonants",
+      "Letter name": "ضاد (dad)",
+      "Comments": "Maghrebi emphatic voiced alveolar stop",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ط",
+      "IPA": "tˤ",
+      "X-SAMPA": "t_?\\",
+      "Position": "default",
+      "Example": "طعام /tˤaʕaːm/ (food)",
+      "Type": "Consonants",
+      "Letter name": "طاء (ta)",
+      "Comments": "Maghrebi emphatic voiceless alveolar stop",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ظ",
+      "IPA": "dˤ",
+      "X-SAMPA": "d_?\\",
+      "Position": "default",
+      "Example": "ظهر /dˤuhr/ (noon)",
+      "Type": "Consonants",
+      "Letter name": "ظاء (zha)",
+      "Comments": "Maghrebi emphatic /dˤ/, often merged with ض",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ة",
+      "IPA": "a",
+      "X-SAMPA": "a",
+      "Position": "default",
+      "Example": "مدرسة /mədrasa/ (school)",
+      "Type": "Consonants",
+      "Letter name": "تاء مربوطة (ta marbuta)",
+      "Comments": "Maghrebi ta marbuta, typically /a/ or silent",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ى",
+      "IPA": "aː",
+      "X-SAMPA": "a:",
+      "Position": "default",
+      "Example": "مستشفى /mustʃfaː/ (hospital)",
+      "Type": "Vowels",
+      "Letter name": "ألف مقصورة (alef maksura)",
+      "Comments": "Maghrebi word-final long /aː/",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ئ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "شيئ /ʃiːʔ/ (thing)",
+      "Type": "Consonants",
+      "Letter name": "همزة على ياء (hamza on ya)",
+      "Comments": "Maghrebi glottal stop on ya",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ؤ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "مؤمن /muʔmin/ (believer)",
+      "Type": "Consonants",
+      "Letter name": "همزة على واو (hamza on waw)",
+      "Comments": "Maghrebi glottal stop on waw",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "آ",
+      "IPA": "ʔaː",
+      "X-SAMPA": "?a:",
+      "Position": "default",
+      "Example": "آمن /ʔaːman/ (safe)",
+      "Type": "Vowels",
+      "Letter name": "ألف مد (alef with madda)",
+      "Comments": "Maghrebi glottal stop + long a",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ث",
+      "IPA": "t",
+      "X-SAMPA": "t",
+      "Position": "default",
+      "Example": "ثلاثة /tlaːta/ (three)",
+      "Type": "Consonants",
+      "Letter name": "ثاء (tha)",
+      "Comments": "Maghrebi /t/, θ→t shift common",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "د",
+      "IPA": "d",
+      "X-SAMPA": "d",
+      "Position": "default",
+      "Example": "دار /daːr/ (house)",
+      "Type": "Consonants",
+      "Letter name": "دال (dal)",
+      "Comments": "Maghrebi voiced alveolar stop",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ذ",
+      "IPA": "d",
+      "X-SAMPA": "d",
+      "Position": "default",
+      "Example": "ذهب /dhəb/ (gold)",
+      "Type": "Consonants",
+      "Letter name": "ذال (dhal)",
+      "Comments": "Maghrebi /d/, ð→d shift common",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ه",
+      "IPA": "h",
+      "X-SAMPA": "h",
+      "Position": "default",
+      "Example": "هنا /hna/ (here)",
+      "Type": "Consonants",
+      "Letter name": "هاء (ha)",
+      "Comments": "Maghrebi voiceless glottal fricative",
+      "user": "llm"
     }
   ],
   "MSA": [
