@@ -20997,6 +20997,105 @@
       "Letter name": "ألف (alef)",
       "Comments": "MSA long vowel [aː] word-medially",
       "user": "llm"
+    },
+    {
+      "Arabic letter": "ة",
+      "IPA": "a",
+      "X-SAMPA": "a",
+      "Position": "word-final",
+      "Example": "مدرسة /madrasa/ (school)",
+      "Type": "Consonants",
+      "Letter name": "تاء مربوطة (ta marbuta)",
+      "Comments": "MSA ta marbuta in pausal form, pronounced as [a] or [ah]",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ة",
+      "IPA": "at",
+      "X-SAMPA": "at",
+      "Position": "construct",
+      "Example": "مدرسة الأطفال /madrasatu l-ʔatˤfaːl/ (children's school)",
+      "Type": "Consonants",
+      "Letter name": "تاء مربوطة (ta marbuta)",
+      "Comments": "MSA ta marbuta in construct state, pronounced as [at]",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ة",
+      "IPA": "ah",
+      "X-SAMPA": "ah",
+      "Position": "default",
+      "Example": "شركة /ʃarikah/ (company)",
+      "Type": "Consonants",
+      "Letter name": "تاء مربوطة (ta marbuta)",
+      "Comments": "MSA ta marbuta default pronunciation with final [h]",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ئ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "شيئ /ʃajʔ/ (thing)",
+      "Type": "Consonants",
+      "Letter name": "همزة على ياء (hamza on ya)",
+      "Comments": "MSA glottal stop carried by ya",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ئ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "word-medial",
+      "Example": "رائحة /raːʔiħa/ (smell)",
+      "Type": "Consonants",
+      "Letter name": "همزة على ياء (hamza on ya)",
+      "Comments": "MSA glottal stop on ya word-medially",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ئ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "word-final",
+      "Example": "شاطئ /ʃaːtˤiʔ/ (beach)",
+      "Type": "Consonants",
+      "Letter name": "همزة على ياء (hamza on ya)",
+      "Comments": "MSA glottal stop on ya word-finally",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ؤ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "مؤمن /muʔmin/ (believer)",
+      "Type": "Consonants",
+      "Letter name": "همزة على واو (hamza on waw)",
+      "Comments": "MSA glottal stop carried by waw",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ؤ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "word-medial",
+      "Example": "مسؤول /masʔuːl/ (responsible)",
+      "Type": "Consonants",
+      "Letter name": "همزة على واو (hamza on waw)",
+      "Comments": "MSA glottal stop on waw word-medially",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ؤ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "word-final",
+      "Example": "لؤلؤ /luʔluʔ/ (pearl)",
+      "Type": "Consonants",
+      "Letter name": "همزة على واو (hamza on waw)",
+      "Comments": "MSA glottal stop on waw word-finally",
+      "user": "llm"
     }
   ]
 }
