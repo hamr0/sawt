@@ -695,13 +695,75 @@ def download_matrix_csv():
         return jsonify({'error': str(e)}), 500
 
 
+def _determine_word_status(word_obj: Dict) -> tuple:
+    """
+    Determine processing status and failed layers for a word.
+
+    Returns:
+        Tuple of (status, failed_layers)
+        - status: 'success', 'warning', or 'error'
+        - failed_layers: comma-separated codes (diac, syl, ipa, phon)
+    """
+    failed_layers = []
+
+    # Check for diacritization issues
+    original = word_obj.get('original', '')
+    diacritized = word_obj.get('diacritized', '')
+    if original == diacritized or not diacritized:
+        # No diacritization applied - could be failure
+        if any('\u064e' <= c <= '\u0652' for c in diacritized):
+            pass  # Has diacritics, likely OK
+        else:
+            # Check if it's an Arabic word that should have diacritics
+            if any('\u0600' <= c <= '\u06FF' for c in original):
+                failed_layers.append('diac')
+
+    # Check for syllable pattern issues
+    pattern = word_obj.get('syllable_pattern', '-')
+    if pattern and 'UNKNOWN' in pattern:
+        failed_layers.append('syl')
+
+    # Check for IPA issues
+    ipa = word_obj.get('ipa', '')
+    if ipa:
+        # Count IPA characters vs raw Arabic characters
+        raw_arabic_count = sum(1 for c in ipa if '\u0600' <= c <= '\u06FF')
+        if raw_arabic_count > 0:
+            # Has raw Arabic in IPA output - means some chars weren't converted
+            failed_layers.append('ipa')
+    else:
+        # No IPA generated at all
+        failed_layers.append('ipa')
+
+    # Check for phonology rules
+    phon_rules = word_obj.get('phonology_rules', [])
+    if isinstance(phon_rules, list):
+        phon_rules = phon_rules
+    elif isinstance(phon_rules, str):
+        phon_rules = [phon_rules] if phon_rules else []
+    else:
+        phon_rules = []
+
+    # Determine overall status
+    if not failed_layers:
+        status = 'success'
+    elif len(failed_layers) == 1:
+        status = 'warning'
+    else:
+        status = 'error'
+
+    failed_layers_str = ','.join(failed_layers) if failed_layers else '-'
+
+    return status, failed_layers_str
+
+
 def _generate_hierarchical_csv(result: Dict) -> str:
     """
     Generate hierarchical CSV content from processing result.
 
-    CSV format with 11 columns:
+    CSV format with 13 columns:
     Type, Word, Position, Original, Diacritized, Syllable_Pattern, Syllable_Index,
-    Syllable_Role, Phonology_Rules, IPA, X-SAMPA
+    Syllable_Role, Phonology_Rules, IPA, X-SAMPA, Status, Failed_Layers
 
     Args:
         result: Hierarchical processing result from HierarchicalProcessor
@@ -716,7 +778,7 @@ def _generate_hierarchical_csv(result: Dict) -> str:
     headers = [
         'Type', 'Word', 'Position', 'Original', 'Diacritized',
         'Syllable_Pattern', 'Syllable_Index', 'Syllable_Role',
-        'Phonology_Rules', 'IPA', 'X-SAMPA'
+        'Phonology_Rules', 'IPA', 'X-SAMPA', 'Status', 'Failed_Layers'
     ]
     writer.writerow(headers)
 
@@ -731,6 +793,13 @@ def _generate_hierarchical_csv(result: Dict) -> str:
         else:
             phonology_rules_str = str(phonology_rules) if phonology_rules else '-'
 
+        # Determine status and failed layers for WORD rows
+        if row.get('type') == 'WORD':
+            status, failed_layers = _determine_word_status(row)
+        else:
+            status = '-'
+            failed_layers = '-'
+
         csv_row = [
             row.get('type', ''),
             row.get('word', ''),
@@ -742,7 +811,9 @@ def _generate_hierarchical_csv(result: Dict) -> str:
             row.get('syllable_role', '-'),
             phonology_rules_str,
             row.get('ipa', ''),
-            row.get('xsampa', '')
+            row.get('xsampa', ''),
+            status,
+            failed_layers
         ]
 
         writer.writerow(csv_row)
