@@ -17,6 +17,15 @@ from src.core.hierarchical_processor import HierarchicalProcessor
 
 app = Flask(__name__)
 
+# Arabic diacritics that are acceptable passthrough in IPA output
+# These are NOT converted to IPA by the mapper, but are expected in output
+ARABIC_DIACRITICS = {
+    '\u064B', '\u064C', '\u064D',  # tanween (fathatan, dammatan, kasratan)
+    '\u064E', '\u064F', '\u0650',  # short vowels (fatha, damma, kasra)
+    '\u0651', '\u0652',            # shadda, sukun
+    '\u0670'                       # superscript alef
+}
+
 # Initialize eSpeak TTS
 espeak_tts = ESpeakTTS()
 
@@ -278,6 +287,9 @@ def process_with_progress():
                     text,
                     applied_rules_mapping=None
                 )
+
+                # Add Status and Failed_Layers to each word
+                hierarchical_result = _add_status_to_hierarchical_result(hierarchical_result)
 
                 # Add expected IPA comparison if provided
                 if expected_ipa:
@@ -637,7 +649,12 @@ def download_matrix_csv():
     """
     Download hierarchical matrix data as CSV.
 
-    Expected JSON:
+    Expected JSON (Option 1 - Pre-processed data):
+    {
+        "hierarchical_data": {...}  # Already processed hierarchical result
+    }
+
+    Expected JSON (Option 2 - Process from scratch):
     {
         "text": "صباح الخير",
         "dialect": "EG",
@@ -647,31 +664,37 @@ def download_matrix_csv():
     Returns:
     CSV file with columns:
     Type, Word, Position, Original, Diacritized, Syllable_Pattern, Syllable_Index,
-    Syllable_Role, Phonology_Rules, IPA, X-SAMPA
+    Syllable_Role, Phonology_Rules, IPA, X-SAMPA, Status, Failed_Layers
 
     Filename format: tts_matrix_YYYYMMDD_HHMMSS.csv
     """
     try:
         data = request.get_json()
-        text = data.get('text', '')
-        dialect = data.get('dialect', 'EG')
-        expected_ipa = data.get('expected_ipa', None)
 
-        if not text:
-            return jsonify({'error': 'No text provided'}), 400
+        # Option 1: Use pre-processed data if provided (FAST PATH)
+        if 'hierarchical_data' in data and data['hierarchical_data']:
+            hierarchical_result = data['hierarchical_data']
+        else:
+            # Option 2: Process from scratch (SLOW PATH - for backwards compatibility)
+            text = data.get('text', '')
+            dialect = data.get('dialect', 'EG')
+            expected_ipa = data.get('expected_ipa', None)
 
-        # Step 1: Process the text using standard ArabicTTS pipeline
-        tts = ArabicTTS(dialect)
-        tts_result = tts.process_text(text)
+            if not text:
+                return jsonify({'error': 'No text provided'}), 400
 
-        # Step 2: Convert to hierarchical structure with character-level analysis
-        hierarchical_result = hierarchical_processor.process_result(
-            tts_result,
-            text,
-            applied_rules_mapping=None
-        )
+            # Step 1: Process the text using standard ArabicTTS pipeline
+            tts = ArabicTTS(dialect)
+            tts_result = tts.process_text(text)
 
-        # Step 3: Generate CSV from hierarchical data
+            # Step 2: Convert to hierarchical structure with character-level analysis
+            hierarchical_result = hierarchical_processor.process_result(
+                tts_result,
+                text,
+                applied_rules_mapping=None
+            )
+
+        # Generate CSV from hierarchical data
         csv_content = _generate_hierarchical_csv(hierarchical_result)
 
         # Step 4: Create response with proper headers
@@ -726,10 +749,14 @@ def _determine_word_status(word_obj: Dict) -> tuple:
     # Check for IPA issues
     ipa = word_obj.get('ipa', '')
     if ipa:
-        # Count IPA characters vs raw Arabic characters
-        raw_arabic_count = sum(1 for c in ipa if '\u0600' <= c <= '\u06FF')
+        # Count unconverted Arabic characters (excluding acceptable diacritics)
+        # Diacritics are expected in IPA output - they're not in masterTTS.json so pass through
+        raw_arabic_count = sum(
+            1 for c in ipa
+            if '\u0600' <= c <= '\u06FF' and c not in ARABIC_DIACRITICS
+        )
         if raw_arabic_count > 0:
-            # Has raw Arabic in IPA output - means some chars weren't converted
+            # Has actual unconverted Arabic letters (not just diacritics)
             failed_layers.append('ipa')
     else:
         # No IPA generated at all
@@ -755,6 +782,28 @@ def _determine_word_status(word_obj: Dict) -> tuple:
     failed_layers_str = ','.join(failed_layers) if failed_layers else '-'
 
     return status, failed_layers_str
+
+
+def _add_status_to_hierarchical_result(result: Dict) -> Dict:
+    """
+    Add Status and Failed_Layers fields to each word in hierarchical result.
+
+    Args:
+        result: Hierarchical processing result from HierarchicalProcessor
+
+    Returns:
+        Modified result with Status and Failed_Layers added to each word
+    """
+    if not result.get('words') or not isinstance(result['words'], list):
+        return result
+
+    for word_obj in result['words']:
+        if word_obj.get('type') == 'WORD':
+            status, failed_layers = _determine_word_status(word_obj)
+            word_obj['status'] = status
+            word_obj['failed_layers'] = failed_layers
+
+    return result
 
 
 def _generate_hierarchical_csv(result: Dict) -> str:

@@ -463,3 +463,94 @@ All 5 user issues have been addressed:
 - Automatic Polly engine fallback (invisible to users)
 - Improved UI layout (audio bars above matrix)
 
+---
+
+## Issue #6: Is Diacritization Dialect-Specific?
+
+### ✅ CLARIFIED
+
+**Question:** "is diacrization important for MSA only? do other dialect selection need diacrization, or enhance pronounciaton? does diacrization vary from dialect to another?"
+
+### Answer: Diacritization is MSA-Based but Enhances ALL Dialects
+
+**Key Points:**
+
+1. **Mishkal is MSA-based** - Trained on Modern Standard Arabic corpus
+   - No dialect-specific diacritization models
+   - Produces the same diacritization regardless of target dialect
+   - `apply_diacritization()` does NOT pass dialect parameter to Mishkal
+
+2. **Diacritization happens BEFORE dialect selection**
+   - Step 1: Universal diacritization (MSA-based)
+   - Step 2: Universal syllabification (uses diacritics)
+   - Step 3: Universal phonological processing
+   - Step 4: Dialect-specific IPA mapping (here's where dialects differ)
+
+3. **Same diacritization, different pronunciation**
+   ```
+   Example: قلب (heart)
+
+   Mishkal (MSA-based): قلب → قَلْب (adds fatha on ق, sukun on ل)
+
+   Egyptian IPA:  قَلْب → [ʔælb]  (qaf → glottal stop, fatha → [æ])
+   MSA IPA:       قَلْب → [qalb]  (qaf → uvular stop, fatha → [a])
+   Gulf IPA:      قَلْب → [galb]  (qaf → velar stop, fatha → [a])
+   ```
+
+4. **Why diacritization enhances ALL dialects:**
+   - **Guides syllabification**: Vowels define syllable boundaries
+   - **Helps position detection**: Word-initial vs medial vs final
+   - **Enables better IPA mapping**: Diacritized ق vs undiacritized ق
+   - **Improves pronunciation accuracy**: Even for dialects, proper syllables matter
+
+5. **Regarding قِ (qaf with kasra) varying by dialect:**
+   - The diacritic ِ (kasra) is the SAME from Mishkal for all dialects
+   - But masterTTS.json has dialect-specific IPA for ق+kasra:
+     - Egyptian: قِ → /gi/ (before front vowels)
+     - MSA: قِ → /qi/ (standard pronunciation)
+     - Gulf: قِ → /qi/ (follows MSA)
+
+### Architecture Flow
+
+```
+Input: قلب (undiacritized)
+    ↓
+[Step 1: Universal Diacritization (Mishkal - MSA-based)]
+    ↓
+Output: قَلْب (diacritized)
+    ↓
+[Step 2-3: Universal Syllabification & Phonological Processing]
+    ↓
+Syllables: [قَ] [لْب]
+    ↓
+[Step 4: Dialect-Specific IPA Mapping (masterTTS.json)]
+    ↓
+Egyptian: [ʔæ] [lb] = [ʔælb]
+MSA:      [qa] [lb] = [qalb]
+Gulf:     [ga] [lb] = [galb]
+```
+
+### Why Mishkal Struggles with Dialects
+
+**Mishkal Handles Well:**
+- Common MSA vocabulary
+- Standard grammatical patterns
+- Regular verb conjugations
+
+**Mishkal Struggles With:**
+- Dialectal proper nouns (e.g., الإسكندرية - Alexandria)
+- Colloquial dialect words not in MSA
+- Regional place names
+- Slang and informal speech
+
+**System Behavior:**
+- When Mishkal fails: System continues with undiacritized text (graceful fallback)
+- Status marked as "diac" failure in Failed_Layers
+- IPA mapping still works (direct character lookup)
+
+### Related Files
+
+- `/home/hamr/PycharmProjects/ArabicTTS/src/main.py` (lines 359-406) - Diacritization code
+- `/home/hamr/PycharmProjects/ArabicTTS/docs/ARCHITECTURE.md` (lines 76-77) - Architecture documentation
+- `/home/hamr/PycharmProjects/ArabicTTS/data/dictionaries/masterTTS.json` - Dialect-specific IPA mappings
+

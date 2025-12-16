@@ -8677,296 +8677,6 @@
       "Comments": "This shows that /ː/ is used to indicate vowel lengthening in Gulf Arabic.\nConsonant gemination ‹ll›: /ɡull/ [ɡull] 'he said'\nThe short vowels /a/, /i/, /u/ become long vowels /aː/, /iː/, /uː/ when followed by /ː/.",
       "Notes": "Indicates a long vowel or a geminate consonant.",
       "Type": "Sample"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "default",
-      "Example": "نور /nuːr/ (light)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic alveolar nasal",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-initial",
-      "Example": "ناس /naːs/ (people)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic alveolar nasal word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-medial",
-      "Example": "منزل /manzil/ (house)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic alveolar nasal word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-final",
-      "Example": "حسن /ħasan/ (good)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic alveolar nasal word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "default",
-      "Example": "ليل /leːl/ (night)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic alveolar lateral",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-initial",
-      "Example": "لبن /laban/ (milk)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic alveolar lateral word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-medial",
-      "Example": "علم /ʕilm/ (knowledge)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic alveolar lateral word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-final",
-      "Example": "جمل /d͡ʒamal/ (camel)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic alveolar lateral word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ك",
-      "IPA": "k",
-      "X-SAMPA": "k",
-      "Position": "default",
-      "Example": "كتاب /kitaːb/ (book)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic velar stop (can be affricated before /i/)",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ك",
-      "IPA": "k",
-      "X-SAMPA": "k",
-      "Position": "word-initial",
-      "Example": "كبير /tʃibiːr/ (big - affricates before /i/)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic velar stop word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ك",
-      "IPA": "k",
-      "X-SAMPA": "k",
-      "Position": "word-medial",
-      "Example": "مكتب /maktab/ (office)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic velar stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ك",
-      "IPA": "k",
-      "X-SAMPA": "k",
-      "Position": "word-final",
-      "Example": "ملك /malik/ (king)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic velar stop word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ح",
-      "IPA": "ħ",
-      "X-SAMPA": "X\\",
-      "Position": "default",
-      "Example": "حب /ħubb/ (love)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiceless pharyngeal fricative",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ح",
-      "IPA": "ħ",
-      "X-SAMPA": "X\\",
-      "Position": "word-initial",
-      "Example": "حار /ħaːr/ (hot)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiceless pharyngeal word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ح",
-      "IPA": "ħ",
-      "X-SAMPA": "X\\",
-      "Position": "word-medial",
-      "Example": "صحيح /sˁaħiːħ/ (correct)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiceless pharyngeal word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ح",
-      "IPA": "ħ",
-      "X-SAMPA": "X\\",
-      "Position": "word-final",
-      "Example": "صباح /sˁabaːħ/ (morning)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiceless pharyngeal word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ه",
-      "IPA": "h",
-      "X-SAMPA": "h",
-      "Position": "default",
-      "Example": "هو /huː/ (he)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic glottal fricative",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ه",
-      "IPA": "h",
-      "X-SAMPA": "h",
-      "Position": "word-initial",
-      "Example": "هنا /hiniː/ (here)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic glottal fricative word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ه",
-      "IPA": "h",
-      "X-SAMPA": "h",
-      "Position": "word-medial",
-      "Example": "فاهم /faːhim/ (understanding)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic glottal fricative word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ه",
-      "IPA": "h",
-      "X-SAMPA": "h",
-      "Position": "word-final",
-      "Example": "وجه /wid͡ʒih/ (face)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic glottal fricative word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "default",
-      "Example": "تمر /tamar/ (dates)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiceless alveolar stop",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-initial",
-      "Example": "تفاح /tuffaːħ/ (apple)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiceless alveolar stop word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-final",
-      "Example": "بيت /beːt/ (house)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiceless alveolar stop word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ب",
-      "IPA": "b",
-      "X-SAMPA": "b",
-      "Position": "default",
-      "Example": "باب /baːb/ (door)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiced bilabial stop",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ب",
-      "IPA": "b",
-      "X-SAMPA": "b",
-      "Position": "word-medial",
-      "Example": "حبيب /ħabiːb/ (beloved)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiced bilabial stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ب",
-      "IPA": "b",
-      "X-SAMPA": "b",
-      "Position": "word-final",
-      "Example": "كتاب /kitaːb/ (book)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiced bilabial stop word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ف",
-      "IPA": "f",
-      "X-SAMPA": "f",
-      "Position": "default",
-      "Example": "فلس /fulus/ (money)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiceless labiodental fricative",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ف",
-      "IPA": "f",
-      "X-SAMPA": "f",
-      "Position": "word-medial",
-      "Example": "مفتاح /miftaːħ/ (key)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiceless labiodental fricative word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ف",
-      "IPA": "f",
-      "X-SAMPA": "f",
-      "Position": "word-final",
-      "Example": "صيف /sˁeːf/ (summer)",
-      "Type": "Consonants",
-      "Comments": "Gulf Arabic voiceless labiodental fricative word-finally",
-      "user": "llm"
     }
   ],
   "Levantine": [
@@ -13149,266 +12859,6 @@
       "Comments": "Summary:\n/aː/ has 4 main allophones in Levantine Arabic: [aː], [ɑː], [æː], [ɔː]\n[ɑː] occurs adjacent to uvulars, [æː] adjacent to emphatics\n[ɔː] occurs adjacent to labials",
       "Notes": "Indicates that the preceding vowel is long.",
       "Type": "Suprasegmentals"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "default",
-      "Example": "تمر /tamar/ (dates)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiceless alveolar stop",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-initial",
-      "Example": "تفاح /tuffaːħ/ (apple)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiceless alveolar stop word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-medial",
-      "Example": "كتاب /ktaːb/ (book)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiceless alveolar stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-final",
-      "Example": "بيت /beːt/ (house)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiceless alveolar stop word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ع",
-      "IPA": "ʕ",
-      "X-SAMPA": "?\\",
-      "Position": "default",
-      "Example": "عين /ʕeːn/ (eye)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiced pharyngeal fricative",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ع",
-      "IPA": "ʕ",
-      "X-SAMPA": "?\\",
-      "Position": "word-initial",
-      "Example": "علم /ʕilim/ (he knew)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiced pharyngeal word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ع",
-      "IPA": "ʕ",
-      "X-SAMPA": "?\\",
-      "Position": "word-medial",
-      "Example": "سعيد /saʕiːd/ (happy)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiced pharyngeal word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ع",
-      "IPA": "ʕ",
-      "X-SAMPA": "?\\",
-      "Position": "word-final",
-      "Example": "جمع /ʒamaʕ/ (he gathered)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiced pharyngeal word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "م",
-      "IPA": "m",
-      "X-SAMPA": "m",
-      "Position": "word-initial",
-      "Example": "محمد /mħammad/ (Muhammad)",
-      "Type": "Consonants",
-      "Comments": "Levantine bilabial nasal word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "م",
-      "IPA": "m",
-      "X-SAMPA": "m",
-      "Position": "word-medial",
-      "Example": "حمد /ħamad/ (he praised)",
-      "Type": "Consonants",
-      "Comments": "Levantine bilabial nasal word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "م",
-      "IPA": "m",
-      "X-SAMPA": "m",
-      "Position": "word-final",
-      "Example": "قلم /ʔalam/ (pen)",
-      "Type": "Consonants",
-      "Comments": "Levantine bilabial nasal word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-initial",
-      "Example": "نور /nuːr/ (light)",
-      "Type": "Consonants",
-      "Comments": "Levantine alveolar nasal word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-medial",
-      "Example": "منزل /manzil/ (house)",
-      "Type": "Consonants",
-      "Comments": "Levantine alveolar nasal word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-final",
-      "Example": "زمن /zaman/ (time)",
-      "Type": "Consonants",
-      "Comments": "Levantine alveolar nasal word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-initial",
-      "Example": "ليل /leːl/ (night)",
-      "Type": "Consonants",
-      "Comments": "Levantine alveolar lateral word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-medial",
-      "Example": "علم /ʕilim/ (he knew)",
-      "Type": "Consonants",
-      "Comments": "Levantine alveolar lateral word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-final",
-      "Example": "جمل /ʒamal/ (camel)",
-      "Type": "Consonants",
-      "Comments": "Levantine alveolar lateral word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ر",
-      "IPA": "r",
-      "X-SAMPA": "r",
-      "Position": "word-initial",
-      "Example": "رجل /raʒil/ (man)",
-      "Type": "Consonants",
-      "Comments": "Levantine alveolar trill word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ر",
-      "IPA": "r",
-      "X-SAMPA": "r",
-      "Position": "word-medial",
-      "Example": "ضرب /dˁarab/ (he hit)",
-      "Type": "Consonants",
-      "Comments": "Levantine alveolar trill word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ر",
-      "IPA": "r",
-      "X-SAMPA": "r",
-      "Position": "word-final",
-      "Example": "نور /nuːr/ (light)",
-      "Type": "Consonants",
-      "Comments": "Levantine alveolar trill word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "س",
-      "IPA": "s",
-      "X-SAMPA": "s",
-      "Position": "word-initial",
-      "Example": "سلام /salaːm/ (peace)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiceless alveolar fricative word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "س",
-      "IPA": "s",
-      "X-SAMPA": "s",
-      "Position": "word-medial",
-      "Example": "مسجد /masʒid/ (mosque)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiceless alveolar fricative word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "س",
-      "IPA": "s",
-      "X-SAMPA": "s",
-      "Position": "word-final",
-      "Example": "درس /daris/ (he studied)",
-      "Type": "Consonants",
-      "Comments": "Levantine voiceless alveolar fricative word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ك",
-      "IPA": "k",
-      "X-SAMPA": "k",
-      "Position": "word-initial",
-      "Example": "كتاب /ktaːb/ (book)",
-      "Type": "Consonants",
-      "Comments": "Levantine velar stop word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ك",
-      "IPA": "k",
-      "X-SAMPA": "k",
-      "Position": "word-medial",
-      "Example": "حكم /ħakam/ (he ruled)",
-      "Type": "Consonants",
-      "Comments": "Levantine velar stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ك",
-      "IPA": "k",
-      "X-SAMPA": "k",
-      "Position": "word-final",
-      "Example": "ملك /malek/ (king)",
-      "Type": "Consonants",
-      "Comments": "Levantine velar stop word-finally",
-      "user": "llm"
     }
   ],
   "Maghreb": [
@@ -16432,260 +15882,6 @@
       "Comments": "Summary:\n/◌ː/ has 4 allophones in Maghrebi Arabic: [◌ː], ~[◌ː], [◌ˑ], [◌̆]\n[◌ː] default in careful speech\n~[◌ː] shortened in casual speech\n[◌ˑ] before pauses\n[◌̆] in unstressed syllables",
       "Notes": "long vowel",
       "Type": "Suprasegmentals"
-    },
-    {
-      "Arabic letter": "ي",
-      "IPA": "i",
-      "X-SAMPA": "i",
-      "Position": "default",
-      "Example": "يد /jidd/ (hand)",
-      "Type": "Vowels",
-      "Letter name": "ياء (yaa)",
-      "Comments": "Maghrebi vowel /i/ or consonant /j/",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ي",
-      "IPA": "j",
-      "X-SAMPA": "j",
-      "Position": "word-initial",
-      "Example": "يوم /juːm/ (day)",
-      "Type": "Consonants",
-      "Letter name": "ياء (yaa)",
-      "Comments": "Maghrebi palatal approximant word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ي",
-      "IPA": "j",
-      "X-SAMPA": "j",
-      "Position": "word-medial",
-      "Example": "بيت /biːt/ (house)",
-      "Type": "Consonants",
-      "Letter name": "ياء (yaa)",
-      "Comments": "Maghrebi palatal approximant word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ي",
-      "IPA": "i",
-      "X-SAMPA": "i",
-      "Position": "word-final",
-      "Example": "في /fiː/ (in)",
-      "Type": "Vowels",
-      "Letter name": "ياء (yaa)",
-      "Comments": "Maghrebi long vowel word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "م",
-      "IPA": "m",
-      "X-SAMPA": "m",
-      "Position": "word-initial",
-      "Example": "محمد /mħəmməd/ (Muhammad)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi bilabial nasal word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "م",
-      "IPA": "m",
-      "X-SAMPA": "m",
-      "Position": "word-medial",
-      "Example": "حمار /ħmaːr/ (donkey)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi bilabial nasal word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "م",
-      "IPA": "m",
-      "X-SAMPA": "m",
-      "Position": "word-final",
-      "Example": "قلم /qləm/ (pen)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi bilabial nasal word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-initial",
-      "Example": "نور /nuːr/ (light)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi alveolar nasal word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-medial",
-      "Example": "منزل /mənzəl/ (house)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi alveolar nasal word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-final",
-      "Example": "زين /ziːn/ (good)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi alveolar nasal word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-initial",
-      "Example": "تفاح /tuffaːħ/ (apple)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi voiceless alveolar stop word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-medial",
-      "Example": "كتاب /ktaːb/ (book)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi voiceless alveolar stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-final",
-      "Example": "بيت /biːt/ (house)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi voiceless alveolar stop word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ب",
-      "IPA": "b",
-      "X-SAMPA": "b",
-      "Position": "word-initial",
-      "Example": "باب /baːb/ (door)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi voiced bilabial stop word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ب",
-      "IPA": "b",
-      "X-SAMPA": "b",
-      "Position": "word-medial",
-      "Example": "حبيب /ħbiːb/ (beloved)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi voiced bilabial stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ب",
-      "IPA": "b",
-      "X-SAMPA": "b",
-      "Position": "word-final",
-      "Example": "كتاب /ktaːb/ (book)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi voiced bilabial stop word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-initial",
-      "Example": "ليل /liːl/ (night)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi alveolar lateral word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-medial",
-      "Example": "علم /ʕləm/ (he knew)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi alveolar lateral word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-final",
-      "Example": "جمل /ʒməl/ (camel)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi alveolar lateral word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ر",
-      "IPA": "r",
-      "X-SAMPA": "r",
-      "Position": "word-initial",
-      "Example": "رجل /raːʒəl/ (man)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi alveolar trill word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ر",
-      "IPA": "r",
-      "X-SAMPA": "r",
-      "Position": "word-medial",
-      "Example": "ضرب /dˁrəb/ (he hit)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi alveolar trill word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ر",
-      "IPA": "r",
-      "X-SAMPA": "r",
-      "Position": "word-final",
-      "Example": "نور /nuːr/ (light)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi alveolar trill word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "س",
-      "IPA": "s",
-      "X-SAMPA": "s",
-      "Position": "word-initial",
-      "Example": "سلام /slaːm/ (peace)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi voiceless alveolar fricative word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "س",
-      "IPA": "s",
-      "X-SAMPA": "s",
-      "Position": "word-medial",
-      "Example": "مسجد /msʒid/ (mosque)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi voiceless alveolar fricative word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "س",
-      "IPA": "s",
-      "X-SAMPA": "s",
-      "Position": "word-final",
-      "Example": "درس /drəs/ (he studied)",
-      "Type": "Consonants",
-      "Comments": "Maghrebi voiceless alveolar fricative word-finally",
-      "user": "llm"
     }
   ],
   "MSA": [
@@ -17413,7 +16609,7 @@
     },
     {
       "Arabic letter": "ض",
-      "IPA": "dʕ",
+      "IPA": "/dʕ/",
       "X-SAMPA": "[dʕ]",
       "Position": "word-initial",
       "Example": "ضرب (ḍaraba)",
@@ -17432,7 +16628,7 @@
     },
     {
       "Arabic letter": "ض",
-      "IPA": "ðʕ",
+      "IPA": "/ðʕ/",
       "X-SAMPA": "[ðʕ]",
       "Position": "word-final",
       "Example": "حاضر (ḥāḍir)",
@@ -17451,7 +16647,7 @@
     },
     {
       "Arabic letter": "ض",
-      "IPA": "ðʕ",
+      "IPA": "/ðʕ/",
       "X-SAMPA": "[ðʕ]",
       "Position": "between-vowels",
       "Example": "جاذب (jādhib)",
@@ -17470,7 +16666,7 @@
     },
     {
       "Arabic letter": "ض",
-      "IPA": "dʕ",
+      "IPA": "/dʕ/",
       "X-SAMPA": "[dʕ]",
       "Position": "default",
       "Example": "ضرب (ḍaraba)",
@@ -17489,7 +16685,7 @@
     },
     {
       "Arabic letter": "ض",
-      "IPA": "ðʕ",
+      "IPA": "/ðʕ/",
       "X-SAMPA": "[ðʕ]",
       "Position": "word-initial",
       "Example": "حاضر (ḥāḍir)",
@@ -17508,7 +16704,7 @@
     },
     {
       "Arabic letter": "ض",
-      "IPA": "dʕʕ",
+      "IPA": "/dʕʕ/",
       "X-SAMPA": "[dʕʕ]",
       "Position": "geminated",
       "Example": "مضطرب (muḍṭarib)",
@@ -17527,7 +16723,7 @@
     },
     {
       "Arabic letter": "ج",
-      "IPA": "d͡ʒ",
+      "IPA": "/d͡ʒ/",
       "X-SAMPA": "[d͡ʒ]",
       "Position": "default",
       "Example": "جبل /d͡ʒabal/ (mountain)",
@@ -17546,7 +16742,7 @@
     },
     {
       "Arabic letter": "ج",
-      "IPA": "ʒ",
+      "IPA": "/ʒ/",
       "X-SAMPA": "[ʒ]",
       "Position": "intervocalic",
       "Example": "مجلة /maʒalla/ (magazine)",
@@ -17565,7 +16761,7 @@
     },
     {
       "Arabic letter": "ذ",
-      "IPA": "ð",
+      "IPA": "/ð/",
       "X-SAMPA": "[ð]",
       "Position": "default",
       "Example": "ناذر /naːðir/ (rare)",
@@ -17584,7 +16780,7 @@
     },
     {
       "Arabic letter": "ذ",
-      "IPA": "d",
+      "IPA": "/d/",
       "X-SAMPA": "[d]",
       "Position": "phrase-initial",
       "Example": "ذهب /ðahaba/ → [dahaba] (to go)",
@@ -17603,7 +16799,7 @@
     },
     {
       "Arabic letter": "ذ",
-      "IPA": "ðʕ",
+      "IPA": "/ðʕ/",
       "X-SAMPA": "[ðʕ]",
       "Position": "emphatic-environments",
       "Example": "ظريف /ðʕariːf/ (kind)",
@@ -17622,7 +16818,7 @@
     },
     {
       "Arabic letter": "ظ",
-      "IPA": "ðʕ",
+      "IPA": "/ðʕ/",
       "X-SAMPA": "[ðʕ]",
       "Position": "word-initial",
       "Example": "ظرف (ẓarf)",
@@ -17641,7 +16837,7 @@
     },
     {
       "Arabic letter": "ظ",
-      "IPA": "dʕ",
+      "IPA": "/dʕ/",
       "X-SAMPA": "[dʕ]",
       "Position": "word-medial",
       "Example": "اذطرب (idʕṭarab)",
@@ -17660,7 +16856,7 @@
     },
     {
       "Arabic letter": "ظ",
-      "IPA": "dʕ",
+      "IPA": "/dʕ/",
       "X-SAMPA": "[dʕ]",
       "Position": "word-final",
       "Example": "حاضر (ḥāḍir)",
@@ -17679,7 +16875,7 @@
     },
     {
       "Arabic letter": "ظ",
-      "IPA": "ðʕ",
+      "IPA": "/ðʕ/",
       "X-SAMPA": "[ðʕ]",
       "Position": "default",
       "Example": "ذئب /ðʕaʔb/ (wolf)",
@@ -17698,7 +16894,7 @@
     },
     {
       "Arabic letter": "ظ",
-      "IPA": "ðʕː",
+      "IPA": "/ðʕː/",
       "X-SAMPA": "[ðʕː]",
       "Position": "long",
       "Example": "ساذع /saːðʕiʕ/ (radiant)",
@@ -17717,7 +16913,7 @@
     },
     {
       "Arabic letter": "ظ",
-      "IPA": "ðʕðʕ",
+      "IPA": "/ðʕðʕ/",
       "X-SAMPA": "[ðʕðʕ]",
       "Position": "geminated",
       "Example": "مذھّل /muðʕðʕahhal/ (bedazzled)",
@@ -17736,7 +16932,7 @@
     },
     {
       "Arabic letter": "د",
-      "IPA": "dʕ",
+      "IPA": "/dʕ/",
       "X-SAMPA": "[dʕ]",
       "Position": "urban-dialects",
       "Example": "دواء /dʕawaaʔ/ (medicine)",
@@ -17755,7 +16951,7 @@
     },
     {
       "Arabic letter": "ف",
-      "IPA": "fʕ",
+      "IPA": "/fʕ/",
       "X-SAMPA": "[fʕ]",
       "Position": "word-initial",
       "Example": "فأس (faʾs)",
@@ -17774,7 +16970,7 @@
     },
     {
       "Arabic letter": "ف",
-      "IPA": "v",
+      "IPA": "/v/",
       "X-SAMPA": "[v]",
       "Position": "between-vowels",
       "Example": "سفينة (safīnah)",
@@ -17793,7 +16989,7 @@
     },
     {
       "Arabic letter": "ف",
-      "IPA": "f",
+      "IPA": "/f/",
       "X-SAMPA": "[f]",
       "Position": "default",
       "Example": "فرس /faras/ (horse)",
@@ -17812,7 +17008,7 @@
     },
     {
       "Arabic letter": "ف",
-      "IPA": "fː",
+      "IPA": "/fː/",
       "X-SAMPA": "[fː]",
       "Position": "long",
       "Example": "ظفّاف /ðʕaffaːf/ (light)",
@@ -17831,7 +17027,7 @@
     },
     {
       "Arabic letter": "ف",
-      "IPA": "ff",
+      "IPA": "/ff/",
       "X-SAMPA": "[ff]",
       "Position": "geminated",
       "Example": "مكتوف /makttuf/ (envelope)",
@@ -17850,7 +17046,7 @@
     },
     {
       "Arabic letter": "ف",
-      "IPA": "v",
+      "IPA": "/v/",
       "X-SAMPA": "[v]",
       "Position": "in-loanwords",
       "Example": "فيديو /vidjuː/ (video)",
@@ -18496,7 +17692,7 @@
     },
     {
       "Arabic letter": "ل",
-      "IPA": "ɫ",
+      "IPA": "/ɫ/",
       "X-SAMPA": "[l]",
       "Position": "[default]",
       "Example": "[خفيف] /xɫiːf/ (light)",
@@ -18515,7 +17711,7 @@
     },
     {
       "Arabic letter": "ل",
-      "IPA": "ɫ",
+      "IPA": "/ɫ/",
       "X-SAMPA": "[l]",
       "Position": "[preverbal]",
       "Example": "[يخفى] /jalxɫaː/ → [jalkɫaː] (to hide)",
@@ -18534,7 +17730,7 @@
     },
     {
       "Arabic letter": "ل",
-      "IPA": "ɫ",
+      "IPA": "/ɫ/",
       "X-SAMPA": "[ɾ]",
       "Position": "[intervocalic]",
       "Example": "[مخفوف] /maʌɾʊːf/ (lenited)",
@@ -18591,7 +17787,7 @@
     },
     {
       "Arabic letter": "م",
-      "IPA": "m",
+      "IPA": "/m/",
       "X-SAMPA": "[m]",
       "Position": "[default]",
       "Example": "[مرحبا] /marħaban/ (welcome)",
@@ -18610,7 +17806,7 @@
     },
     {
       "Arabic letter": "م",
-      "IPA": "m",
+      "IPA": "/m/",
       "X-SAMPA": "[mˁ]",
       "Position": "[emphatic-environments]",
       "Example": "[ضمن] /ḍamˁan/ (including)",
@@ -18667,7 +17863,7 @@
     },
     {
       "Arabic letter": "ن",
-      "IPA": "n",
+      "IPA": "/n/",
       "X-SAMPA": "[n]",
       "Position": "[default]",
       "Example": "[نجم] /nad͡ʒm/ (star)",
@@ -18686,7 +17882,7 @@
     },
     {
       "Arabic letter": "ن",
-      "IPA": "n",
+      "IPA": "/n/",
       "X-SAMPA": "[nˁ]",
       "Position": "[emphatic-environments]",
       "Example": "[ضنك] /ḍanˁak/ (narrowness)",
@@ -18762,7 +17958,7 @@
     },
     {
       "Arabic letter": "ق",
-      "IPA": "q",
+      "IPA": "/q/",
       "X-SAMPA": "[q]",
       "Position": "[default]",
       "Example": "[قلب] /qalb/ (heart)",
@@ -18781,7 +17977,7 @@
     },
     {
       "Arabic letter": "ق",
-      "IPA": "q",
+      "IPA": "/q/",
       "X-SAMPA": "[ɢ]",
       "Position": "[casual-speech]",
       "Example": "[قلب] [ɢalb]",
@@ -18857,7 +18053,7 @@
     },
     {
       "Arabic letter": "ر",
-      "IPA": "r",
+      "IPA": "/r/",
       "X-SAMPA": "[ɾ]",
       "Position": "[intervocalic]",
       "Example": "[برنامج] /bɾanaːmɑdʒ/ (program)",
@@ -18876,7 +18072,7 @@
     },
     {
       "Arabic letter": "ر",
-      "IPA": "r",
+      "IPA": "/r/",
       "X-SAMPA": "[ʀ]",
       "Position": "[classical-pronunciation]",
       "Example": "[رأي] /ʀæʔj/ (opinion)",
@@ -18895,7 +18091,7 @@
     },
     {
       "Arabic letter": "ر",
-      "IPA": "r",
+      "IPA": "/r/",
       "X-SAMPA": "[ʁ]",
       "Position": "[urban-dialects]",
       "Example": "[رجل] [ʁadʒəl]",
@@ -20469,534 +19665,6 @@
       "Comments": "For nouns, primary stress can shift to grammatical inflections: كِتَابٌ /kiˈtābun/ (book)\nSo the length mark /ː/ does not change phonetically. It simply marks long consonants and vowels in Arabic.\nStress is not phonemic in Arabic but applies to syllables\nDefault is penultimate syllable\nStress shifts for nominal inflections",
       "Notes": "",
       "Type": "Other"
-    },
-    {
-      "Arabic letter": "أ",
-      "IPA": "ʔ",
-      "X-SAMPA": "?",
-      "Position": "default",
-      "Example": "أكل /ʔakala/ (to eat)",
-      "Type": "Consonants",
-      "Letter name": "همزة على ألف (hamza on alef)",
-      "Comments": "MSA glottal stop, word-initial hamza above alef",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "أ",
-      "IPA": "ʔ",
-      "X-SAMPA": "?",
-      "Position": "word-initial",
-      "Example": "أحمد /ʔaħmad/ (Ahmad)",
-      "Type": "Consonants",
-      "Letter name": "همزة على ألف (hamza on alef)",
-      "Comments": "MSA glottal stop word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "أ",
-      "IPA": "ʔ",
-      "X-SAMPA": "?",
-      "Position": "word-medial",
-      "Example": "مأكول /maʔkuːl/ (eaten)",
-      "Type": "Consonants",
-      "Letter name": "همزة على ألف (hamza on alef)",
-      "Comments": "MSA glottal stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "أ",
-      "IPA": "ʔ",
-      "X-SAMPA": "?",
-      "Position": "word-final",
-      "Example": "قرأ /qaraʔa/ (he read)",
-      "Type": "Consonants",
-      "Letter name": "همزة على ألف (hamza on alef)",
-      "Comments": "MSA glottal stop word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "إ",
-      "IPA": "ʔ",
-      "X-SAMPA": "?",
-      "Position": "default",
-      "Example": "إلى /ʔilaː/ (to)",
-      "Type": "Consonants",
-      "Letter name": "همزة تحت ألف (hamza under alef)",
-      "Comments": "MSA glottal stop, hamza below alef typically word-initial",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "إ",
-      "IPA": "ʔ",
-      "X-SAMPA": "?",
-      "Position": "word-initial",
-      "Example": "إبراهيم /ʔibraːhiːm/ (Ibrahim)",
-      "Type": "Consonants",
-      "Letter name": "همزة تحت ألف (hamza under alef)",
-      "Comments": "MSA glottal stop word-initially with kasra",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "إ",
-      "IPA": "ʔ",
-      "X-SAMPA": "?",
-      "Position": "word-medial",
-      "Example": "سإل /saʔala/ (he asked - variant spelling)",
-      "Type": "Consonants",
-      "Letter name": "همزة تحت ألف (hamza under alef)",
-      "Comments": "MSA glottal stop word-medially (rare position for this form)",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "إ",
-      "IPA": "ʔ",
-      "X-SAMPA": "?",
-      "Position": "word-final",
-      "Example": "جزإ /d͡ʒuzʔ/ (part - variant)",
-      "Type": "Consonants",
-      "Letter name": "همزة تحت ألف (hamza under alef)",
-      "Comments": "MSA glottal stop word-finally (very rare for this form)",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "م",
-      "IPA": "m",
-      "X-SAMPA": "m",
-      "Position": "word-initial",
-      "Example": "محمد /muħammad/ (Muhammad)",
-      "Type": "Consonants",
-      "Letter name": "ميم (meem)",
-      "Comments": "MSA bilabial nasal, maintains [m] in all positions",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "م",
-      "IPA": "m",
-      "X-SAMPA": "m",
-      "Position": "word-medial",
-      "Example": "حمد /ħamada/ (he praised)",
-      "Type": "Consonants",
-      "Letter name": "ميم (meem)",
-      "Comments": "MSA bilabial nasal word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "م",
-      "IPA": "m",
-      "X-SAMPA": "m",
-      "Position": "word-final",
-      "Example": "قلم /qalam/ (pen)",
-      "Type": "Consonants",
-      "Letter name": "ميم (meem)",
-      "Comments": "MSA bilabial nasal word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "م",
-      "IPA": "m",
-      "X-SAMPA": "m",
-      "Position": "default",
-      "Example": "مدرسة /madrasa/ (school)",
-      "Type": "Consonants",
-      "Letter name": "ميم (meem)",
-      "Comments": "MSA bilabial nasal default position",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-initial",
-      "Example": "نور /nuːr/ (light)",
-      "Type": "Consonants",
-      "Letter name": "نون (noon)",
-      "Comments": "MSA alveolar nasal word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-medial",
-      "Example": "منزل /manzil/ (house)",
-      "Type": "Consonants",
-      "Letter name": "نون (noon)",
-      "Comments": "MSA alveolar nasal word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "word-final",
-      "Example": "زمن /zaman/ (time)",
-      "Type": "Consonants",
-      "Letter name": "نون (noon)",
-      "Comments": "MSA alveolar nasal word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ن",
-      "IPA": "n",
-      "X-SAMPA": "n",
-      "Position": "default",
-      "Example": "نحن /naħnu/ (we)",
-      "Type": "Consonants",
-      "Letter name": "نون (noon)",
-      "Comments": "MSA alveolar nasal default position",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-initial",
-      "Example": "تابع /taːbiʕa/ (he followed)",
-      "Type": "Consonants",
-      "Letter name": "تاء (taa)",
-      "Comments": "MSA voiceless alveolar stop, maintains [t] word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-medial",
-      "Example": "كتاب /kitaːb/ (book)",
-      "Type": "Consonants",
-      "Letter name": "تاء (taa)",
-      "Comments": "MSA voiceless alveolar stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "word-final",
-      "Example": "بيت /bajt/ (house)",
-      "Type": "Consonants",
-      "Letter name": "تاء (taa)",
-      "Comments": "MSA voiceless alveolar stop word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ت",
-      "IPA": "t",
-      "X-SAMPA": "t",
-      "Position": "default",
-      "Example": "تمر /tamr/ (dates)",
-      "Type": "Consonants",
-      "Letter name": "تاء (taa)",
-      "Comments": "MSA voiceless alveolar stop default position",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ب",
-      "IPA": "b",
-      "X-SAMPA": "b",
-      "Position": "word-medial",
-      "Example": "حبيب /ħabiːb/ (beloved)",
-      "Type": "Consonants",
-      "Letter name": "باء (baa)",
-      "Comments": "MSA voiced bilabial stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ب",
-      "IPA": "b",
-      "X-SAMPA": "b",
-      "Position": "word-final",
-      "Example": "كتاب /kitaːb/ (book)",
-      "Type": "Consonants",
-      "Letter name": "باء (baa)",
-      "Comments": "MSA voiced bilabial stop word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-initial",
-      "Example": "ليل /lajl/ (night)",
-      "Type": "Consonants",
-      "Letter name": "لام (laam)",
-      "Comments": "MSA alveolar lateral word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ل",
-      "IPA": "l",
-      "X-SAMPA": "l",
-      "Position": "word-medial",
-      "Example": "علم /ʕilm/ (knowledge)",
-      "Type": "Consonants",
-      "Letter name": "لام (laam)",
-      "Comments": "MSA alveolar lateral word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ر",
-      "IPA": "r",
-      "X-SAMPA": "r",
-      "Position": "word-initial",
-      "Example": "رجل /rad͡ʒul/ (man)",
-      "Type": "Consonants",
-      "Letter name": "راء (raa)",
-      "Comments": "MSA alveolar trill word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ر",
-      "IPA": "r",
-      "X-SAMPA": "r",
-      "Position": "word-medial",
-      "Example": "ضرب /dˁaraba/ (he hit)",
-      "Type": "Consonants",
-      "Letter name": "راء (raa)",
-      "Comments": "MSA alveolar trill word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ر",
-      "IPA": "r",
-      "X-SAMPA": "r",
-      "Position": "word-final",
-      "Example": "نور /nuːr/ (light)",
-      "Type": "Consonants",
-      "Letter name": "راء (raa)",
-      "Comments": "MSA alveolar trill word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ر",
-      "IPA": "r",
-      "X-SAMPA": "r",
-      "Position": "default",
-      "Example": "رسول /rasuːl/ (messenger)",
-      "Type": "Consonants",
-      "Letter name": "راء (raa)",
-      "Comments": "MSA alveolar trill default position",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "س",
-      "IPA": "s",
-      "X-SAMPA": "s",
-      "Position": "word-medial",
-      "Example": "مسجد /masd͡ʒid/ (mosque)",
-      "Type": "Consonants",
-      "Letter name": "سين (seen)",
-      "Comments": "MSA voiceless alveolar fricative word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "س",
-      "IPA": "s",
-      "X-SAMPA": "s",
-      "Position": "word-final",
-      "Example": "درس /dars/ (lesson)",
-      "Type": "Consonants",
-      "Letter name": "سين (seen)",
-      "Comments": "MSA voiceless alveolar fricative word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "س",
-      "IPA": "s",
-      "X-SAMPA": "s",
-      "Position": "default",
-      "Example": "سلام /salaːm/ (peace)",
-      "Type": "Consonants",
-      "Letter name": "سين (seen)",
-      "Comments": "MSA voiceless alveolar fricative default position",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ك",
-      "IPA": "k",
-      "X-SAMPA": "k",
-      "Position": "word-initial",
-      "Example": "كتب /kataba/ (he wrote)",
-      "Type": "Consonants",
-      "Letter name": "كاف (kaaf)",
-      "Comments": "MSA voiceless velar stop word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ك",
-      "IPA": "k",
-      "X-SAMPA": "k",
-      "Position": "word-medial",
-      "Example": "حكم /ħakama/ (he ruled)",
-      "Type": "Consonants",
-      "Letter name": "كاف (kaaf)",
-      "Comments": "MSA voiceless velar stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ف",
-      "IPA": "f",
-      "X-SAMPA": "f",
-      "Position": "word-medial",
-      "Example": "نافذة /naːfiða/ (window)",
-      "Type": "Consonants",
-      "Letter name": "فاء (faa)",
-      "Comments": "MSA voiceless labiodental fricative word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ف",
-      "IPA": "f",
-      "X-SAMPA": "f",
-      "Position": "word-final",
-      "Example": "نصف /nisˁf/ (half)",
-      "Type": "Consonants",
-      "Letter name": "فاء (faa)",
-      "Comments": "MSA voiceless labiodental fricative word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ع",
-      "IPA": "ʕ",
-      "X-SAMPA": "?\\",
-      "Position": "word-initial",
-      "Example": "علم /ʕilm/ (knowledge)",
-      "Type": "Consonants",
-      "Letter name": "عين (ain)",
-      "Comments": "MSA voiced pharyngeal fricative word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ع",
-      "IPA": "ʕ",
-      "X-SAMPA": "?\\",
-      "Position": "word-medial",
-      "Example": "سعيد /saʕiːd/ (happy)",
-      "Type": "Consonants",
-      "Letter name": "عين (ain)",
-      "Comments": "MSA voiced pharyngeal fricative word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ع",
-      "IPA": "ʕ",
-      "X-SAMPA": "?\\",
-      "Position": "default",
-      "Example": "عرب /ʕarab/ (Arabs)",
-      "Type": "Consonants",
-      "Letter name": "عين (ain)",
-      "Comments": "MSA voiced pharyngeal fricative default position",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ح",
-      "IPA": "ħ",
-      "X-SAMPA": "X\\",
-      "Position": "word-initial",
-      "Example": "حب /ħubb/ (love)",
-      "Type": "Consonants",
-      "Letter name": "حاء (haa)",
-      "Comments": "MSA voiceless pharyngeal fricative word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ح",
-      "IPA": "ħ",
-      "X-SAMPA": "X\\",
-      "Position": "word-medial",
-      "Example": "محمد /muħammad/ (Muhammad)",
-      "Type": "Consonants",
-      "Letter name": "حاء (haa)",
-      "Comments": "MSA voiceless pharyngeal fricative word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ح",
-      "IPA": "ħ",
-      "X-SAMPA": "X\\",
-      "Position": "default",
-      "Example": "حكم /ħukm/ (judgment)",
-      "Type": "Consonants",
-      "Letter name": "حاء (haa)",
-      "Comments": "MSA voiceless pharyngeal fricative default position",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "د",
-      "IPA": "d",
-      "X-SAMPA": "d",
-      "Position": "word-medial",
-      "Example": "مدينة /madiːna/ (city)",
-      "Type": "Consonants",
-      "Letter name": "دال (daal)",
-      "Comments": "MSA voiced alveolar stop word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "د",
-      "IPA": "d",
-      "X-SAMPA": "d",
-      "Position": "word-final",
-      "Example": "محمد /muħammad/ (Muhammad)",
-      "Type": "Consonants",
-      "Letter name": "دال (daal)",
-      "Comments": "MSA voiced alveolar stop word-finally",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ه",
-      "IPA": "h",
-      "X-SAMPA": "h",
-      "Position": "word-medial",
-      "Example": "فاهم /faːhim/ (understanding)",
-      "Type": "Consonants",
-      "Letter name": "هاء (heh)",
-      "Comments": "MSA voiceless glottal fricative word-medially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "و",
-      "IPA": "w",
-      "X-SAMPA": "w",
-      "Position": "word-initial",
-      "Example": "ولد /walad/ (boy)",
-      "Type": "Consonants",
-      "Letter name": "واو (waaw)",
-      "Comments": "MSA labio-velar approximant word-initially",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "و",
-      "IPA": "w",
-      "X-SAMPA": "w",
-      "Position": "word-medial",
-      "Example": "حوار /ħiwaːr/ (dialogue)",
-      "Type": "Consonants",
-      "Letter name": "واو (waaw)",
-      "Comments": "MSA labio-velar approximant word-medially (as consonant)",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ي",
-      "IPA": "j",
-      "X-SAMPA": "j",
-      "Position": "word-medial",
-      "Example": "بيت /bajt/ (house)",
-      "Type": "Consonants",
-      "Letter name": "ياء (yaa)",
-      "Comments": "MSA palatal approximant word-medially (as consonant)",
-      "user": "llm"
-    },
-    {
-      "Arabic letter": "ا",
-      "IPA": "aː",
-      "X-SAMPA": "a:",
-      "Position": "word-medial",
-      "Example": "كتاب /kitaːb/ (book)",
-      "Type": "Vowels",
-      "Letter name": "ألف (alef)",
-      "Comments": "MSA long vowel [aː] word-medially",
-      "user": "llm"
     }
   ]
 }

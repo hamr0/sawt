@@ -155,7 +155,8 @@ class HierarchicalProcessor:
                 diacritized,
                 syllables,
                 word_rules,
-                applied_rules_mapping
+                applied_rules_mapping,
+                dialect
             )
 
             word_entry["characters"] = char_entries
@@ -171,7 +172,8 @@ class HierarchicalProcessor:
         diacritized: str,
         syllables: List[Dict],
         word_rules: Set[str],
-        applied_rules_mapping: Optional[Dict]
+        applied_rules_mapping: Optional[Dict],
+        dialect: str = 'EG'
     ) -> List[Dict]:
         """
         Create character-level entries with syllable roles and phonology tracking.
@@ -206,7 +208,7 @@ class HierarchicalProcessor:
 
             # Extract character IPA
             char_ipa = self._extract_char_ipa(
-                char, syllable_index, syllables, word_rules
+                char, syllable_index, syllables, word_rules, dialect
             )
 
             # Extract character X-SAMPA
@@ -393,33 +395,79 @@ class HierarchicalProcessor:
         char: str,
         syll_idx: int,
         syllables: List[Dict],
-        word_rules: Set[str]
+        word_rules: Set[str],
+        dialect: str = 'EG'
     ) -> str:
         """
         Extract IPA for a single character.
+
+        Strategy:
+        1. Try to get syllable IPA (if syllable boundaries are valid)
+        2. If syllable IPA is empty (syllabification failed), fallback to direct lookup
+        3. Direct lookup uses undiacritized character (strips diacritics first)
 
         Args:
             char: The character
             syll_idx: Index of containing syllable
             syllables: All syllables
             word_rules: Rules applied at word level
+            dialect: Target dialect for IPA lookup (default: 'EG')
 
         Returns:
             IPA representation of character
         """
-        if syll_idx < 0 or syll_idx >= len(syllables):
+        # Try to get syllable IPA if valid syllable index
+        if 0 <= syll_idx < len(syllables):
+            syllable = syllables[syll_idx]
+            syllable_ipa = syllable.get('ipa', '')
+
+            # If syllable IPA exists, return it (normal case)
+            if syllable_ipa:
+                return syllable_ipa
+
+        # FALLBACK: Syllabification failed or invalid index
+        # Try direct character lookup using undiacritized character
+        undiacritized_char = self._strip_diacritics(char)
+
+        if undiacritized_char:
+            # Use IPAMapper for direct lookup (lazy import to avoid circular dependency)
+            try:
+                from src.core.ipa_mapper import IPAMapper
+                ipa_mapper = IPAMapper()
+                ipa = ipa_mapper.get_ipa_for_char(
+                    undiacritized_char,
+                    dialect,
+                    position='default'
+                )
+                # Return IPA only if it was converted (not returned as-is)
+                return ipa if ipa != undiacritized_char else ""
+            except Exception:
+                return ""
+
+        return ""
+
+    def _strip_diacritics(self, text: str) -> str:
+        """
+        Remove Arabic diacritics from text.
+
+        Args:
+            text: Text potentially containing diacritics
+
+        Returns:
+            Text with all diacritics removed
+        """
+        if not text:
             return ""
 
-        syllable = syllables[syll_idx]
+        # Arabic diacritics range: U+064B-U+0652
+        diacritics = {
+            '\u064B', '\u064C', '\u064D',  # tanween (fathatan, dammatan, kasratan)
+            '\u064E', '\u064F', '\u0650',  # short vowels (fatha, damma, kasra)
+            '\u0651', '\u0652',            # shadda, sukun
+            '\u0670'                       # superscript alef
+        }
 
-        # Get the syllable IPA (now properly populated by IPAMapper)
-        syllable_ipa = syllable.get('ipa', '')
-        syllable_text = syllable.get('syllable', '')
-
-        # For now, return full syllable IPA
-        # Full char-by-char IPA extraction would require complex phonetic analysis
-        # This is acceptable for the matrix view as it shows per-syllable IPA
-        return syllable_ipa
+        return ''.join(c for c in text if c not in diacritics)
 
     def _extract_char_rules(
         self,
