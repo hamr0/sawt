@@ -232,31 +232,31 @@ aws configure
 
 ---
 
-## 📚 Documentation Quick Links
+## 📚 Documentation Quick Reference
 
 ### Essential Reading
-- **@docs/INDEX.md** - Documentation hub (complete navigation)
-- **@docs/ARCHITECTURE.md** - HLA/HLD, complete system design
-- **@docs/TECH_STACK.md** - Technology decisions & rationale
-- **@docs/TESTING.md** - Complete testing guide (329 tests)
-- **@README.md** - Project overview, features, setup
+- **Documentation Hub** - Complete navigation of all docs (check docs/INDEX.md)
+- **Architecture Guide** - High-level architecture and design patterns (HLA/HLD)
+- **Technology Stack** - Technology decisions, rationale, and dependencies
+- **Testing Guide** - Comprehensive testing documentation covering all 329 tests
+- **Project Overview** - Main README with features, setup, and quick start
 
-### Polly Integration
-- **@docs/polly/README.md** - Polly docs overview & navigation
-- **@docs/polly/QUICKSTART_GUIDE.md** - Get started with Polly
-- **@docs/polly/TTS_TECHNOLOGY_RESEARCH_2024.md** - SOTA research
-- **@docs/polly/COLLABORATIVE_DECISION_POLLY.md** - Strategic analysis
+### Polly Integration Docs
+- **Polly Overview** - Integration documentation and navigation hub
+- **Quick Start Guide** - Step-by-step guide to get started with AWS Polly
+- **TTS Research** - State-of-the-art TTS technology research (60+ sources)
+- **Strategic Analysis** - Collaborative decision-making process and rationale
 
-### Planning & Tasks
-- **@tasks/TASK_LIST.md** - Complete task tracking
-- **@tasks/0001-prd-mvp-phase1.md** - MVP requirements
-- **@tasks/0001-prd-polly-integration.md** - Polly integration PRD
-- **@docs/planning/COMPLETE_ROADMAP.md** - 6-month roadmap
+### Planning & Tracking
+- **Task Management** - Complete task list and tracking system
+- **MVP Requirements** - Original MVP Phase 1 product requirements
+- **Polly Integration PRD** - Product requirements for Polly integration
+- **Development Roadmap** - 6-month roadmap with milestones and goals
 
-### Reports & Results
-- **@docs/reports/MVP_PHASE1_COMPLETE.md** - MVP completion report
-- **@docs/reports/MVP_VALIDATION_RESULTS.md** - Validation results
-- **@docs/DEMO_PRESENTATION.md** - 28-slide demo presentation
+### Results & Reports
+- **MVP Completion** - Phase 1 completion report with metrics
+- **Validation Results** - MVP validation outcomes and test results
+- **Demo Presentation** - 28-slide presentation deck for stakeholders
 
 ---
 
@@ -315,7 +315,7 @@ df61246 - chore: mark automated POC validation tasks complete (5.1-5.7)
 ## 💡 Development Workflow
 
 ### For New Features
-1. Read relevant docs (@docs/ARCHITECTURE.md, @docs/TECH_STACK.md)
+1. Review architecture and tech stack documentation first
 2. Write tests first (TDD approach)
 3. Implement feature in src/
 4. Run tests (`pytest tests/ -v`)
@@ -330,7 +330,7 @@ df61246 - chore: mark automated POC validation tasks complete (5.1-5.7)
 5. Document fix if non-obvious
 
 ### For Polly Integration Work
-1. Check @docs/polly/ for context
+1. Check Polly documentation folder for context and guidance
 2. Use test scripts (scripts/test_polly_*.py)
 3. Monitor AWS costs (free tier: 5M chars/month)
 4. Test with sample content before long audiobooks
@@ -380,11 +380,16 @@ df61246 - chore: mark automated POC validation tasks complete (5.1-5.7)
 
 ---
 
-**For complete context:** See @KNOWLEDGE_BASE.md
-**For detailed architecture:** See @docs/ARCHITECTURE.md
-**For Polly integration:** See @docs/polly/README.md
-**For all documentation:** See @docs/INDEX.md
+## 📖 Where to Find More Information
+
+**Need complete project context?** Check KNOWLEDGE_BASE.md for comprehensive project knowledge
+
+**Looking for architecture details?** Review the architecture documentation in docs/
+
+**Working on Polly integration?** See the Polly documentation folder in docs/polly/
+
+**Want to explore all docs?** Start with the documentation index in docs/INDEX.md
 
 ---
 
-*This file is auto-loaded by Claude Code for optimal context awareness.*
+*This file provides essential context for Claude Code. For deeper dives, consult the documentation folders as needed.*
