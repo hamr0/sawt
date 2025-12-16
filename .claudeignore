@@ -1,9 +1,19 @@
-# Exclude ALL markdown files and documentation from Claude context
-**/*.md
+# Exclude specific documentation directories and files
 docs/
 tasks/
+tools/syllabifier/reports/
 reports/
 demo_output/
+
+# Exclude large root-level documentation files (keep only CLAUDE.md)
+KNOWLEDGE_BASE.md
+CONTEXT_INITIALIZATION_SUMMARY.md
+IMPLEMENTATION_SUMMARY.md
+MIGRATION_GUIDE.md
+CLARIFICATIONS.md
+README.md
+
+# Exclude git and cache files
 .claudeignore
 .git/
 .gitignore
@@ -12,11 +22,23 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Keep only essential files for development
-CLAUDE.md
-README.md
-src/
-tests/
-data/dictionaries/
-scripts/
-requirements.txt
+# Exclude test output files
+tests/arabic-text-test.txt
+static/audio/*.wav
+static/audio/*.mp3
+
+# Exclude backup files
+*.backup
+*.bak
+*.backup_*
+
+# Keep these essential files accessible:
+# - CLAUDE.md (root level - project context)
+# - README.md (root level - project overview)
+# - MIGRATION_GUIDE.md (root level)
+# - CLARIFICATIONS.md (root level)
+# - All source code (src/)
+# - All tests (tests/)
+# - Data dictionaries (data/dictionaries/)
+# - Scripts (scripts/)
+# - Requirements (requirements.txt)
