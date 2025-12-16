@@ -13640,6 +13640,160 @@
       "Type": "Consonants",
       "Comments": "Levantine velar stop word-finally",
       "user": "llm"
+    },
+    {
+      "Arabic letter": "ة",
+      "IPA": "e",
+      "X-SAMPA": "e",
+      "Position": "default",
+      "Example": "مدرسة /madrase/ (school)",
+      "Type": "Consonants",
+      "Letter name": "تاء مربوطة (ta marbuta)",
+      "Comments": "Levantine ta marbuta, typically /e/ in casual speech",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ة",
+      "IPA": "e",
+      "X-SAMPA": "e",
+      "Position": "word-final",
+      "Example": "شركة /ʃerke/ (company)",
+      "Type": "Consonants",
+      "Letter name": "تاء مربوطة (ta marbuta)",
+      "Comments": "Levantine ta marbuta word-finally as [e]",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ئ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "شيء /ʃeʔ/ (thing)",
+      "Type": "Consonants",
+      "Letter name": "همزة على ياء (hamza on ya)",
+      "Comments": "Levantine glottal stop on ya",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ئ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "word-medial",
+      "Example": "رائحة /raːʔħa/ (smell)",
+      "Type": "Consonants",
+      "Letter name": "همزة على ياء (hamza on ya)",
+      "Comments": "Levantine glottal stop word-medially",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ئ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "word-final",
+      "Example": "شاطئ /ʃaːteʔ/ (beach)",
+      "Type": "Consonants",
+      "Letter name": "همزة على ياء (hamza on ya)",
+      "Comments": "Levantine glottal stop word-finally",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ظ",
+      "IPA": "dˤ",
+      "X-SAMPA": "d_?\\",
+      "Position": "default",
+      "Example": "ظهر /dˤuhr/ (noon)",
+      "Type": "Consonants",
+      "Letter name": "ظاء (zha)",
+      "Comments": "Levantine emphatic /dˤ/, often merged with ض",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ؤ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "مؤمن /muʔmen/ (believer)",
+      "Type": "Consonants",
+      "Letter name": "همزة على واو (hamza on waw)",
+      "Comments": "Levantine glottal stop on waw",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ز",
+      "IPA": "z",
+      "X-SAMPA": "z",
+      "Position": "default",
+      "Example": "زيت /zeːt/ (oil)",
+      "Type": "Consonants",
+      "Letter name": "زاي (zayn)",
+      "Comments": "Levantine voiced alveolar fricative",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ث",
+      "IPA": "t",
+      "X-SAMPA": "t",
+      "Position": "default",
+      "Example": "ثلاثة /tlaːte/ (three)",
+      "Type": "Consonants",
+      "Letter name": "ثاء (tha)",
+      "Comments": "Levantine /t/, θ→t shift common",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ط",
+      "IPA": "tˤ",
+      "X-SAMPA": "t_?\\",
+      "Position": "default",
+      "Example": "طعام /tˤaʕaːm/ (food)",
+      "Type": "Consonants",
+      "Letter name": "طاء (ta)",
+      "Comments": "Levantine emphatic voiceless alveolar stop",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ق",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "قلب /ʔaleb/ (heart)",
+      "Type": "Consonants",
+      "Letter name": "قاف (qaf)",
+      "Comments": "Levantine glottal stop, q→ʔ shift",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "غ",
+      "IPA": "ɣ",
+      "X-SAMPA": "G",
+      "Position": "default",
+      "Example": "غرفة /ɣurfe/ (room)",
+      "Type": "Consonants",
+      "Letter name": "غين (ghayn)",
+      "Comments": "Levantine voiced velar fricative",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "خ",
+      "IPA": "x",
+      "X-SAMPA": "x",
+      "Position": "default",
+      "Example": "خبز /xubez/ (bread)",
+      "Type": "Consonants",
+      "Letter name": "خاء (kha)",
+      "Comments": "Levantine voiceless velar fricative",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ج",
+      "IPA": "ʒ",
+      "X-SAMPA": "Z",
+      "Position": "default",
+      "Example": "جبل /ʒabal/ (mountain)",
+      "Type": "Consonants",
+      "Letter name": "جيم (jeem)",
+      "Comments": "Levantine voiced postalveolar fricative",
+      "user": "llm"
     }
   ],
   "Maghreb": [
