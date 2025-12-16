@@ -17214,6 +17214,39 @@
       "Letter name": "هاء (ha)",
       "Comments": "Maghrebi voiceless glottal fricative",
       "user": "llm"
+    },
+    {
+      "Arabic letter": "أ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "أكل /ʔkəl/ (to eat)",
+      "Type": "Consonants",
+      "Letter name": "همزة على ألف (hamza on alef)",
+      "Comments": "Maghrebi glottal stop, hamza above alef",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "إ",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "إلى /ʔilaː/ (to)",
+      "Type": "Consonants",
+      "Letter name": "همزة تحت ألف (hamza under alef)",
+      "Comments": "Maghrebi glottal stop, hamza below alef",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ء",
+      "IPA": "ʔ",
+      "X-SAMPA": "?",
+      "Position": "default",
+      "Example": "ملء /mlʔ/ (filling)",
+      "Type": "Consonants",
+      "Letter name": "همزة (hamza)",
+      "Comments": "Maghrebi glottal stop, standalone hamza",
+      "user": "llm"
     }
   ],
   "MSA": [
