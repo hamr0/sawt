@@ -990,12 +990,12 @@
             html += '<button onclick="showPollyWarning()">💰 Generate with Polly</button>';
             html += '</div>';
 
+            // Audio containers (positioned before matrix for better UX)
+            html += '<div id="espeakAudioContainer" style="margin-top: 15px; margin-bottom: 10px;"></div>';
+            html += '<div id="pollyAudioContainer" style="margin-top: 10px; margin-bottom: 20px;"></div>';
+
             // Matrix Table
             html += createMatrixTable(result, expectedIPA);
-
-            // Audio containers (hidden by default, appear below matrix)
-            html += '<div id="espeakAudioContainer" style="margin-top: 15px;"></div>';
-            html += '<div id="pollyAudioContainer" style="margin-top: 10px;"></div>';
 
             outputSections.innerHTML = html;
         }

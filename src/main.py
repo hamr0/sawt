@@ -363,11 +363,16 @@ class ArabicTTS:
         This is Step 1 of preprocessing (per NOTCLAUDE.md architecture).
         Only processes tokens with Arabic text.
 
+        If Mishkal diacritization fails, continues with undiacritized text
+        (graceful fallback). The Status/Failed_Layers system will detect
+        that diacritization failed and mark it as 'diac' failure.
+
         Args:
             tokens: List of token dicts from tokenize()
 
         Returns:
-            Tokens with diacritized content, original field preserved
+            Tokens with diacritized content (or original if diacritization failed),
+            original field preserved
         """
         for token in tokens:
             if token["type"] == "word":
@@ -379,14 +384,25 @@ class ArabicTTS:
                         diacritized = self.diacritizer.tashkeel(original)
                         # Mishkal sometimes adds leading/trailing spaces, strip them
                         diacritized = diacritized.strip()
-                        token["content"] = diacritized
+
+                        # Only use diacritized version if it actually added diacritics
+                        if diacritized and diacritized != original:
+                            token["content"] = diacritized
+                            token["diacritization_success"] = True
+                        else:
+                            # Mishkal returned same text (no diacritization applied)
+                            # Continue with original, mark as failure
+                            token["diacritization_success"] = False
                         token["original"] = original  # Preserve original undiacritized
+
                     except Exception as e:
                         # If diacritization fails, keep original but don't crash
-                        # Log the error but continue processing
+                        # Log the error but continue processing (graceful fallback)
                         import sys
                         print(f"Warning: Diacritization failed for '{original}': {e}", file=sys.stderr)
                         token["original"] = original
+                        token["diacritization_success"] = False
+                        # Continue processing with undiacritized text
         return tokens
 
     def analyze_char(self, index: int, token: Dict) -> Dict:
