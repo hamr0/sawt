@@ -204,7 +204,7 @@ class IPAMapper:
                       - 'has_gemination': if geminated
                       - 'sun_letter_assimilation': if assimilated
                       - 'has_emphatic': if emphatic
-            dialect: Target dialect ("EG", "MSA", "Gulf", "Levantine", "Maghrebi")
+            dialect: Target dialect ("EG", "MSA", "Gulf", "Levantine", "Maghreb")
 
         Returns:
             Complete IPA transcription string
