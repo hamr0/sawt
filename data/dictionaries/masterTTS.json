@@ -21096,6 +21096,72 @@
       "Letter name": "همزة على واو (hamza on waw)",
       "Comments": "MSA glottal stop on waw word-finally",
       "user": "llm"
+    },
+    {
+      "Arabic letter": "ص",
+      "IPA": "sˤ",
+      "X-SAMPA": "s_?\\",
+      "Position": "default",
+      "Example": "صباح /sˤabaːħ/ (morning)",
+      "Type": "Consonants",
+      "Letter name": "صاد (sad)",
+      "Comments": "MSA emphatic alveolar fricative",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ث",
+      "IPA": "θ",
+      "X-SAMPA": "T",
+      "Position": "default",
+      "Example": "ثلاثة /θalaːθa/ (three)",
+      "Type": "Consonants",
+      "Letter name": "ثاء (tha)",
+      "Comments": "MSA voiceless dental fricative (as in English 'think')",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ط",
+      "IPA": "tˤ",
+      "X-SAMPA": "t_?\\",
+      "Position": "default",
+      "Example": "طعام /tˤaʕaːm/ (food)",
+      "Type": "Consonants",
+      "Letter name": "طاء (ta)",
+      "Comments": "MSA emphatic alveolar stop",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "ق",
+      "IPA": "q",
+      "X-SAMPA": "q",
+      "Position": "default",
+      "Example": "قلب /qalb/ (heart)",
+      "Type": "Consonants",
+      "Letter name": "قاف (qaf)",
+      "Comments": "MSA voiceless uvular stop",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "غ",
+      "IPA": "ɣ",
+      "X-SAMPA": "G",
+      "Position": "default",
+      "Example": "غرفة /ɣurfa/ (room)",
+      "Type": "Consonants",
+      "Letter name": "غين (ghayn)",
+      "Comments": "MSA voiced velar fricative",
+      "user": "llm"
+    },
+    {
+      "Arabic letter": "خ",
+      "IPA": "x",
+      "X-SAMPA": "x",
+      "Position": "default",
+      "Example": "خبز /xubz/ (bread)",
+      "Type": "Consonants",
+      "Letter name": "خاء (kha)",
+      "Comments": "MSA voiceless velar fricative",
+      "user": "llm"
     }
   ]
 }
