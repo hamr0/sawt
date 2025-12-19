@@ -527,7 +527,8 @@ def generate_audio():
 
         # Combine IPA and X-SAMPA parts
         full_ipa = ' '.join(ipa_parts) if ipa_parts else text
-        full_xsampa = ' '.join(xsampa_parts) if xsampa_parts else ''
+        # X-SAMPA should be continuous without spaces (Polly treats spaces as word boundaries)
+        full_xsampa = ''.join(xsampa_parts) if xsampa_parts else ''
 
         if engine == 'espeak':
             # Generate eSpeak audio
@@ -834,6 +835,16 @@ def _generate_hierarchical_csv(result: Dict) -> str:
     # Extract and flatten rows from hierarchical data
     rows = _flatten_matrix_rows(result)
 
+    # Track stats for summary row
+    stats = {
+        'total_words': 0,
+        'success': 0,
+        'warning': 0,
+        'warning_layers': {},  # Track failed layers for warnings
+        'error': 0,
+        'error_layers': {}  # Track failed layers for errors
+    }
+
     # Write data rows with proper escaping
     for row in rows:
         phonology_rules = row.get('phonology_rules', [])
@@ -845,6 +856,14 @@ def _generate_hierarchical_csv(result: Dict) -> str:
         # Determine status and failed layers for WORD rows
         if row.get('type') == 'WORD':
             status, failed_layers = _determine_word_status(row)
+            stats['total_words'] += 1
+            stats[status] += 1
+
+            # Track failed layers by status
+            if status == 'warning' and failed_layers and failed_layers != '-':
+                stats['warning_layers'][failed_layers] = stats['warning_layers'].get(failed_layers, 0) + 1
+            elif status == 'error' and failed_layers and failed_layers != '-':
+                stats['error_layers'][failed_layers] = stats['error_layers'].get(failed_layers, 0) + 1
         else:
             status = '-'
             failed_layers = '-'
@@ -866,6 +885,45 @@ def _generate_hierarchical_csv(result: Dict) -> str:
         ]
 
         writer.writerow(csv_row)
+
+    # Add Processing Stats row as the last row
+    if stats['total_words'] > 0:
+        success_rate = (stats['success'] / stats['total_words'] * 100) if stats['total_words'] > 0 else 0
+
+        # Format warning with failed layers (most common)
+        warning_str = f"Warning: {stats['warning']}"
+        if stats['warning_layers']:
+            most_common_warning = max(stats['warning_layers'].items(), key=lambda x: x[1])
+            warning_str += f" {most_common_warning[0]}"
+
+        # Format error with failed layers (most common)
+        error_str = f"Error: {stats['error']}"
+        if stats['error_layers']:
+            most_common_error = max(stats['error_layers'].items(), key=lambda x: x[1])
+            error_str += f" {most_common_error[0]}"
+
+        stats_row = [
+            'Processing Stats',
+            f"Total: {stats['total_words']}",
+            f"Success: {stats['success']}",
+            warning_str,
+            error_str,
+            f"Success Rate: {success_rate:.1f}%",
+            '-', '-', '-', '-', '-', '-', '-'
+        ]
+        writer.writerow(stats_row)
+
+        # Add Notes row explaining failed layer codes
+        notes_row = [
+            'Notes',
+            'Failed Layer Codes:',
+            'diac=Diacritization',
+            'syl=Syllabification',
+            'ipa=IPA Generation',
+            'phon=Phonology Rules',
+            '-', '-', '-', '-', '-', '-', '-'
+        ]
+        writer.writerow(notes_row)
 
     csv_content = output.getvalue()
     output.close()

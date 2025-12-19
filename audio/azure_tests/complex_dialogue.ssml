@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-EG">
+  <voice name="ar-EG-SalmaNeural">
+    في يوم من الأيام، كانت هناك فتاة صغيرة اسمها ليلى تعيش في قرية جميلة.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    صاحت ليلى بفرح: أمي! انظري إلى الطائر الجميل في الحديقة!
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    قالت الأم بحنان:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-ShakirNeural">
+    نعم يا حبيبتي، إنه طائر رائع. لكن يجب أن نحترم الطيور ولا نزعجها.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    فجأة ظهر أخوها الأكبر حسن وهو يحمل كتاباً.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    قال حسن بحماس:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-SA-ZariyahNeural">
+    ليلى! لقد وجدت كتاباً عن الطيور في المكتبة!
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    ردت ليلى بسعادة:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-SA-HamedNeural">
+    رائع يا حسن! هل يمكنك أن تقرأ لي عنه؟
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    قال حسن:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-AE-FatimaNeural">
+    بالطبع! دعيني أريك الصور أولاً.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    جلس الأطفال معاً وبدأوا يقرأون عن الطيور الجميلة.
+  </voice>
+</speak>

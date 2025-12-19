@@ -52,25 +52,29 @@ class PollyTTS:
     def xsampa_to_ssml(self, xsampa: str, text: str) -> str:
         """
         Convert X-SAMPA phonetic string to Polly SSML format
-        
+
         Args:
-            xsampa: X-SAMPA phonetic transcription (can be empty)
+            xsampa: X-SAMPA phonetic transcription (IGNORED for Arabic - see note)
             text: Original Arabic text
-        
+
         Returns:
-            SSML string with phoneme tags for Polly (or plain text if X-SAMPA empty)
-        
+            SSML string with plain text only (phoneme tags not supported for Arabic)
+
+        Note:
+            AWS Polly does NOT support X-SAMPA (or any phoneme alphabet) for Arabic voices.
+            X-SAMPA is only supported for 22 languages (English, French, German, etc.).
+            For Arabic (arb), Polly uses its built-in MSA pronunciation only.
+
+            Supported languages for X-SAMPA: cy-GB, da-DK, de-DE, en-AU, en-GB, en-GB-WLS,
+            en-IN, en-US, fr-BE, fr-CA, fr-FR, is-IS, it-IT, nb-NO, nl-BE, nl-NL, pl-PL,
+            pt-BR, pt-PT, ro-RO, sv-SE, tr-TR
+
         Example:
             >>> polly.xsampa_to_ssml("saba:H", "صباح")
-            '<speak><phoneme alphabet="x-sampa" ph="saba:H">صباح</phoneme></speak>'
-            >>> polly.xsampa_to_ssml("", "صباح")
-            '<speak>صباح</speak>'
+            '<speak>صباح</speak>'  # X-SAMPA ignored, plain text used
         """
-        # If X-SAMPA is empty, use plain text (Polly's built-in pronunciation)
-        if not xsampa or xsampa.strip() == "":
-            return f'<speak>{text}</speak>'
-        # Otherwise use phoneme control
-        return f'<speak><phoneme alphabet="x-sampa" ph="{xsampa}">{text}</phoneme></speak>'
+        # ALWAYS use plain text for Arabic (phoneme tags not supported)
+        return f'<speak>{text}</speak>'
     
     def generate_audio(
         self,

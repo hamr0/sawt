@@ -1,41 +1,28 @@
-# LLM Tasks: Diacritization Testing & Fallback Strategy
+# LLM Tasks: Diacritization Testing & Documentation
 
-This folder contains testing scripts and plans for improving diacritization accuracy.
+This folder contains testing scripts and historical documentation for diacritization strategy.
 
 ## Quick Start
 
-### 1. Test Mishkal vs CAMeL (DO THIS FIRST)
+### Test Mishkal Diacritization
 
 ```bash
-# Install CAMeL Tools
-pip install camel-tools
-
 # Export CSV from demo page, then test it
-cd /home/hamr/PycharmProjects/ArabicTTS/tasks/LLM
-python test_diacritization_comparison.py /path/to/your/csv/file.csv
+cd /home/hamr/PycharmProjects/ArabicTTS/tasks/llm
+python test_mishkal_diacritization.py /path/to/your/csv/file.csv
 ```
 
 **Output**:
-- Console: Real-time results and recommendations
-- CSV: `diacritization_comparison.csv` with side-by-side comparison
-
-### 2. Make Decision
-
-Based on test results, choose:
-- **Mishkal → CAMeL**: If CAMeL catches 30%+ of Mishkal failures
-- **CAMeL → Mishkal**: If Mishkal catches 30%+ of CAMeL failures
-- **Single tool**: If one dominates or they're redundant
-- **Add LLM**: If free tools still have high failure rate (user pays)
+- Console: Real-time results and success statistics
+- CSV: `mishkal_test_results.csv` with detailed results
 
 ## Files
 
 ### Testing
-- **`test_diacritization_comparison.py`**: Main test script
-  - Tests Mishkal separately
-  - Tests CAMeL separately
-  - Compares both on same data
-  - Tests 4 fallback sequences
-  - Generates comparison CSV
+- **`test_mishkal_diacritization.py`**: Mishkal test script
+  - Tests Mishkal on CSV words
+  - Generates success statistics
+  - Outputs detailed results CSV
 
 ### Documentation
 - **`testing-mishkal-camel.md`**: Testing plan and instructions

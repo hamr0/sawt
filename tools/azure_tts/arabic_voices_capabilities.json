@@ -1,0 +1,408 @@
+{
+  "query_timestamp": "2025-12-18T20:34:57.665873",
+  "azure_region": "eastus",
+  "total_voices_available": 617,
+  "arabic_voices_count": 32,
+  "dialects": {
+    "ar-AE": {
+      "locale": "ar-AE",
+      "voices": [
+        {
+          "short_name": "ar-AE-FatimaNeural",
+          "local_name": "فاطمة",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-AE-HamdanNeural",
+          "local_name": "حمدان",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-BH": {
+      "locale": "ar-BH",
+      "voices": [
+        {
+          "short_name": "ar-BH-LailaNeural",
+          "local_name": "ليلى",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-BH-AliNeural",
+          "local_name": "علي",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-DZ": {
+      "locale": "ar-DZ",
+      "voices": [
+        {
+          "short_name": "ar-DZ-AminaNeural",
+          "local_name": "أمينة",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-DZ-IsmaelNeural",
+          "local_name": "إسماعيل",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-EG": {
+      "locale": "ar-EG",
+      "voices": [
+        {
+          "short_name": "ar-EG-SalmaNeural",
+          "local_name": "سلمى",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-EG-ShakirNeural",
+          "local_name": "شاكر",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-IQ": {
+      "locale": "ar-IQ",
+      "voices": [
+        {
+          "short_name": "ar-IQ-RanaNeural",
+          "local_name": "رنا",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-IQ-BasselNeural",
+          "local_name": "باسل",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-JO": {
+      "locale": "ar-JO",
+      "voices": [
+        {
+          "short_name": "ar-JO-SanaNeural",
+          "local_name": "سناء",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-JO-TaimNeural",
+          "local_name": "تيم",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-KW": {
+      "locale": "ar-KW",
+      "voices": [
+        {
+          "short_name": "ar-KW-NouraNeural",
+          "local_name": "نورا",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-KW-FahedNeural",
+          "local_name": "فهد",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-LB": {
+      "locale": "ar-LB",
+      "voices": [
+        {
+          "short_name": "ar-LB-LaylaNeural",
+          "local_name": "ليلى",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-LB-RamiNeural",
+          "local_name": "رامي",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-LY": {
+      "locale": "ar-LY",
+      "voices": [
+        {
+          "short_name": "ar-LY-ImanNeural",
+          "local_name": "إيمان",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-LY-OmarNeural",
+          "local_name": "أحمد",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-MA": {
+      "locale": "ar-MA",
+      "voices": [
+        {
+          "short_name": "ar-MA-MounaNeural",
+          "local_name": "منى",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-MA-JamalNeural",
+          "local_name": "جمال",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-OM": {
+      "locale": "ar-OM",
+      "voices": [
+        {
+          "short_name": "ar-OM-AyshaNeural",
+          "local_name": "عائشة",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-OM-AbdullahNeural",
+          "local_name": "عبدالله",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-QA": {
+      "locale": "ar-QA",
+      "voices": [
+        {
+          "short_name": "ar-QA-AmalNeural",
+          "local_name": "أمل",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-QA-MoazNeural",
+          "local_name": "معاذ",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-SA": {
+      "locale": "ar-SA",
+      "voices": [
+        {
+          "short_name": "ar-SA-ZariyahNeural",
+          "local_name": "زارية",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-SA-HamedNeural",
+          "local_name": "حامد",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-SY": {
+      "locale": "ar-SY",
+      "voices": [
+        {
+          "short_name": "ar-SY-AmanyNeural",
+          "local_name": "أماني",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-SY-LaithNeural",
+          "local_name": "ليث",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-TN": {
+      "locale": "ar-TN",
+      "voices": [
+        {
+          "short_name": "ar-TN-ReemNeural",
+          "local_name": "ريم",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-TN-HediNeural",
+          "local_name": "هادي",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    },
+    "ar-YE": {
+      "locale": "ar-YE",
+      "voices": [
+        {
+          "short_name": "ar-YE-MaryamNeural",
+          "local_name": "مريم",
+          "gender": "female",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        },
+        {
+          "short_name": "ar-YE-SalehNeural",
+          "local_name": "صالح",
+          "gender": "male",
+          "voice_type": "OnlineNeural",
+          "style_list": [
+            ""
+          ],
+          "role_play_list": []
+        }
+      ]
+    }
+  }
+}

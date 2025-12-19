@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-EG">
+  <voice name="ar-EG-SalmaNeural">
+    الفصل الأول: البداية
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    في صباح يوم جميل من أيام الربيع، استيقظ أحمد على صوت زقزقة العصافير. كان يشعر بالحماس لأن اليوم كان يوم مميز.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    قال أحمد لنفسه:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-ShakirNeural">
+    اليوم سأبدأ مشروعي الجديد!
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    نزل إلى المطبخ حيث وجد أمه فاطمة تحضر الفطور.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    قالت فاطمة:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-SA-ZariyahNeural">
+    صباح الخير يا أحمد! لقد استيقظت مبكراً اليوم.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    رد أحمد:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-SA-HamedNeural">
+    صباح النور يا أمي! أنا متحمس لبدء العمل على مشروعي.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    ابتسمت فاطمة وقالت: هذا رائع يا بني! لكن لا تنسى أن تأكل فطورك أولاً.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    بعد الفطور، خرج أحمد من المنزل وتوجه نحو المكتبة. في الطريق، قابل صديقه القديم علي.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    صاح علي: أحمد! إلى أين أنت ذاهب في هذا الصباح الجميل؟
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    رد أحمد:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-SA-HamedNeural">
+    مرحباً يا علي! أنا ذاهب إلى المكتبة للبحث عن معلومات لمشروعي.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    قال علي:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-AE-FatimaNeural">
+    يا له من توقيت مثالي! أنا أيضاً ذاهب إلى هناك. هل تمانع إذا رافقتك؟
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    رد أحمد بسعادة:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-AE-HamdanNeural">
+    بالطبع! يسعدني ذلك.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    مشى الصديقان معاً وهما يتحدثان عن أحلامهما وطموحاتهما. كان يوماً جميلاً، ولم يعلما أن مغامرة كبيرة تنتظرهما.
+  </voice>
+</speak>

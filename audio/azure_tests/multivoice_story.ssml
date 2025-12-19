@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-EG">
+  <voice name="ar-EG-SalmaNeural">
+    كان يا ما كان في قديم الزمان، في مدينة صغيرة، عاش رجل يدعى أحمد وزوجته فاطمة.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    قال أحمد:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-ShakirNeural">
+    يا فاطمة، أريد أن أذهب إلى السوق لشراء بعض الطعام.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    قالت فاطمة:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-SA-ZariyahNeural">
+    حسناً يا أحمد، لكن كن حذراً في الطريق.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    ذهب أحمد إلى السوق ووجد صديقه القديم علي.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    صرخ علي:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-SA-HamedNeural">
+    أحمد! يا لها من مفاجأة! لم أرك منذ سنوات!
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    رد أحمد:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-ShakirNeural">
+    علي! كم أنا سعيد برؤيتك! كيف حالك؟
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    همس علي:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-SA-HamedNeural">
+    الحمد لله، الأمور جيدة. وأنت؟
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    قال أحمد:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-ShakirNeural">
+    أنا بخير، الحمد لله.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    عاد أحمد إلى البيت وحكى لفاطمة عن لقائه.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    قالت فاطمة:
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-SA-ZariyahNeural">
+    ما شاء الله! يجب أن ندعو علي لزيارتنا قريباً.
+    <break time="500ms"/>
+  </voice>
+  <voice name="ar-EG-SalmaNeural">
+    وعاشوا في سعادة وهناء.
+  </voice>
+</speak>

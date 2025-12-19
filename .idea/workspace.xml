@@ -4,7 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="351687aa-e935-4a81-9ea7-0bc9828bfc92" name="Changes" comment="created context contextualization, organized /docs and init the project" />
+    <list default="true" id="351687aa-e935-4a81-9ea7-0bc9828bfc92" name="Changes" comment="created context contextualization, organized /docs and init the project">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/hierarchical_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hierarchical_processor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/integrations/polly.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/integrations/polly.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165603_432827.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165603_608203.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165604_054226.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165604_181869.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165604_331278.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165604_466379.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251216_080057_908789.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251216_080111_651930.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251216_085142_269683.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251216_085327_677852.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_MSA_20251030_165603_754927.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/audio/output_MSA_20251030_165603_912114.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tasks/llm/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/tasks/llm/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tasks/llm/test_diacritization_comparison.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/demo.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/demo.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,6 +64,7 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;last_opened_file_path&quot;: &quot;/home/hamr/PycharmProjects/agentic-toolkit&quot;
@@ -56,7 +78,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+        <option value="bundled-python-sdk-f2b7a9f6281b-6e1f45a539f7-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.29346.142" />
       </set>
     </attachedChunks>
   </component>
@@ -79,6 +101,17 @@
     </task>
     <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="created context contextualization, organized /docs and init the project" />

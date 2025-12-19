@@ -8,6 +8,7 @@ from src.core.gemination import GeminationProcessor
 from src.core.sun_letters import SunLetterProcessor
 from src.core.allophones import AllophoneProcessor
 from src.core.emphatic import EmphaticProcessor
+from src.core.hierarchical_processor import HierarchicalProcessor
 
 
 class ArabicSyllabifier:
@@ -724,6 +725,7 @@ class ArabicTTS:
         # Initialize universal components
         self.position_detector = PositionDetector()
         self.ipa_mapper = IPAMapper()
+        self.hierarchical_processor = HierarchicalProcessor()
 
         # Initialize diacritizer as None (lazy-load on first use)
         self._diacritizer = None
@@ -932,6 +934,12 @@ class ArabicTTS:
             # Generate IPA using IPAMapper (dialect-specific step)
             # NOTE: map_to_ipa also populates syllable["ipa"] with per-syllable IPA
             ipa_transcription = self.ipa_mapper.map_to_ipa(syllables, dialect)
+
+            # Generate X-SAMPA for each syllable (for Polly and other TTS engines)
+            for syllable in syllables:
+                ipa = syllable.get('ipa', '')
+                xsampa = self.hierarchical_processor._convert_to_xsampa(ipa)
+                syllable['xsampa'] = xsampa
 
             # Use original undiacritized text if available, else use the diacritized word_str
             original_text = word.get("original", word_str)

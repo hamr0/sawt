@@ -202,27 +202,6 @@
             margin-bottom: 20px;
         }
 
-        .view-toggle {
-            margin-bottom: 15px;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .view-toggle label {
-            display: flex;
-            align-items: center;
-            font-weight: normal;
-            margin-bottom: 0;
-            gap: 8px;
-        }
-
-        .view-toggle input[type="radio"] {
-            margin: 0;
-            cursor: pointer;
-        }
-
         .matrix-table-wrapper {
             overflow-x: auto;
             border: 1px solid #ddd;
@@ -633,7 +612,6 @@
 
     <script>
         let currentMatrixData = null;
-        let currentViewFilter = 'all'; // all, words, characters
 
         // File upload handler
         // Track if file was uploaded (for precedence)
@@ -774,7 +752,6 @@
                 // Display results after processing completes
                 if (resultData) {
                     currentMatrixData = resultData;
-                    currentViewFilter = 'all';
                     displayMatrixResults(resultData);
                 } else {
                     outputSections.innerHTML = '<div class="error">Failed to process text. Please try again.</div>';
@@ -1005,23 +982,6 @@
             // Success Statistics
             html += createStatistics(result);
 
-            // View Toggle Controls
-            html += '<div class="view-toggle">';
-            html += '<span style="font-weight: bold;">View:</span>';
-            html += '<label>';
-            html += '<input type="radio" name="viewFilter" value="all" checked onchange="setViewFilter(\'all\')">';
-            html += 'All (Words + Characters)';
-            html += '</label>';
-            html += '<label>';
-            html += '<input type="radio" name="viewFilter" value="words" onchange="setViewFilter(\'words\')">';
-            html += 'Words Only';
-            html += '</label>';
-            html += '<label>';
-            html += '<input type="radio" name="viewFilter" value="characters" onchange="setViewFilter(\'characters\')">';
-            html += 'Characters Only';
-            html += '</label>';
-            html += '</div>';
-
             html += '</div>'; // End matrix-section
 
             // Controls - Single line above matrix
@@ -1091,10 +1051,6 @@
             // Table Body
             html += '<tbody>';
             rows.forEach((row, index) => {
-                if (!shouldShowRow(row, currentViewFilter)) {
-                    return;
-                }
-
                 const isWordRow = row.type === 'WORD';
                 let rowClass = isWordRow ? 'row-type-WORD' : 'row-type-CHAR';
 
@@ -1176,20 +1132,6 @@
             });
 
             return rows;
-        }
-
-        function shouldShowRow(row, filter) {
-            if (filter === 'all') return true;
-            if (filter === 'words') return row.type === 'WORD';
-            if (filter === 'characters') return row.type === 'CHAR';
-            return true;
-        }
-
-        function setViewFilter(filter) {
-            currentViewFilter = filter;
-            if (currentMatrixData) {
-                displayMatrixResults(currentMatrixData);
-            }
         }
 
         async function downloadMatrixCSV() {

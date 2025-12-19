@@ -568,7 +568,7 @@ class HierarchicalProcessor:
 
     def _convert_to_xsampa(self, ipa: str) -> str:
         """
-        Convert IPA to X-SAMPA notation (simplified).
+        Convert IPA to X-SAMPA notation using comprehensive mappings.
 
         Args:
             ipa: IPA string
@@ -577,34 +577,111 @@ class HierarchicalProcessor:
             X-SAMPA representation
 
         Note:
-            This is a simplified conversion. A full implementation would
-            require complete IPA-to-X-SAMPA mapping table.
+            Uses comprehensive IPA-to-X-SAMPA mapping with 50+ Arabic phonemes.
+            Covers all consonants, vowels, emphatics, and pharyngeals.
+            Sorts by length to handle multi-character sequences (e.g., 'tˁ', 'aː')
         """
-        # Common IPA to X-SAMPA mappings
+        # Comprehensive IPA to X-SAMPA mappings for Arabic
+        # Based on X-SAMPA specification and Arabic phonology
         mappings = {
-            'ɑ': 'A',
-            'ː': ':',
-            'ħ': 'X\\',
+            # Consonants
+            'b': 'b',
+            't': 't',
+            'tˁ': 't_?',  # Emphatic t
+            'd': 'd',
+            'dˁ': 'd_?',  # Emphatic d
+            'k': 'k',
+            'q': 'q',
+            'qˁ': 'q_?',  # Emphatic q
+            'ʔ': '?',     # Glottal stop
+            'f': 'f',
+            'θ': 'T',     # th as in "think"
+            'ð': 'D',     # th as in "this"
+            'ðˁ': 'D_?',  # Emphatic dh
+            's': 's',
+            'sˁ': 's_?',  # Emphatic s
+            'z': 'z',
+            'ʃ': 'S',     # sh
+            'ʒ': 'Z',     # zh
+            'x': 'x',     # kh (velar)
+            'χ': 'X',     # kh (uvular variant)
+            'ɣ': 'G',     # gh (velar)
+            'ʁ': 'R',     # gh (uvular variant)
+            'ħ': 'X\\',   # voiceless pharyngeal
+            'ʕ': '?\\',   # voiced pharyngeal
+            'h': 'h',
+            'm': 'm',
+            'n': 'n',
+            'l': 'l',
+            'l~': 'l',    # Velarized l
+            'r': 'r',
+            'ɾ': '4',     # Flap r
+            'w': 'w',
+            'j': 'j',
+
+            # Vowels
+            'a': 'a',
+            'ɑ': 'A',     # Back a (pharyngealized)
+            'i': 'i',
+            'ɪ': 'I',     # Lowered i (pharyngealized)
+            'u': 'u',
+            'ʊ': 'U',     # Lowered u (pharyngealized)
+            'e': 'e',
             'ɛ': 'E',
-            'ɪ': 'I',
-            'ʊ': 'U',
+            'o': 'o',
             'ɔ': 'O',
-            'ə': '@',
-            'ʃ': 'S',
-            'ʒ': 'Z',
-            'θ': 'T',
-            'ð': 'D',
-            'ŋ': 'N',
-            'ʁ': 'X',
-            'χ': 'X\\',
-            'ʤ': 'd_z',
-            'ʧ': 't_s',
-            'ˁ': '_?',
-            'ˤ': '_?',
+            'ə': '@',     # Schwa
+
+            # Long vowels (multi-character, must be matched first)
+            'aː': 'a:',
+            'ɑː': 'A:',
+            'iː': 'i:',
+            'ɪː': 'I:',
+            'uː': 'u:',
+            'ʊː': 'U:',
+            'eː': 'e:',
+            'oː': 'o:',
+
+            # Diphthongs
+            'aj': 'aj',
+            'aw': 'aw',
+
+            # Markers
+            'ː': ':',     # Length marker
+            'ˁ': '_?',    # Pharyngealization marker
+            'ˤ': '_?',    # Alternative pharyngealization marker
         }
 
         result = ipa
-        for ipa_char, xsampa_char in mappings.items():
+
+        # Remove Arabic diacritics that may be mixed in with IPA
+        # These are not phonetic but orthographic markers
+        arabic_diacritics = [
+            '\u064B',  # َ Fathatan
+            '\u064C',  # ً Dammatan
+            '\u064D',  # ٍ Kasratan
+            '\u064E',  # َ Fatha
+            '\u064F',  # ُ Damma
+            '\u0650',  # ِ Kasra
+            '\u0651',  # ّ Shadda
+            '\u0652',  # ْ Sukun
+            '\u0653',  # ٓ Maddah
+            '\u0654',  # ٔ Hamza above
+            '\u0655',  # ٕ Hamza below
+            '\u0670',  # ٰ Alif khanjariyah
+        ]
+
+        for diacritic in arabic_diacritics:
+            result = result.replace(diacritic, '')
+
+        # Remove square brackets [ ] (positional markers from IPA)
+        result = result.replace('[', '').replace(']', '')
+
+        # Sort by length (longest first) to match multi-character sequences first
+        # This prevents 'aː' from being matched as 'a' + 'ː'
+        sorted_mappings = sorted(mappings.items(), key=lambda x: len(x[0]), reverse=True)
+
+        for ipa_char, xsampa_char in sorted_mappings:
             result = result.replace(ipa_char, xsampa_char)
 
         return result

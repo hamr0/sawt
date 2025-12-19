@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ar-EG">
+  <voice name="ar-EG-SalmaNeural">
+    كان يا ما كان في قديم الزمان، في مدينة صغيرة، عاش رجل يدعى أحمد وزوجته فاطمة.
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-SalmaNeural">
+    قال أحمد:
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-ShakirNeural">
+    يا فاطمة، أريد أن أذهب إلى السوق لشراء بعض الطعام.
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-SalmaNeural">
+    قالت فاطمة:
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-SA-ZariyahNeural">
+    حسناً يا أحمد، لكن كن حذراً في الطريق.
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-SalmaNeural">
+    ذهب أحمد إلى السوق ووجد صديقه القديم علي.
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-SalmaNeural">
+    صرخ علي:
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-SA-HamedNeural">
+    أحمد! يا لها من مفاجأة! لم أرك منذ سنوات!
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-SalmaNeural">
+    رد أحمد:
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-ShakirNeural">
+    علي! كم أنا سعيد برؤيتك! كيف حالك؟
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-SalmaNeural">
+    همس علي:
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-SA-HamedNeural">
+    الحمد لله، الأمور جيدة. وأنت؟
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-SalmaNeural">
+    قال أحمد:
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-ShakirNeural">
+    أنا بخير، الحمد لله.
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-SalmaNeural">
+    عاد أحمد إلى البيت وحكى لفاطمة عن لقائه.
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-SalmaNeural">
+    قالت فاطمة:
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-SA-ZariyahNeural">
+    ما شاء الله! يجب أن ندعو علي لزيارتنا قريباً.
+  </voice>
+  <break time="500ms"/>
+  <voice name="ar-EG-SalmaNeural">
+    وعاشوا في سعادة وهناء.
+  </voice>
+</speak>
