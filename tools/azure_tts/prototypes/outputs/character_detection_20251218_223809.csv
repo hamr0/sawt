@@ -1,0 +1,27 @@
+Type,Segment_ID,Chapter,Text,Speaker,Detection_Method,Confidence,Quote_Pattern,Speech_Count,Prosody_Rate,Prosody_Pitch,Prosody_Volume,Status,Needs_Review
+SEGMENT,1,1,كان يوما جميلا في القاهرة. المدينة مليئة بالحياة والحركة.,Narrator,default,high,-,-,1.0,0%,0%,success,-
+SEGMENT,2,1,قال أحمد:,Narrator,default,high,-,-,1.0,0%,0%,success,-
+SEGMENT,3,1,مرحبا يا فاطمة، كيف حالك اليوم؟,أحمد,quote_guillemet+speaker_attr_before,high,« »,-,1.0,0%,0%,success,-
+SEGMENT,4,1,ردت فاطمة بابتسامة:,Narrator,default,high,-,-,1.0,0%,0%,success,-
+SEGMENT,5,1,أنا بخير والحمد لله. كيف كانت رحلتك إلى الإسكندرية؟,فاطمة,quote_double+speaker_attr_before,high,""" """,-,1.0,0%,0%,success,-
+SEGMENT,6,1,كانت رائعة جدا,أحمد,quote_guillemet+speaker_attr_after,high,« »,-,1.0,0%,0%,success,-
+SEGMENT,7,1,أجاب أحمد.,Narrator,default,high,-,-,1.0,0%,0%,success,-
+SEGMENT,8,1,زرت المكتبة القديمة والمتاحف,أحمد,quote_guillemet+speaker_attr_before,high,« »,-,1.0,0%,0%,success,-
+SEGMENT,9,1,.,Narrator,default,high,-,-,1.0,0%,0%,success,-
+SEGMENT,10,1,قال محمود وهو يقترب منهما:,Narrator,default,high,-,-,1.0,0%,0%,success,-
+SEGMENT,11,1,سمعت أنكما تتحدثان عن الإسكندرية,محمود,quote_single+speaker_attr_before,medium,' ',-,1.0,0%,0%,success,-
+SEGMENT,12,1,.,Narrator,default,high,-,-,1.0,0%,0%,success,-
+SEGMENT,13,1,نعم، أحمد عاد للتو من هناك,فاطمة,quote_double+speaker_attr_after,high,""" """,-,1.0,0%,0%,success,-
+SEGMENT,14,1,قالت فاطمة.,Narrator,default,high,-,-,1.0,0%,0%,success,-
+SEGMENT,15,1,تحدث أحمد عن المدينة بحماس، وقال:,Narrator,default,high,-,-,1.0,0%,0%,success,-
+SEGMENT,16,1,يجب أن تزوروها جميعا في الصيف,أحمد,quote_guillemet+speaker_attr_before,high,« »,-,1.0,0%,0%,success,-
+SEGMENT,17,1,.,Narrator,default,high,-,-,1.0,0%,0%,success,-
+SEGMENT,18,1,هذا صحيح تماما، قال محمود، ,Unknown,quote_em_dash,medium,— —,-,1.0,0%,0%,warning,Confirm_Speaker
+SEGMENT,19,1,المدينة جميلة في ذلك الوقت.,محمود,quote_em_dash+speaker_attr_before,medium,— —,-,1.0,0%,0%,success,-
+SEGMENT,20,1,وهكذا استمرت المحادثة بينهم لساعات طويلة.,Narrator,default,high,-,-,1.0,0%,0%,success,-
+Processing Stats,Total Segments: 20,Success: 19,Warning: 1,Error: 0,Success Rate: 95.0%,Flagged for Review: 1 (5.0%),-,-,-,-,-,-
+Character Stats,Detected Characters: 5,Narrator: 11 segs,Unknown: 1 segs (1 speeches),أحمد: 4 segs (4 speeches),فاطمة: 2 segs (2 speeches),محمود: 2 segs (2 speeches),-,-,-,-,-,-,-
+Detection Methods,default: 11,quote_double+speaker_attr_after: 1,quote_double+speaker_attr_before: 1,quote_em_dash: 1,quote_em_dash+speaker_attr_before: 1,quote_guillemet+speaker_attr_after: 1,quote_guillemet+speaker_attr_before: 3,quote_single+speaker_attr_before: 1,-,-,-,-,-
+Confidence Breakdown,High: 17 (85.0%),Medium: 3 (15.0%),Low: 0 (0.0%),-,-,-,-,-,-,-,-,-
+Review Flags,Confirm_Speaker: 1,-,-,-,-,-,-,-,-,-,-,-,-
+Notes,Detection Method Codes:,quote_guillemet=« »,"quote_double="" """,quote_single=' ',quote_em_dash=— —,speaker_attr_before=قال patterns before,speaker_attr_after=قال patterns after,default=No quotes,-,-,-,-

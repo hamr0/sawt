@@ -1,0 +1,72 @@
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="ar-EG">
+<voice name="ar-EG-SalmaNeural">
+كان يوما جميلا في القاهرة. المدينة مليئة بالحياة والحركة.
+<break time="300ms"/>
+قال أحمد:
+<break time="300ms"/>
+</voice>
+<voice name="ar-EG-ShakirNeural">
+مرحبا يا فاطمة، كيف حالك اليوم؟
+<break time="300ms"/>
+</voice>
+<voice name="ar-EG-SalmaNeural">
+ردت فاطمة بابتسامة:
+<break time="300ms"/>
+</voice>
+<voice name="ar-SA-ZariyahNeural">
+<prosody rate="0.95" pitch="+5%" volume="0%">
+أنا بخير والحمد لله. كيف كانت رحلتك إلى الإسكندرية؟
+</prosody>
+<break time="300ms"/>
+</voice>
+<voice name="ar-EG-ShakirNeural">
+كانت رائعة جدا
+<break time="300ms"/>
+</voice>
+<voice name="ar-EG-SalmaNeural">
+أجاب أحمد.
+<break time="300ms"/>
+</voice>
+<voice name="ar-EG-ShakirNeural">
+زرت المكتبة القديمة والمتاحف
+<break time="300ms"/>
+</voice>
+<voice name="ar-EG-SalmaNeural">
+قال محمود وهو يقترب منهما:
+<break time="300ms"/>
+</voice>
+<voice name="ar-SA-HamedNeural">
+<prosody rate="1.05" pitch="-5%" volume="0%">
+سمعت أنكما تتحدثان عن الإسكندرية
+</prosody>
+<break time="300ms"/>
+</voice>
+<voice name="ar-SA-ZariyahNeural">
+<prosody rate="0.95" pitch="+5%" volume="0%">
+نعم، أحمد عاد للتو من هناك
+</prosody>
+<break time="300ms"/>
+</voice>
+<voice name="ar-EG-SalmaNeural">
+قالت فاطمة.
+<break time="300ms"/>
+تحدث أحمد عن المدينة بحماس، وقال:
+<break time="300ms"/>
+</voice>
+<voice name="ar-EG-ShakirNeural">
+يجب أن تزوروها جميعا في الصيف
+<break time="300ms"/>
+هذا صحيح تماما، قال محمود، 
+<break time="300ms"/>
+</voice>
+<voice name="ar-SA-HamedNeural">
+<prosody rate="1.05" pitch="-5%" volume="0%">
+المدينة جميلة في ذلك الوقت.
+</prosody>
+<break time="300ms"/>
+</voice>
+<voice name="ar-EG-SalmaNeural">
+وهكذا استمرت المحادثة بينهم لساعات طويلة.
+<break time="300ms"/>
+</voice>
+</speak>
