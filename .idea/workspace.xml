@@ -4,28 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="351687aa-e935-4a81-9ea7-0bc9828bfc92" name="Changes" comment="created context contextualization, organized /docs and init the project">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/hierarchical_processor.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/hierarchical_processor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/integrations/polly.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/integrations/polly.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165603_432827.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165603_608203.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165604_054226.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165604_181869.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165604_331278.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251030_165604_466379.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251216_080057_908789.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251216_080111_651930.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251216_085142_269683.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_EG_20251216_085327_677852.mp3" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_MSA_20251030_165603_754927.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/audio/output_MSA_20251030_165603_912114.wav" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tasks/llm/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/tasks/llm/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tasks/llm/test_diacritization_comparison.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/demo.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/demo.html" afterDir="false" />
-    </list>
+    <list default="true" id="351687aa-e935-4a81-9ea7-0bc9828bfc92" name="Changes" comment="created context contextualization, organized /docs and init the project" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,12 +26,16 @@
     &quot;assignee&quot;: &quot;amrhas82&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/amrhas82/ArabicTTS.git&quot;,
-    &quot;accountId&quot;: &quot;7b4ce9af-ba12-470a-8168-51a2fd93f408&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/amrhas82/ArabicTTS.git",
+    "accountId": "1910042e-d9bb-4340-aa2a-3c155e98b007"
   }
-}</component>
+}]]></component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>
@@ -61,24 +44,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/hamr/PycharmProjects/agentic-toolkit&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "ai.playground.ignore.import.keys.banner.in.settings": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/hamr/PycharmProjects/agentic-toolkit",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;ChangesTree.GroupingKeys&quot;: [
-      &quot;directory&quot;
+  "keyToStringList": {
+    "ChangesTree.GroupingKeys": [
+      "directory"
     ]
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-f2b7a9f6281b-6e1f45a539f7-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.29346.142" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.30387.127" />
+        <option value="bundled-python-sdk-3944b0c99280-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.30387.127" />
       </set>
     </attachedChunks>
   </component>
@@ -90,6 +86,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1755237165618</updated>
+      <workItem from="1769545827723" duration="616000" />
     </task>
     <task id="LOCAL-00001" summary="created context contextualization, organized /docs and init the project">
       <option name="closed" value="true" />
@@ -101,6 +98,9 @@
     </task>
     <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
