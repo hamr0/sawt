@@ -1,10 +1,7 @@
-numpy
-pandas
-tqdm
-PyYAML
-python-Levenshtein
+# Audiobook production pipeline
+pdfplumber>=0.10.0
+azure-cognitiveservices-speech>=1.35.0
+
+# Testing
 pytest
 pytest-cov
-flask
-mishkal
-boto3>=1.28.0

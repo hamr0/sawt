@@ -11,7 +11,7 @@ venv/
 *.h5
 *.model
 
-# Outputs
+# Outputs (per-book working data, audio, CSVs)
 /output/
 /tmp/
 

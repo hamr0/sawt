@@ -1,115 +1,39 @@
 # Decisions Log
 
-Track architectural and technical decisions with rationale.
-
----
+Architecture and design decisions with rationale. Record decisions that future-you would want to know about.
 
 ## Format
 
 ```
-## DEC-XXX: Decision Title
-
-**Date:** YYYY-MM-DD
-**Status:** Accepted | Superseded | Deprecated
-**Context:** Why this decision was needed
+### YYYY-MM-DD: [Decision]
+**Context:** Why this came up
 **Decision:** What was decided
-**Rationale:** Why this choice
-**Consequences:** Impact of decision
+**Rationale:** Why
+**Alternatives considered:** What else was on the table
 ```
 
 ---
 
-## Decisions
+### 2026-02-05: Azure plain text over IPA phoneme control
+**Context:** IPA pipeline produced accurate linguistic processing but unusable audio
+**Decision:** Send plain Arabic text to Azure neural voices, no phoneme-level control
+**Rationale:** Azure's neural models handle pronunciation better than letter-by-letter SSML phoneme tags. The IPA approach was technically impressive but produced robotic output.
+**Alternatives:** Continue refining IPA pipeline, try different TTS engines with phoneme support
 
-### DEC-001: IPA-First Architecture
+### 2026-02-05: Two-voice primary, multi-voice stretch
+**Context:** Need to decide voice approach for audiobook production
+**Decision:** Binary narration/dialogue classification first, per-character attribution later
+**Rationale:** Two-voice is tractable (colon detection already works), covers 70-80% of fiction. Multi-voice attribution sits at 63.5% automated after 7 iterations — hard problem.
+**Alternatives:** Jump straight to multi-voice, single-voice only
 
-**Date:** 2025-10-01
-**Status:** Accepted
-**Context:** Need to build Arabic TTS with high pronunciation accuracy across dialects
-**Decision:** Build linguistic intelligence internally (IPA/phonology), use external voice synthesis
-**Rationale:**
-- Own the IP (phonological rules, syllabification)
-- Voice is commodity (can switch providers)
-- Better control over dialect-specific pronunciation
-- Debug-friendly vs black-box neural TTS
-**Consequences:**
-- More upfront work on phonological rules
-- Can switch voice providers without losing core value
-- Pronunciation accuracy depends on our rules, not training data
+### 2026-02-05: POC isolation by data boundaries
+**Context:** How should pipeline stages connect?
+**Decision:** Each POC reads from previous POC's file output, not its code
+**Rationale:** Can rewrite any POC without breaking the next one. CSV files at every stage enable review.
+**Alternatives:** Direct function calls between stages, shared data models
 
-### DEC-002: Phonological Processor Order
-
-**Date:** 2025-10-15
-**Status:** Accepted
-**Context:** Multiple phonological rules interact with each other
-**Decision:** Fixed processing order: Gemination → Sun Letters → Allophones → Emphatic Spread
-**Rationale:**
-- Gemination affects consonant doubling (must happen first)
-- Sun letter assimilation depends on geminated consonants
-- Allophones depend on both above
-- Emphatic spread is final vowel modification
-**Consequences:**
-- Order cannot be changed without breaking accuracy
-- Each processor is independent but assumes prior processing
-- Testing must respect this order
-
-### DEC-003: masterTTS.json Lookup After Processing
-
-**Date:** 2025-10-20
-**Status:** Accepted
-**Context:** Dictionary lookup timing affects output
-**Decision:** IPA lookup from masterTTS.json happens AFTER all phonological processing
-**Rationale:**
-- Processing creates context markers (geminated, emphatic, position)
-- Dictionary entries include context-specific variants
-- Lookup with context = accurate IPA
-**Consequences:**
-- Dictionary entries must cover all context combinations
-- Cannot do early dictionary lookup optimization
-- Architecture is validated and working
-
-### DEC-004: Amazon Polly for Production Voice
-
-**Date:** 2025-10-30
-**Status:** Accepted
-**Context:** eSpeak NG produces robotic voice unsuitable for audiobooks
-**Decision:** Use Amazon Polly (Zeina voice) for production audio
-**Rationale:**
-- Significantly better voice quality
-- Accepts X-SAMPA/SSML input (matches our pipeline)
-- Cost-effective ($16/million chars, 5M/month free)
-- Strategic fit: we own linguistics, they provide voice
-**Consequences:**
-- AWS credentials required
-- Zeina uses standard engine only (not neural)
-- Cost monitoring needed at scale
-
-### DEC-005: Universal Processors (No Dialect Parameter)
-
-**Date:** 2025-12-14
-**Status:** Accepted
-**Context:** Processors were accepting dialect parameter but not using it
-**Decision:** Remove dialect parameter from all processors; dialect only affects IPA lookup
-**Rationale:**
-- Phonological rules (gemination, sun letters, emphatics) are universal to Arabic
-- Only IPA mapping varies by dialect
-- Cleaner API, reduced confusion
-**Consequences:**
-- Breaking change for old API (see migration guide)
-- AllophoneProcessor deprecated in favor of PositionDetector + IPAMapper
-- Dialect is runtime parameter at IPA lookup only
-
----
-
-## Template for New Decisions
-
-```
-### DEC-XXX: Title
-
-**Date:**
-**Status:**
-**Context:**
-**Decision:**
-**Rationale:**
-**Consequences:**
-```
+### 2026-02-05: No dialect switching per book
+**Context:** Azure offers 14+ voices across 7 Arabic dialects
+**Decision:** One voice profile per book, no mid-book dialect switching
+**Rationale:** Arabic dialect changes expressions and meaning, not just accent. Switching dialects mid-book would sound unnatural and change meaning.
+**Alternatives:** Detect dialogue dialect per character, match voice dialect

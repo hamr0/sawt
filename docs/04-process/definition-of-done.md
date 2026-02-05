@@ -1,85 +1,38 @@
 # Definition of Done
 
-Criteria that must be met before work is considered complete.
+## Per-POC Completion
 
----
+A POC is done when:
 
-## Code Changes
+- [ ] Module implemented in `src/audiobook/`
+- [ ] Tests pass: `pytest tests/audiobook/test_{module}.py -v`
+- [ ] Run on at least 1 real book
+- [ ] CSV output reviewed chapter by chapter
+- [ ] No text loss (character count verification where applicable)
+- [ ] Edge cases handled or documented as known limitations
 
-### Before Committing
+## POC-Specific Criteria
 
-- [ ] All existing tests pass (`pytest tests/ -v`)
-- [ ] New functionality has test coverage
-- [ ] No security vulnerabilities introduced
-- [ ] Code follows existing patterns in codebase
+### POC-1: Book Ingestion
+- Clean text extraction from both PDF and TXT
+- Zero text loss (verified by char count comparison)
+- Correct paragraph boundary detection
+- Arabic encoding normalized (Presentation Forms → Standard)
 
-### Before Merging
+### POC-2: Chapter Splitting
+- Correct chapter boundary detection on 3+ books
+- No mid-sentence splits
+- Chapter files concatenate back to original text
+- Chapters exceeding Azure limits are split at paragraph boundaries
 
-- [ ] Pre-commit hook passes (runs full test suite)
-- [ ] No regressions in accuracy metrics
-- [ ] Documentation updated if API changed
+### POC-3a: Two-Voice
+- All narration/dialogue boundaries verified via CSV review
+- Complete two-voice audiobook from at least 1 real book
+- Voice switching sounds natural on listen-through
+- Repeatable on a second book with different formatting
 
----
-
-## Feature Implementation
-
-### Minimum Criteria
-
-- [ ] Feature works for happy path
-- [ ] Error cases handled gracefully
-- [ ] Tests written and passing
-- [ ] Works with all supported dialects (if applicable)
-
-### Quality Criteria
-
-- [ ] Processing speed not significantly degraded
-- [ ] Memory usage reasonable
-- [ ] No silent failures (errors logged/reported)
-
----
-
-## Bug Fixes
-
-- [ ] Root cause identified and documented
-- [ ] Fix addresses root cause (not just symptoms)
-- [ ] Regression test added
-- [ ] Bug logged in `03-logs/bug-log.md`
-
----
-
-## Documentation
-
-### When Required
-
-- API changes → Update relevant docs
-- New features → Add to feature docs
-- Architecture changes → Update system-state.md
-- Decisions made → Log in decisions-log.md
-
-### Quality Criteria
-
-- Clear and concise
-- Code examples where helpful
-- Links to related docs
-
----
-
-## Release Checklist
-
-- [ ] All tests passing (329/329)
-- [ ] Accuracy metrics maintained (>90% syl, >90% IPA)
-- [ ] Performance benchmarks met (>10 words/sec)
-- [ ] CHANGELOG updated
-- [ ] Version bumped if applicable
-- [ ] Documentation current
-
----
-
-## Quick Reference
-
-| Work Type | Must Have | Should Have |
-|-----------|-----------|-------------|
-| Code change | Tests pass | Docs updated |
-| Bug fix | Root cause, regression test | Bug log entry |
-| Feature | Tests, error handling | Feature docs |
-| Refactor | All tests pass | No behavior change |
+### POC-3b: Multi-Voice (stretch)
+- Character attribution completed for at least 1 book
+- CSV review completed for all "Unknown" segments
+- Multi-voice audiobook with distinct character voices
+- Honest assessment: is quality improvement worth the review effort?
