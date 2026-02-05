@@ -50,32 +50,32 @@ Text processing IS the product. SSML is just markup. Let Azure handle pronunciat
 
 ## Active Code
 
-```
-src/audiobook/          # Pipeline modules (one per POC)
-tests/audiobook/        # Tests per POC
-data/books/             # Input books
-output/                 # Per-book working output (gitignored)
-docs/02-features/azure-audiobooks/  # Plan, repo structure
-```
+| Path | Purpose |
+|------|---------|
+| src/audiobook/ | Pipeline modules (one file per POC) |
+| tests/audiobook/ | Tests per POC |
+| data/books/ | Input books (PDF/TXT) |
+| output/ | Per-book working output (gitignored) |
 
 ## Archive
 
-`archive/` contains a previous IPA phonological pipeline. Reference only, not active.
-POC reference (7 iterations of dialogue detection R&D): `docs/02-features/azure-audiobooks/reference/prototypes/`
+`archive/` -- previous IPA phonological pipeline (code + old docs). Reference only, not active.
+Prototype history (7 iterations) -- `docs/02-features/azure-audiobooks/reference/prototypes/`
 
-## Key Decisions
+## Key Patterns
 
-- No dialect switching for audiobooks — a book is a book
 - POCs isolated by data boundaries (file output), not code imports
-- CSV review at every pipeline stage, chapter-by-chapter review cadence
-- Two-voice first (narrator + dialogue), multi-voice is stretch goal
+- CSV review at every pipeline stage, chapter-by-chapter cadence
+- Two-voice first (narrator + dialogue), multi-voice is stretch
 - Code-first for text processing, LLM only where it demonstrably helps
+- No dialect switching -- a book is a book
 
-## Essential Commands
+## Commands
 
 ```bash
-pytest tests/audiobook/ -v    # Run audiobook tests
-pip install -r requirements.txt
+pytest tests/audiobook/ -v        # Run audiobook tests
+pytest tests/audiobook/test_ingest.py -v  # Run single POC tests
+pip install -r requirements.txt   # Install dependencies
 ```
 
 ## Docs
@@ -83,7 +83,5 @@ pip install -r requirements.txt
 | Topic | Location |
 |-------|----------|
 | Documentation hub | docs/README.md |
-| Execution plan | docs/02-features/azure-audiobooks/PLAN.md |
-| Repo structure | docs/02-features/azure-audiobooks/REPO_STRUCTURE.md |
-| Product requirements | docs/01-product/prd.md |
-| System state | docs/00-context/system-state.md |
+| Execution plan (source of truth) | docs/02-features/azure-audiobooks/PLAN.md |
+| Knowledge base (topic index) | docs/KNOWLEDGE_BASE.md |
