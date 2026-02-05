@@ -301,21 +301,17 @@ output/{format}/book/audio/chapter_*.mp3
 
 **Definition of done:** Clean text output from EPUB and DOCX that a human reads and says "yes, this is the book, nothing missing, nothing garbled" ✓
 
-#### POC-1 Fine-Tuning (Post-Pipeline)
+#### POC-1/POC-2 Polish (COMPLETE — Feb 2026)
 
-POC-1 is production-quality code but carries minor POC rough edges. These do NOT block POC-2
-(data boundary isolation means POC-2 reads files, not code). Graduate after pipeline shape
-stabilizes (post POC-3/4), so all modules get polished with consistent patterns at once.
+Both modules polished with consistent patterns:
 
-| Item | Current | Target | Effort |
-|------|---------|--------|--------|
-| Logging | `print()` statements | `logging` module with levels | 30 min |
-| Exception context | Raw third-party errors bubble up | `IngestionError` wrapper with book/stage context | 20 min |
-| Return types | Plain `dict` | `TypedDict` or `dataclass` for `normalize_arabic` stats and `ingest` result | 30 min |
-| Magic numbers | Hardcoded thresholds (`arabic_chars < 10`, `paragraphs <= 3`) | Named constants or function params | 15 min |
-| Module docstring | Minimal | Module-level docstring with usage example | 10 min |
-
-**When to do it:** After POC-3 Phase A (two-voice) is working. Polish all modules together.
+| Item | What was done |
+|------|---------------|
+| Logging | `print()` → `logging` module (INFO for reports, DEBUG for paths) in both modules |
+| Exception context | `IngestionError(ValueError)` with book/stage context wrapping third-party errors |
+| Return types | `NormStats` and `IngestSummary` TypedDicts for type-safe return values |
+| Magic numbers | 6 named constants (`MIN_ARABIC_CHARS_PER_PAGE`, `PARAGRAPH_FALLBACK_THRESHOLD`, etc.) |
+| Module docstring | Usage example added to `ingest.py` |
 
 ---
 

@@ -3,21 +3,77 @@ POC-1: Book Ingestion
 
 EPUB/DOCX/TXT → clean text with paragraph boundaries.
 
+Usage:
+    from src.audiobook.ingest import ingest
+    summary = ingest("data/books/epub/my-book.epub")
+    # Output: output/epub/my-book/ingestion/clean_text.txt
+    #         output/epub/my-book/ingestion/paragraphs.csv
+
 Input:  data/books/{epub,docx,txt}/book.*
 Output: output/{epub,docx,txt}/{book}/ingestion/clean_text.txt
         output/{epub,docx,txt}/{book}/ingestion/paragraphs.csv
 """
 import csv
+import logging
 import re
 import unicodedata
 from pathlib import Path
+from typing import TypedDict
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+MIN_ARABIC_CHARS_PER_PAGE = 10    # Skip EPUB pages with fewer Arabic chars (e.g. archive.org notices)
+PARAGRAPH_FALLBACK_THRESHOLD = 3  # If blank-line split yields ≤ this, try single-newline split
+LINE_COUNT_THRESHOLD = 20         # Only fall back to newline split if text has this many lines
+BACK_MATTER_SEARCH_WINDOW = 15    # Search last N paragraphs for publisher boilerplate
+MAX_WALKBACK_STEPS = 3            # Walk back over short title/author lines before cut point
+MAX_SHORT_PARA_LEN = 50           # Paragraphs shorter than this are considered title/author during walkback
+
+
+# ---------------------------------------------------------------------------
+# Exceptions
+# ---------------------------------------------------------------------------
+
+class IngestionError(ValueError):
+    """Raised when book ingestion fails, with book and stage context."""
+    def __init__(self, message: str, book: str = "", stage: str = ""):
+        self.book = book
+        self.stage = stage
+        super().__init__(message)
+
+
+# ---------------------------------------------------------------------------
+# Return types
+# ---------------------------------------------------------------------------
+
+class NormStats(TypedDict):
+    presentation_forms_converted: int
+    tatweel_stripped: int
+    separators_stripped: int
+
+
+class IngestSummary(TypedDict):
+    book_slug: str
+    format: str
+    total_chars: int
+    paragraph_count: int
+    back_matter_removed: int
+    output_dir: str
+    presentation_forms_converted: int
+    tatweel_stripped: int
+    separators_stripped: int
 
 
 # ---------------------------------------------------------------------------
 # Arabic text normalization
 # ---------------------------------------------------------------------------
 
-def normalize_arabic(text: str) -> tuple[str, dict]:
+def normalize_arabic(text: str) -> tuple[str, NormStats]:
     """Normalize Arabic text: NFKC, strip tatweel, collapse whitespace.
 
     Returns (cleaned_text, stats_dict).
@@ -159,7 +215,7 @@ def extract_epub(path: str) -> str:
         # Skip pages with no Arabic content (e.g. archive.org notices)
         page_combined = " ".join(page_texts)
         arabic_chars = sum(1 for c in page_combined if "\u0600" <= c <= "\u06FF")
-        if arabic_chars < 10:
+        if arabic_chars < MIN_ARABIC_CHARS_PER_PAGE:
             continue
 
         paragraphs.extend(page_texts)
@@ -189,10 +245,10 @@ def strip_back_matter(paragraphs: list[str]) -> tuple[list[str], list[str]]:
 
     Returns (cleaned_paragraphs, removed_paragraphs).
     """
-    if len(paragraphs) < 5:
+    if len(paragraphs) < BACK_MATTER_SEARCH_WINDOW // 3:
         return paragraphs, []
 
-    search_start = max(0, len(paragraphs) - 15)
+    search_start = max(0, len(paragraphs) - BACK_MATTER_SEARCH_WINDOW)
 
     # Find earliest paragraph containing a back-matter marker
     cut_idx = None
@@ -210,7 +266,7 @@ def strip_back_matter(paragraphs: list[str]) -> tuple[list[str], list[str]]:
     # Walk back over short preceding paragraphs (book title, author name)
     # Max 3 steps, only over lines < 50 chars (title/author are very short)
     walked = 0
-    while cut_idx > 0 and walked < 3 and len(paragraphs[cut_idx - 1]) < 50:
+    while cut_idx > 0 and walked < MAX_WALKBACK_STEPS and len(paragraphs[cut_idx - 1]) < MAX_SHORT_PARA_LEN:
         cut_idx -= 1
         walked += 1
 
@@ -229,7 +285,7 @@ def _split_paragraphs(text: str) -> list[str]:
     # If we got very few chunks but the text has many lines, it's hard-wrapped text
     # Fall back to single-newline splitting
     line_count = text.count("\n")
-    if len(raw_paragraphs) <= 3 and line_count > 20:
+    if len(raw_paragraphs) <= PARAGRAPH_FALLBACK_THRESHOLD and line_count > LINE_COUNT_THRESHOLD:
         raw_paragraphs = text.split("\n")
 
     paragraphs = []
@@ -263,13 +319,20 @@ def ingest(book_path: str, output_dir: str = "output") -> dict:
     suffix = bp.suffix.lower()
 
     if suffix not in EXTRACTORS:
-        raise ValueError(f"Unsupported format: {suffix}")
+        raise IngestionError(f"Unsupported format: {suffix}", book=str(bp), stage="format_check")
 
     # Derive book slug from filename (no extension)
     book_slug = bp.stem
 
     # Extract raw text
-    raw_text = EXTRACTORS[suffix](str(bp))
+    try:
+        raw_text = EXTRACTORS[suffix](str(bp))
+    except (FileNotFoundError, ValueError):
+        raise
+    except Exception as exc:
+        raise IngestionError(
+            f"Extraction failed for {bp.name}: {exc}", book=book_slug, stage="extraction"
+        ) from exc
 
     # Normalize Arabic encoding
     clean_text, norm_stats = normalize_arabic(raw_text)
@@ -315,16 +378,15 @@ def ingest(book_path: str, output_dir: str = "output") -> dict:
         **norm_stats,
     }
 
-    # Print encoding report
-    print(f"\n--- Ingestion Report: {bp.name} ---")
-    print(f"  Format: {suffix}")
-    print(f"  Paragraphs: {len(paragraphs)}")
-    print(f"  Total chars: {len(clean_text_out)}")
-    print(f"  Presentation forms converted: {norm_stats['presentation_forms_converted']}")
-    print(f"  Tatweel stripped: {norm_stats['tatweel_stripped']}")
+    logger.info("Ingestion complete: %s", bp.name)
+    logger.info("  Format: %s | Paragraphs: %d | Chars: %d",
+                suffix, len(paragraphs), len(clean_text_out))
+    if norm_stats["presentation_forms_converted"]:
+        logger.info("  Presentation forms converted: %d", norm_stats["presentation_forms_converted"])
+    if norm_stats["tatweel_stripped"]:
+        logger.info("  Tatweel stripped: %d", norm_stats["tatweel_stripped"])
     if back_matter:
-        print(f"  Back-matter stripped: {len(back_matter)} paragraphs")
-        print(f"    First removed: {back_matter[0][:60]}...")
-    print(f"  Output: {out_dir}")
+        logger.info("  Back-matter stripped: %d paragraphs", len(back_matter))
+    logger.debug("  Output: %s", out_dir)
 
     return summary

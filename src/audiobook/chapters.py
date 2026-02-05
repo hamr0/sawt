@@ -13,8 +13,11 @@ Hard rules:
   3. All detection runs on clean_text.txt (format-agnostic).
 """
 import csv
+import logging
 import re
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -519,12 +522,11 @@ def split_book(ingestion_dir: str, output_dir: str | None = None) -> dict:
         "sub_splits": splits_needed,
     }
 
-    print(f"\n--- Chapter Split Report ---")
-    print(f"  Delimiter: {summary['delimiter_type']}")
-    print(f"  Units: {summary['total_units']}")
-    print(f"  Total chars: {summary['total_chars']}")
-    print(f"  Page markers filtered: {summary['page_markers_filtered']}")
-    print(f"  Sub-splits needed: {summary['sub_splits']}")
-    print(f"  Output: {out_path}")
+    logger.info("Chapter split complete: %s", summary["delimiter_type"])
+    logger.info("  Units: %d | Chars: %d | Page markers filtered: %d",
+                summary["total_units"], summary["total_chars"], summary["page_markers_filtered"])
+    if summary["sub_splits"]:
+        logger.info("  Sub-splits needed: %d", summary["sub_splits"])
+    logger.debug("  Output: %s", out_path)
 
     return summary
