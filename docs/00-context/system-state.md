@@ -9,7 +9,7 @@ Pipeline skeleton is in place. No POCs implemented yet.
 ## Architecture
 
 ```
-Raw Book (PDF/TXT) → Ingestion → Chapter Splitting → Dialogue Detection → SSML → Azure TTS → Audio
+Raw Book (PDF/TXT/EPUB) → Ingestion → Chapter Splitting → Dialogue Detection → SSML → Azure TTS → Audio
 ```
 
 Each stage produces CSV output for human review. POCs are isolated by data boundaries (file output), not code imports.
@@ -19,7 +19,7 @@ Each stage produces CSV output for human review. POCs are isolated by data bound
 ```
 src/audiobook/          # Pipeline modules (skeleton)
 ├── __init__.py
-├── ingest.py           # POC-1: PDF/TXT → clean text
+├── ingest.py           # POC-1: PDF/TXT/EPUB → clean text
 ├── chapters.py         # POC-2: chapter detection & splitting
 ├── dialogue.py         # POC-3: dialogue detection
 ├── azure_client.py     # Azure SDK wrapper
@@ -28,14 +28,17 @@ src/audiobook/          # Pipeline modules (skeleton)
 └── review.py           # CSV export at every stage
 
 tests/audiobook/        # Test skeletons
-data/books/             # Input books (awalad-7aretna.txt, book2.txt)
+data/books/             # Input books organized by format
+├── txt/                #   awalad-7aretna.txt, book2.txt
+├── pdf/                #   3 Hindawi text-based PDFs (Mahfouz)
+└── epub/               #   (TBD)
 output/                 # Per-book working output (gitignored)
 ```
 
 ## Data Flow
 
 ```
-data/books/book.txt
+data/books/{txt,pdf,epub}/book.*
     ↓ ingest.py
 output/book/ingestion/clean_text.txt + paragraphs.csv    ← REVIEW
     ↓ chapters.py

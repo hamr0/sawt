@@ -1,7 +1,6 @@
-# Arabic Audiobook Production
+# ArabicTTS
 
-Produce Arabic audiobooks from raw book files (PDF/TXT) using Azure Neural TTS.
-Two-voice (narrator + dialogue) as primary goal. Multi-voice (per-character) as stretch.
+A script-based pipeline that processes raw Arabic books (EPUB/DOCX/TXT) through text extraction, chapter splitting, and dialogue detection, then generates multi-voice audiobooks automatically via Azure Neural TTS.
 
 ---
 
@@ -9,20 +8,20 @@ Two-voice (narrator + dialogue) as primary goal. Multi-voice (per-character) as 
 
 | What | Status |
 |------|--------|
-| POC-1: Book Ingestion | Pending |
-| POC-2: Chapter Splitting | Pending |
+| POC-1: Book Ingestion | Complete |
+| POC-2: Chapter Splitting | Complete |
 | POC-3a: Two-Voice (narrator/dialogue) | Pending |
 | POC-3b: Multi-Voice (per-character) | Stretch |
 
 ## How It Works
 
 ```
-data/books/book.pdf
-    | ingest.py        → output/{book}/ingestion/  (clean text + paragraphs.csv)
-    | chapters.py      → output/{book}/chapters/   (chapter files + chapters.csv)
-    | dialogue.py      → output/{book}/segments/   (narrator/dialogue tags + per-chapter CSV)
-    | ssml.py          → output/{book}/ssml/       (SSML with voice tags)
-    | azure_client.py  → output/{book}/audio/      (MP3 per chapter)
+data/books/{epub,docx,txt}/book.*
+    | ingest.py        → output/{format}/{book}/ingestion/  (clean text + paragraphs.csv)
+    | chapters.py      → output/{format}/{book}/chapters/   (chapter files + chapters.csv)
+    | dialogue.py      → output/{format}/{book}/segments/   (narrator/dialogue tags + per-chapter CSV)
+    | ssml.py          → output/{format}/{book}/ssml/       (SSML with voice tags)
+    | azure_client.py  → output/{format}/{book}/audio/      (MP3 per chapter)
 ```
 
 Each step produces a CSV for review. Review chapter by chapter, perfect each step before moving on.
@@ -39,7 +38,7 @@ Each step produces a CSV for review. Review chapter by chapter, perfect each ste
 
 ```
 src/audiobook/          # Pipeline modules (one file per POC)
-    ingest.py           #   POC-1: PDF/TXT → clean text
+    ingest.py           #   POC-1: EPUB/DOCX/TXT → clean text
     chapters.py         #   POC-2: chapter detection & splitting
     dialogue.py         #   POC-3: narrator/dialogue/character detection
     azure_client.py     #   Azure TTS wrapper
@@ -48,7 +47,7 @@ src/audiobook/          # Pipeline modules (one file per POC)
     review.py           #   CSV export at every stage
 
 tests/audiobook/        # Tests per POC
-data/books/             # Input books (PDF/TXT)
+data/books/             # Input books (txt/, pdf/, epub/)
 output/                 # Per-book working output (gitignored)
 docs/                   # Documentation
 ```

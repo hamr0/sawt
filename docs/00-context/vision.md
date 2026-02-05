@@ -2,7 +2,7 @@
 
 ## What We're Building
 
-An Arabic audiobook production pipeline that converts raw books (PDF/TXT) into two-voice audiobooks using Azure Neural TTS.
+An Arabic audiobook production pipeline that converts raw books (PDF/TXT/EPUB) into two-voice audiobooks using Azure Neural TTS.
 
 ## Why
 
@@ -14,7 +14,7 @@ An Arabic audiobook production pipeline that converts raw books (PDF/TXT) into t
 
 Text processing IS the product. Once text is correctly broken into narration and dialogue segments, SSML generation and TTS are commodity operations. The hard problems are:
 
-1. **Extracting clean text** from PDF/TXT with correct encoding and paragraph structure
+1. **Extracting clean text** from PDF/TXT/EPUB with correct encoding and paragraph structure
 2. **Detecting chapter boundaries** with safe splitting at paragraph breaks
 3. **Classifying narration vs dialogue** — the primary differentiator
 

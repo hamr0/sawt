@@ -39,12 +39,12 @@ Keep this managed block so 'aur init --config' can refresh the instructions.
 
 # ArabicTTS - Arabic Audiobook Production
 
-Produce Arabic audiobooks from raw book files (PDF/TXT) using Azure Neural TTS.
+Produce Arabic audiobooks from raw book files (PDF/TXT/EPUB) using Azure Neural TTS.
 Two-voice (narrator + dialogue) as primary goal. Multi-voice (per-character) as stretch.
 
 ## Architecture
 
-Pipeline: Raw Book (PDF/TXT) → Ingestion → Chapter Splitting → Dialogue Detection → SSML → Azure TTS → Audio
+Pipeline: Raw Book (PDF/TXT/EPUB) → Ingestion → Chapter Splitting → Dialogue Detection → SSML → Azure TTS → Audio
 
 Text processing IS the product. SSML is just markup. Let Azure handle pronunciation.
 
@@ -54,7 +54,7 @@ Text processing IS the product. SSML is just markup. Let Azure handle pronunciat
 |------|---------|
 | src/audiobook/ | Pipeline modules (one file per POC) |
 | tests/audiobook/ | Tests per POC |
-| data/books/ | Input books (PDF/TXT) |
+| data/books/ | Input books (txt/, pdf/, epub/) |
 | output/ | Per-book working output (gitignored) |
 
 ## Archive

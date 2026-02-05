@@ -2,7 +2,7 @@
 
 ## Goal
 
-Produce Arabic audiobooks from raw book files (PDF/TXT) using Azure Neural TTS with two distinct voices: one for narration, one for dialogue.
+Produce Arabic audiobooks from raw book files (PDF/TXT/EPUB) using Azure Neural TTS with two distinct voices: one for narration, one for dialogue.
 
 ## Target Users
 
@@ -13,7 +13,7 @@ Produce Arabic audiobooks from raw book files (PDF/TXT) using Azure Neural TTS w
 ## Core Requirements
 
 ### POC-1: Book Ingestion
-- Accept PDF and TXT input formats
+- Accept PDF, TXT, and EPUB input formats
 - Extract text preserving paragraph structure
 - Normalize Arabic encoding (Presentation Forms → Standard Arabic)
 - Strip headers, footers, page numbers, publisher noise

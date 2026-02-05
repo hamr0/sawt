@@ -1,7 +1,7 @@
 # Azure Arabic Audiobook Production Plan
 
 **Date:** February 2026
-**Goal:** Produce Arabic audiobooks from raw book files (PDF/TXT) using Azure TTS
+**Goal:** Produce Arabic audiobooks from raw book files (EPUB/DOCX) using Azure TTS
 **Target:** Two-voice audiobooks (narrator + dialogue) as primary deliverable
 **Stretch:** Multi-voice (per-character) after two-voice is proven solid
 **Cost:** ~$8-12 per 150-page book, free tier available (5M chars/month, 12 months)
@@ -30,11 +30,60 @@ They solve different problems entirely. The IPA work lives in `archive/` for ref
 
 ---
 
+## Format Scope & PDF Decision
+
+### Input Formats
+
+| Format | Role | Status | Rationale |
+|--------|------|--------|-----------|
+| **EPUB** | First-class (content source) | Active | Best extraction quality. Born-digital = clean paragraphs + word boundaries. |
+| **DOCX** | First-class (author input) | Adding | Authors write in Word/Google Docs. python-docx handles Arabic cleanly. |
+| **TXT** | Internal-use (bulk corpus) | Supported | Swedish dataset has 1,745 pre-cleaned books. Not user-facing. |
+| **PDF** | Out of scope | Descoped | Intractable word-spacing problem. See below. |
+
+### Why PDF Is Out of Scope
+
+Extensive testing and research (Feb 2026) confirmed that Arabic PDF text extraction is an
+unsolved problem in the open-source ecosystem:
+
+**What we tested:**
+- PyMuPDF — best RTL reading order, but fused words (spacing stored as coordinates)
+- pdfplumber — same fused words + worse reading order
+- Both tested on 3 Hindawi PDFs: al-Liss wal-Kilab, Tharthara, Zuqaq al-Midaqq
+
+**What we found:**
+- Arabic PDFs store word spacing as **positional coordinates**, not space characters
+- Words come out fused: `أﻗﻄﻊُﻫﺬا` instead of `أقطعُ هذا`
+- PyMuPDF closed the Arabic ligature issue as ["wontfix"](https://github.com/pymupdf/PyMuPDF/issues/2199) (requires HarfBuzz)
+- No open-source tool correctly extracts word-spaced Arabic text from PDFs
+- The largest Arabic digital library (Shamela, 15K+ books) uses **human transcription**, not OCR
+- Even Amazon refuses Arabic PDF uploads for Kindle — requires EPUB/DOCX
+- Most Arabic PDFs in the wild are scanned images (require OCR, not text extraction)
+- Calibre's Arabic PDF-to-EPUB conversion is [broken](https://bugs.launchpad.net/calibre/+bug/2032531) (text reversed)
+
+**Why this doesn't matter for our pipeline:**
+- Hindawi (our primary content source) offers EPUB alongside PDF — same books, clean extraction
+- Authors (our primary paying audience) write in DOCX, not PDF
+- The books we'd process from PDF are available in better formats
+- Engineering time is better spent on downstream pipeline stages
+
+**If PDF becomes needed later**, the recommended path is:
+1. PyMuPDF `rawdict` character-bbox gap detection (untried, most promising, no dependencies)
+2. PaddleOCR v5 (40%+ Arabic improvement, free, best OSS OCR for Arabic)
+3. Mistral OCR API (94.9% accuracy, paid, best-in-class)
+
+Full analysis: [research/ARABIC_PDF_EXTRACTION.md](research/ARABIC_PDF_EXTRACTION.md)
+
+PDF test outputs preserved in `output/pdf/` for reference.
+
+---
+
 ## Language Choice: Python
 
 Python is the right tool for this pipeline:
-- **PDF extraction:** pdfplumber/PyPDF2 are mature and battle-tested for Arabic
-- **Arabic text handling:** python-arabic-reshaper, good Unicode/regex support
+- **EPUB extraction:** ebooklib + BeautifulSoup — proven clean results
+- **DOCX extraction:** python-docx — handles Arabic text and paragraph structure cleanly
+- **Arabic text handling:** good Unicode/regex support, NFKC normalization
 - **Azure Speech SDK:** official `azure-cognitiveservices-speech` package
 - **Existing prototype code:** all 7 iterations are Python, patterns are proven
 - **CSV handling:** built-in `csv` module, pandas if needed
@@ -80,17 +129,24 @@ Switching languages would mean rewriting all prototype knowledge for zero meanin
 The actual pipeline difficulty distribution:
 
 ```
-Raw Book (PDF/TXT) ──→ Text Extraction & Cleaning      [HARD - not built]
-                   ──→ Chapter Detection & Splitting    [HARD - not built]
-                   ──→ Narration vs Dialogue Detection  [HARD - 7 iterations, mostly solved]
-                   ──→ Character Attribution             [BEAST - 63.5% automated]
-                   ──→ SSML Generation                   [EASY - just markup templates]
-                   ──→ Azure TTS API                     [EASY - API call]
-                   ──→ Audio Stitching                   [EASY - concatenation]
+Raw Book (EPUB/DOCX) ──→ Text Extraction & Cleaning      [DONE - POC-1 complete]
+                  ──→ Chapter Detection & Splitting    [DONE - POC-2 complete]
+                  ──→ Narration vs Dialogue Detection  [HARD - 7 iterations, mostly solved]
+                  ──→ Character Attribution             [BEAST - 63.5% automated]
+                  ──→ SSML Generation                   [EASY - just markup templates]
+                  ──→ Azure TTS API                     [EASY - API call]
+                  ──→ Audio Stitching                   [EASY - concatenation]
 ```
 
 Once text is correctly broken into parts, SSML is just wrapping segments in voice tags.
 Text processing IS the product. Everything after it is commodity.
+
+### Competitive Moat
+Nobody else has built a raw-book-to-audiobook pipeline for Arabic. Competitors are either
+TTS engines (sell the voice, user handles everything) or audiobook platforms (distribute,
+don't produce). Our text processing pipeline bridges the gap.
+
+Full competitive analysis: [research/MARKET_RESEARCH.md](research/MARKET_RESEARCH.md)
 
 ---
 
@@ -102,7 +158,7 @@ Full details in [REPO_STRUCTURE.md](REPO_STRUCTURE.md).
 ```
 ArabicTTS/
 ├── src/audiobook/          # ACTIVE - audiobook production pipeline
-│   ├── ingest.py           #   POC-1: PDF/TXT → clean text
+│   ├── ingest.py           #   POC-1: EPUB/DOCX/TXT → clean text
 │   ├── chapters.py         #   POC-2: chapter detection & splitting
 │   ├── dialogue.py         #   POC-3: dialogue detection
 │   ├── azure_client.py     #   Azure SDK wrapper
@@ -110,8 +166,13 @@ ArabicTTS/
 │   ├── ssml.py             #   SSML generation
 │   └── review.py           #   CSV export at every stage
 ├── tests/audiobook/        # ACTIVE - audiobook tests
-├── data/books/             # ACTIVE - input books (PDF/TXT)
+├── data/books/             # ACTIVE - input books
+│   ├── epub/               #   EPUB books (primary content source)
+│   ├── docx/               #   DOCX books (author submissions)
+│   ├── txt/                #   TXT files (internal/corpus use)
+│   └── pdf/                #   PDF archive (descoped, reference only)
 ├── output/                 # ACTIVE - per-book working output (gitignored)
+│   └── pdf/                #   PDF test outputs (archived, descoped)
 ├── docs/                   # ACTIVE - documentation
 ├── archive/                # PAUSED - IPA pipeline preserved intact
 │   ├── src/                #   core/, dialects/, integrations/, utils/
@@ -126,18 +187,40 @@ ArabicTTS/
 ### Data flow between POCs (isolated by file output, not code imports)
 
 ```
-data/books/book.txt
+data/books/{epub,docx,txt}/book.*
     ↓ ingest.py
-output/book/ingestion/clean_text.txt + paragraphs.csv    ← REVIEW
+output/{format}/book/ingestion/clean_text.txt + paragraphs.csv    ← REVIEW
     ↓ chapters.py
-output/book/chapters/chapter_*.txt + chapters.csv         ← REVIEW
+output/{format}/book/chapters/chapter_*.txt + chapters.csv         ← REVIEW
     ↓ dialogue.py
-output/book/segments/chapter_*.csv                        ← REVIEW (per chapter)
+output/{format}/book/segments/chapter_*.csv                        ← REVIEW (per chapter)
     ↓ ssml.py
-output/book/ssml/chapter_*.ssml
+output/{format}/book/ssml/chapter_*.ssml
     ↓ azure_client.py
-output/book/audio/chapter_*.mp3
+output/{format}/book/audio/chapter_*.mp3
 ```
+
+---
+
+## Content Resources
+
+### Free Content for Pipeline Development & Publishing
+
+| Resource | What | Format | Size | Access |
+|----------|------|--------|------|--------|
+| **Hindawi Foundation** | Arabic literature, philosophy, science | EPUB + PDF | 3,271 books (CC BY 4.0) | [hindawi.org](https://www.hindawi.org/) |
+| **Arabic E-Book Corpus** | Hindawi books pre-converted to clean text | Plain text + HTML | 1,745 books, 81.5M words | [researchdata.se](https://researchdata.se/en/catalogue/dataset/2024-145) |
+| **Hindawi HuggingFace** | Hindawi content on HuggingFace | Various | Subset | [huggingface.co](https://huggingface.co/datasets/alielfilali01/Hindawi-Books-dataset) |
+| **Archive.org Arabic** | Mixed: scanned + digital books | PDF, some EPUB | Tens of thousands | [archive.org](https://archive.org/details/booksbylanguage_arabic) |
+
+### Tooling
+
+| Tool | Purpose |
+|------|---------|
+| [hindawi-dl](https://github.com/shahwan42/hindawi-dl) | Bulk download Hindawi books |
+| python-docx | DOCX extraction (Arabic paragraph structure) |
+| ebooklib + BeautifulSoup | EPUB extraction (proven in POC-1) |
+| Calibre (ebook-convert) | EPUB ↔ DOCX conversion (Arabic works for this direction) |
 
 ---
 
@@ -161,6 +244,7 @@ output/book/audio/chapter_*.mp3
 - State machine approach handles multiline dialogue continuation
 - CSV review workflow is essential for quality verification
 - Arabic Presentation Forms encoding vs Standard Arabic is a real problem
+- NFKC normalization handles 100% of Presentation Forms (except ornate parentheses U+FD3E/FD3F)
 
 ### Production assets (to evolve into src/audiobook/)
 - `06_simplified_detector.py` — production-ready state machine detector
@@ -184,65 +268,246 @@ output/book/audio/chapter_*.mp3
 
 ---
 
-### POC-1: Book Ingestion (PDF/TXT to clean text)
+### POC-1: Book Ingestion (EPUB/DOCX to clean text)
 
-**Problem:** Books arrive as PDF or TXT with inconsistent encoding, formatting, and structure.
+**Status:** COMPLETE (Feb 2026). Results: [docs/03-logs/POC1_RESULTS.md](../../03-logs/POC1_RESULTS.md)
+
+**Problem:** Books arrive as EPUB or DOCX with inconsistent encoding, formatting, and structure.
 
 **Scope:**
-- PDF text extraction (preserve paragraph structure)
-- TXT file reading with encoding detection
-- Arabic encoding normalization (Presentation Forms → Standard Arabic)
-- Strip headers/footers, page numbers, publisher noise
+- EPUB extraction (HTML-based, cleanest source) — born-digital from Hindawi
+- DOCX extraction (python-docx, author submissions)
+- TXT file reading with encoding detection (internal use: Swedish corpus)
+- Arabic encoding normalization (Presentation Forms → Standard Arabic via NFKC)
 - Preserve paragraph boundaries (critical for later splitting)
 
+**Out of scope:** PDF extraction (see [Format Scope & PDF Decision](#format-scope--pdf-decision))
+
 **Output:**
-- Clean plain text file per book → `output/{book}/ingestion/clean_text.txt`
-- CSV: paragraph inventory → `output/{book}/ingestion/paragraphs.csv`
+- Clean plain text file per book → `output/{format}/{book}/ingestion/clean_text.txt`
+- CSV: paragraph inventory → `output/{format}/{book}/ingestion/paragraphs.csv`
   - Columns: paragraph_number, char_count, word_count, first_50_chars
 - Encoding report: what was normalized, what was stripped
 
-**Review gate:**
-- Open the CSV, spot-check paragraphs
-- Verify no text was lost or corrupted
-- Verify paragraph boundaries are correct
-- Compare paragraph count against page count (sanity check)
+**What was built:**
+- `src/audiobook/ingest.py` — EPUB, DOCX, TXT extractors + normalization + paragraph splitting
+- `tests/audiobook/test_ingest.py` — 21 tests, all passing
+- Tested on 12 books: 5 EPUB (Hindawi), 4 DOCX (Internet Archive/Shamela), 3 TXT (Hindawi via HuggingFace)
+- All output clean, all formats validated by human review
 
-**Test with:** 2-3 real books in different formats
-- `awalad-7aretna.txt` (Mahfouz — already available, TXT)
-- At least 1 PDF book
+**Known issues for POC-2:**
+- DOCX files from Shamela contain page number markers (e.g. `(1/406)`) as separate paragraphs — filter during chapter splitting
+- OCR-based EPUBs (archive.org) have garbled page footers — dropped from test set, only born-digital EPUBs used
 
-**Definition of done:** Clean text output that a human reads and says "yes, this is the book, nothing missing, nothing garbled"
+**Definition of done:** Clean text output from EPUB and DOCX that a human reads and says "yes, this is the book, nothing missing, nothing garbled" ✓
+
+#### POC-1 Fine-Tuning (Post-Pipeline)
+
+POC-1 is production-quality code but carries minor POC rough edges. These do NOT block POC-2
+(data boundary isolation means POC-2 reads files, not code). Graduate after pipeline shape
+stabilizes (post POC-3/4), so all modules get polished with consistent patterns at once.
+
+| Item | Current | Target | Effort |
+|------|---------|--------|--------|
+| Logging | `print()` statements | `logging` module with levels | 30 min |
+| Exception context | Raw third-party errors bubble up | `IngestionError` wrapper with book/stage context | 20 min |
+| Return types | Plain `dict` | `TypedDict` or `dataclass` for `normalize_arabic` stats and `ingest` result | 30 min |
+| Magic numbers | Hardcoded thresholds (`arabic_chars < 10`, `paragraphs <= 3`) | Named constants or function params | 15 min |
+| Module docstring | Minimal | Module-level docstring with usage example | 10 min |
+
+**When to do it:** After POC-3 Phase A (two-voice) is working. Polish all modules together.
 
 ---
 
 ### POC-2: Chapter Detection & Splitting
 
-**Problem:** Books have chapters. Chapters may exceed Azure SSML character limits. Need to split at safe boundaries (end of paragraph, never mid-sentence) so stitched audio doesn't sound weird.
+**Status:** COMPLETE (Feb 2026). Results: [docs/03-logs/POC2_RESULTS.md](../../03-logs/POC2_RESULTS.md)
 
-**Scope:**
-- Detect chapter boundaries (numbered: "الفصل الأول", named, structural patterns, page breaks)
-- Handle books with no explicit chapters (split by size at paragraph boundaries)
-- Character limit management — when a chapter exceeds the limit:
-  - Split at paragraph boundary
-  - Name as "Chapter X (1 of 2)", "Chapter X (2 of 2)"
-  - Track segment numbering for reassembly
-- Handle edge cases: prologue, epilogue, author notes, dedications
+**Problem:** Books use different structural delimiters (chapters, parts, sections, etc.) or none
+at all. Each structural unit becomes an audio file. Units that exceed Azure SSML limits need
+sub-splitting so stitched audio doesn't have weird breaks.
 
-**Output:**
-- Individual chapter text files → `output/{book}/chapters/chapter_01.txt`, etc.
-- CSV: chapter inventory → `output/{book}/chapters/chapters.csv`
-  - Columns: chapter_number, title, char_count, paragraph_count, split_of, total_splits
-- Summary: total chapters, total chars, any chapters that needed splitting
+#### Hard Rules
 
-**Review gate:**
-- Open the CSV, verify chapter boundaries match the actual book
-- Check that split chapters break at paragraph ends
-- Verify no text lost between chapters (char count should sum to total)
-- Read the first and last paragraph of each chapter — do they make sense?
+1. **Never cut mid-paragraph.** All splits — whether by delimiter or size limit — must land on
+   a paragraph boundary. Paragraphs are atomic units throughout the pipeline.
+2. **Delimiter OR size limit — whichever comes first.** Accumulate paragraphs. Two triggers:
+   - Hit a structural delimiter → close the current unit, start a new one
+   - Accumulated text reaches ~25K chars → close at the last complete paragraph before the limit
+3. **All detection runs on `clean_text.txt` from POC-1.** Format-agnostic. No re-parsing of
+   EPUB/DOCX. Works uniformly across all formats.
 
-**Test with:** Same books from POC-1, plus 1 book with very long chapters
+#### Azure SSML Character Limit
 
-**Definition of done:** Chapter files that when concatenated reproduce the original text. No weird breaks. CSV makes it obvious where every chapter starts and ends.
+Azure Speech Service limit: **64KB per SSML request** (WebSocket). Arabic UTF-8 characters are
+~2 bytes each, plus SSML markup overhead → **~25,000 usable Arabic characters per request**.
+
+Source: [Azure Speech quotas](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-services-quotas-and-limits)
+
+Additional limits: max 50 `<voice>` tags per SSML, 100K billable characters per file (Standard tier).
+
+#### Delimiter Hierarchy — Detect, Don't Impose
+
+Arabic books use varied structural markers. Don't hardcode "chapter" — detect what the book
+actually uses and respect its natural structure:
+
+| Level | Arabic Terms | Examples |
+|-------|-------------|----------|
+| **Part** (highest) | جزء، الجزء، القسم، الباب | الجزء الأول، الباب الثاني |
+| **Chapter** | فصل، الفصل | الفصل الأول، الفصل الثالث عشر |
+| **Numbered** | Lone number on its own paragraph | ١، ٢، ٣ or 1, 2, 3 (Western/Eastern Arabic numerals) |
+| **Section** | مبحث، مطلب، فرع | المبحث الأول |
+| **Front/back matter** | مقدمة، تمهيد، خاتمة، إهداء | مقدمة المؤلف، الخاتمة |
+
+**Lone number detection:** A paragraph that is ONLY a number (e.g. `١` or `3`) followed by
+text paragraphs = chapter marker. Common pattern in Arabic fiction. Must be a standalone
+paragraph, not a number embedded in text. Both Western digits (1, 2, 3) and Eastern Arabic
+digits (١، ٢، ٣) should match.
+
+#### Splitting Logic
+
+```
+Accumulate paragraphs from the beginning of the book.
+
+While there are paragraphs remaining:
+  1. If the next paragraph is a structural delimiter:
+     - Close the current unit at the paragraph BEFORE the delimiter
+     - Name it by its delimiter: CH1, CH2, P1, etc.
+     - The delimiter paragraph becomes the first line of the next unit (or is stored as title)
+  2. If adding the next paragraph would exceed ~25K chars:
+     - Close the current unit at the CURRENT paragraph (last complete paragraph before limit)
+     - Name the sub-unit: CH1 - 1/2, CH1 - 2/2 (or P1/CH1 - 1/2 if nested)
+     - Continue accumulating into the next sub-unit
+  3. If a delimiter closes a unit that's already been sub-split:
+     - The final sub-unit gets the last number: CH1 - 3/3
+  4. If no delimiter is ever found:
+     - Pure size-based chunks: 001, 002, 003
+```
+
+#### Naming Convention
+
+| Scenario | Unit names |
+|----------|-----------|
+| Chapter finishes before limit | `CH1`, `CH2`, `CH3` |
+| Chapter exceeds limit (split into 2) | `CH1 - 1/2`, `CH1 - 2/2` |
+| Part > Chapter hierarchy | `P1/CH1`, `P1/CH2`, `P2/CH1` |
+| Nested hierarchy, oversized | `P1/CH1 - 1/2`, `P1/CH1 - 2/2` |
+| No delimiters detected (size-only) | `001`, `002`, `003` |
+| Front/back matter | `مقدمة`, `خاتمة` (use actual title) |
+
+#### What We Don't Detect
+
+- **Headers/sub-headers** within chapters — not useful for audiobook splitting. If a book has
+  no chapter-level delimiters, fall back to size-based splitting. The tool is optimized for
+  audiobooks, not research papers.
+- **Decorative dividers** (★ ● ※ •••) — scene breaks within chapters are not split points.
+  They pass through to POC-3 (dialogue detection may use them as context boundaries).
+- **Date entries, story titles, or other book-specific patterns** — too varied to generalize.
+  Books with these patterns but no standard delimiters fall through to size-based splitting.
+
+#### EPUB Spine — Bonus, Not Foundation
+
+Tested all 5 Hindawi EPUBs. **Spine is NOT a reliable chapter signal:**
+
+| Book | Spine content items | Actual chapters | Spine useful? |
+|------|-------------------|-----------------|---------------|
+| al-liss-wal-kilab | 18 files | 18 | YES (1:1 mapping) |
+| awlad-haretna | 5 files | ~114 | NO (parts, not chapters) |
+| bidaya-wa-nihaya | 1 file | 92 | NO (single-file EPUB) |
+| tharthara-fawq-al-nil | 1 file | 26 | NO (single-file EPUB) |
+| zuqaq-al-midaqq | 1 file | 35 | NO (single-file EPUB) |
+
+Only 1 of 5 has clean spine-to-chapter mapping. 3 of 5 are single-file EPUBs (entire novel in
+one HTML file). Text-based regex on `clean_text.txt` is the catch-all strategy.
+
+#### Survey Findings (12 Test Books)
+
+Surveyed all 12 books' `clean_text.txt` for structural delimiter patterns (Feb 2026).
+
+**EPUB (5 books):**
+
+| Book | Delimiter Found | Count | Pattern |
+|------|----------------|-------|---------|
+| al-liss-wal-kilab | `الفصل الأول`, `الفصل الثاني`... | 19 | Arabic chapter heading |
+| awlad-haretna | `١`, `٢`, `٣`... (standalone paragraphs) | 114 | Lone Eastern Arabic numeral |
+| bidaya-wa-nihaya | `١`, `٢`, `٣`... | 92 | Lone Eastern Arabic numeral |
+| tharthara-fawq-al-nil | `١`, `٢`, `٣`... | 18 | Lone Eastern Arabic numeral |
+| zuqaq-al-midaqq | `١`, `٢`, `٣`... | 35 | Lone Eastern Arabic numeral |
+
+**DOCX (4 books):**
+
+| Book | Delimiter Found | Count | Noise |
+|------|----------------|-------|-------|
+| al-tamheed-fi-tajweed | `الباب` (11) + `الفصل` (8) + `مقدمة` (3) | 22 | None |
+| jawahir-al-adab | `الباب` (31) + `الفصل` (16) + `مقدمة` (1) | 48 | 308 page markers |
+| mabahith-ulum-alquran | **NONE** | 0 | 528 page markers |
+| mawsuat-al-ijaz-al-ilmi | **NONE** | 0 | 249 page markers |
+
+**TXT (3 books):**
+
+| Book | Delimiter Found | Count | Notes |
+|------|----------------|-------|-------|
+| رحلة-ابن-فطومة | **NONE** | 0 | Size fallback |
+| صدى-النسيان | `•••` + Arabic story titles | 21 | Unique (short story collection) |
+| يوميات-نائب-في-الأرياف | Date entries (`١٢ أكتوبر`) | 4 | Unique (diary format) |
+
+**Key findings:**
+1. **Lone Eastern Arabic numerals** are the most common pattern — 4 of 5 EPUBs (259 total matches)
+2. **`الباب` / `الفصل` hierarchy** exists in 2 DOCX books and 1 EPUB (real hierarchy: باب > فصل)
+3. **5 of 12 books have zero standard delimiters** → size-based fallback works as designed
+4. **Page markers `(n/m)` are noise** — 1,085 across 3 DOCX books. Must filter, NOT split on
+5. **Short paragraphs are dialogue, NOT headers** — don't use paragraph length as a signal
+
+#### Regex Patterns (From Survey)
+
+| Priority | What | Regex | Covers |
+|----------|------|-------|--------|
+| 1 | Lone Eastern Arabic numerals | `^[٠-٩]+$` | 4 EPUBs (259 matches) |
+| 2 | Arabic heading terms | `^(الفصل\|الباب\|الجزء\|القسم\|المبحث\|مقدمة\|تمهيد\|خاتمة\|إهداء)` | 1 EPUB + 2 DOCX (70 matches) |
+| 3 | Page markers (**FILTER OUT**) | `^\(\d+/\d+\)$` | 3 DOCX (1,085 noise matches) |
+
+Western digits (`^[0-9]+$`) not found in survey but included for robustness.
+
+#### Scope
+
+- Detect structural delimiters via regex on Arabic heading terms AND lone numbers
+- Support hierarchy: Part (باب) > Chapter (فصل) > Numbered (١٢٣) > Section (مبحث) > Front/Back matter
+- Two split triggers: delimiter boundary OR size limit (~25K chars), whichever comes first
+- **All splits land on paragraph boundaries — never cut mid-paragraph**
+- Sub-split oversized units with numbered naming (CH1 - 1/2, CH1 - 2/2)
+- Handle books with no delimiters (pure size-based fallback at paragraph boundaries)
+- Filter DOCX Shamela page markers `(n/m)` — noise, not structure
+- Tag front/back matter distinctly in CSV (use actual Arabic title)
+- All detection runs on `clean_text.txt` from POC-1 (format-agnostic)
+
+#### Output
+
+- Individual unit text files → `output/{format}/{book}/chapters/chapter_01.txt`, etc.
+- CSV: chapter inventory → `output/{format}/{book}/chapters/chapters.csv`
+  - Columns: unit_number, unit_name, level (part/chapter/numbered/section/frontmatter/size), title, char_count, paragraph_count, split_part, total_splits
+- Summary: detected delimiter type (or "none — size-based"), total units, total chars, splits needed
+
+#### Review Gate
+
+- Open the CSV, verify boundaries match the actual book structure
+- Confirm the detected hierarchy is correct (Parts? Chapters? Numbers? None?)
+- Check that ALL splits land on paragraph ends — no partial paragraphs
+- Verify no text lost between units (char count should sum to total)
+- Read first and last paragraph of each unit — do they make sense?
+
+#### Test Expectations
+
+Same 12 books from POC-1:
+- **5 EPUB fiction** → expect lone numbers (4 books) or الفصل headings (1 book)
+- **2 DOCX religious/academic** → expect الباب/الفصل hierarchy + page marker filtering
+- **2 DOCX academic** → expect NO delimiters, pure size fallback + page marker filtering
+- **3 TXT fiction** → expect NO standard delimiters, size fallback (book-specific patterns exist but not worth special-casing)
+
+#### Definition of Done
+
+Unit files that when concatenated reproduce the original text. No partial paragraphs. Every
+unit under Azure SSML limit (~25K chars). CSV shows detected hierarchy (or size-based fallback)
+and makes every boundary obvious.
 
 ---
 
@@ -352,13 +617,38 @@ output/book/audio/chapter_*.mp3
 
 ## Test Books
 
-| Book | Format | Size | Characters | Notes |
-|------|--------|------|------------|-------|
-| أولاد حارتنا (Mahfouz) | TXT | 34K, 2,717 words | 11+ characters | Available, heavily tested in prototypes |
-| TBD Book 2 | PDF | - | - | Need a PDF to test ingestion |
-| TBD Book 3 | TXT or PDF | - | - | Different formatting conventions for generalization |
+### EPUB (5 Hindawi born-digital — clean)
 
-Priority: Find books with different quotation styles, chapter structures, and dialogue density.
+| Book | Author | Source | Paras | Chars |
+|------|--------|--------|------:|------:|
+| al-liss-wal-kilab | Naguib Mahfouz | Hindawi | 781 | 125K |
+| awlad-haretna | Naguib Mahfouz | Hindawi | 4,299 | 563K |
+| bidaya-wa-nihaya | Naguib Mahfouz | Hindawi | 2,273 | 474K |
+| tharthara-fawq-al-nil-hindawi | Naguib Mahfouz | Hindawi | 1,496 | 146K |
+| zuqaq-al-midaqq | Naguib Mahfouz | Hindawi | 1,412 | 383K |
+
+### DOCX (4 Arabic books from Internet Archive/Shamela)
+
+| Book | Subject | Source | Paras | Chars |
+|------|---------|--------|------:|------:|
+| al-tamheed-fi-tajweed | Quranic recitation | Shamela | 195 | 122K |
+| jawahir-al-adab | Arabic rhetoric | Shamela | 2,108 | 773K |
+| mabahith-ulum-alquran | Quranic sciences | Shamela | 1,056 | 564K |
+| mawsuat-al-ijaz-al-ilmi | Scientific encyclopedia | Shamela | 1,190 | 748K |
+
+Note: Shamela DOCX files contain page number markers (e.g. `(1/406)`) — will filter in POC-2.
+
+### TXT (3 Hindawi books from HuggingFace — clean)
+
+| Book | Author | Source | Paras | Chars |
+|------|--------|--------|------:|------:|
+| رحلة-ابن-فطومة | Naguib Mahfouz | HuggingFace | 856 | 125K |
+| صدى-النسيان | Naguib Mahfouz | HuggingFace | 425 | 81K |
+| يوميات-نائب-في-الأرياف | Tawfiq al-Hakim | HuggingFace | 651 | 147K |
+
+### Archived (PDF — Out of Scope)
+
+PDFs kept in `data/books/pdf/` for reference. Output in `output/pdf/`. Not processed by active pipeline.
 
 ---
 
@@ -366,7 +656,8 @@ Priority: Find books with different quotation styles, chapter structures, and di
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| Language | Python | PDF libs, Azure SDK, existing prototypes, Arabic text handling |
+| **Input formats** | EPUB + DOCX (first-class), TXT (internal) | EPUB = content source, DOCX = author format. PDF descoped — intractable. |
+| Language | Python | EPUB/DOCX libs, Azure SDK, existing prototypes, Arabic text handling |
 | Pronunciation | Let Azure handle it (plain text) | IPA letter-by-letter approach was unusable — validated the hard way |
 | Voice per book | Single profile, no dialect switching | A book is a book. Dialect changes expressions, not just accent |
 | Repo structure | Same repo, IPA archived | Zero code overlap. Archive preserves history without interference |
@@ -376,6 +667,7 @@ Priority: Find books with different quotation styles, chapter structures, and di
 | POC isolation | Data boundaries between POCs | Each POC reads previous POC's file output, not its code |
 | SSML generation | Templates applied to verified segments | Trivial once text processing is correct |
 | Audio stitching | Per-chapter files, concatenated | Matches review workflow (review by chapter) |
+| PDF handling | Out of scope | No OSS tool extracts Arabic PDF text correctly. See research. |
 
 ---
 
@@ -383,26 +675,60 @@ Priority: Find books with different quotation styles, chapter structures, and di
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
-| PDF extraction loses formatting | High | High | Test multiple PDF libraries, compare output |
+| EPUB paragraph boundaries inconsistent across publishers | Medium | High | Test on 5+ books from different sources |
 | Chapter detection fails on unusual structures | Medium | Medium | Fallback: manual chapter markers or size-based splitting |
 | Quotation conventions vary wildly between books | High | Medium | Build normalizer, test on 3+ books with different styles |
 | Two-voice doesn't sound good enough | Low | High | Already tested in prototypes — voice switching works |
 | Multi-voice review is too painful to scale | High | Medium | Accept it as the cost; improve tooling incrementally |
 | Azure free tier runs out during testing | Low | Low | Monitor usage, ~$8-12/book if needed |
+| Competitor (Lahajati) builds same pipeline | Medium | High | Ship fast, build content moat with published audiobooks |
+| AI narration quality insufficient for fiction | Medium | Medium | Start with non-fiction; two-voice masks artifacts |
+
+---
+
+## Go-to-Market Strategy
+
+Detailed analysis: [research/MARKET_RESEARCH.md](research/MARKET_RESEARCH.md)
+
+### Summary
+
+**Phase 1 (Months 1-3):** Produce 20-30 public domain audiobooks from Hindawi CC catalog.
+Publish on YouTube + Spotify/Anghami. Build portfolio and audience. Refine pipeline end-to-end.
+
+**Phase 2 (Months 3-5):** Offer manual audiobook conversion service to young Arab authors.
+$20-40/book. Market via Arabic social media. Success metric: 5+ paying customers.
+
+**Phase 3 (Months 5-8):** If demand validates, build self-serve web tool. $15-25/book.
+
+### Target Audience (Prioritized)
+1. **Young Arab authors / small publishers** — can't afford $1,000+ human narration, write in DOCX
+2. **Content consumers** — reached through published content, not direct marketing
+3. **Institutions** — later, when product is proven
+
+### Distribution Channels
+- YouTube (highest Arabic audiobook search volume, evergreen)
+- Spotify / Apple Podcasts (podcast format)
+- Anghami (70M users, Arabic-native)
+- Audible (accepts AI narration via "Virtual Voice" program)
+- Arabookverse (Arabic audiobook distributor, 300+ platforms)
 
 ---
 
 ## Success Criteria
 
-### POC-1 (Book Ingestion)
-- Clean text extraction from both PDF and TXT
-- Zero text loss (verified by char count comparison)
-- Correct paragraph boundary detection
+### POC-1 (Book Ingestion) ✓ COMPLETE
+- Clean text extraction from EPUB, DOCX, and TXT
+- All paragraph boundaries verified by human review
+- Tested on 12 books across 3 formats (5 EPUB, 4 DOCX, 3 TXT)
+- 21 tests passing, PDF descoped and removed from pipeline
 
-### POC-2 (Chapter Splitting)
-- Correct chapter boundary detection on 3+ books
+### POC-2 (Chapter Splitting) ✓ COMPLETE
+- Detect natural structural delimiters (parts, chapters, sections) across 3+ books
+- Respect book's own hierarchy — don't impose rigid "chapter" concept
+- All units under Azure SSML limit (~25K chars), sub-split oversized units at paragraph boundaries
 - No mid-sentence splits
-- Chapter files concatenate back to original text
+- Unit files concatenate back to original text
+- 91 tests passing, validated on all 12 books
 
 ### POC-3 Phase A (Two-Voice) — THE GOAL
 - Complete two-voice audiobook from at least 1 real book
@@ -422,6 +748,8 @@ Priority: Find books with different quotation styles, chapter structures, and di
 
 | Resource | Location |
 |----------|----------|
+| **Market research** | `docs/02-features/azure-audiobooks/research/MARKET_RESEARCH.md` |
+| **PDF extraction research** | `docs/02-features/azure-audiobooks/research/ARABIC_PDF_EXTRACTION.md` |
 | Production detector | `docs/02-features/azure-audiobooks/reference/prototypes/06_simplified_detector.py` |
 | Voice assignment | `docs/02-features/azure-audiobooks/reference/character_voice_assignment.py` |
 | Azure integration | `docs/02-features/azure-audiobooks/reference/azure_integration.py` |
@@ -429,6 +757,9 @@ Priority: Find books with different quotation styles, chapter structures, and di
 | Scalability analysis | `docs/02-features/azure-audiobooks/reference/prototypes/outputs/SCALABILITY_ANALYSIS.md` |
 | Bug fix history | `docs/02-features/azure-audiobooks/reference/prototypes/outputs/BUG_FIX_TEXT_LOSS_RESOLVED.md` |
 | Research findings | `docs/02-features/azure-audiobooks/reference/prototypes/outputs/QUOTATION_ATTRIBUTION_RESEARCH_FINDINGS.md` |
-| Test book | `data/books/awalad-7aretna.txt` |
+| POC-1 results | `docs/03-logs/POC1_RESULTS.md` |
+| POC-2 results | `docs/03-logs/POC2_RESULTS.md` |
 | Azure voice capabilities | `docs/02-features/azure-audiobooks/reference/arabic_voices_capabilities.json` |
-| Market analysis | MEA audiobook market $237.6M (2024) → $1.24B (2030), 31.5% CAGR |
+| Hindawi CC corpus | [hindawi.org](https://www.hindawi.org/) — 3,271 books, CC BY 4.0 |
+| Swedish text corpus | [researchdata.se](https://researchdata.se/en/catalogue/dataset/2024-145) — 1,745 books, plain text |
+| hindawi-dl | [github.com/shahwan42/hindawi-dl](https://github.com/shahwan42/hindawi-dl) — bulk downloader |
