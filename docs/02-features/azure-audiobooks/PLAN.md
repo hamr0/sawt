@@ -93,27 +93,64 @@ Switching languages would mean rewriting all prototype knowledge for zero meanin
 
 ---
 
+## Product Scope: Fiction Only
+
+**Decision (Feb 2026):** Sawt is optimized for **fiction** (novels, short stories) with dialogue.
+
+### Why Fiction Only?
+
+Testing on non-fiction revealed the dialogue detector creates false positives:
+- **Quranic verses** in `{}` — citations, not dialogue
+- **Scientific quotations** — "قال العلماء:" triggers colon detection, but it's indirect speech
+- **Scholarly citations** — references to historical figures aren't dramatic dialogue
+- Example: `mawsuat-al-ijaz-al-ilmi` (smoking health encyclopedia) marked citations as dialogue throughout
+
+Non-fiction (academic, religious, encyclopedias) works better as **single-voice narration**. The text processing pipeline is designed for fiction's dramatic dialogue, not scholarly references.
+
+### Product Positioning
+
+| Content Type | Sawt Approach | Why |
+|-------------|---------------|-----|
+| **Fiction** | 2+ voices (narrator + dialogue) | Dramatic exchanges, clear speaker turns, voice switching adds life |
+| **Non-fiction** | Single voice (skip POC-3) | Citations aren't "performed" dialogue, needs authoritative consistency |
+| **Special cases** | Manual quote (contact us) | Quranic recitation with tajweed, custom multi-voice academic content |
+
+**Documentation:** "Sawt produces multi-voice audiobooks for Arabic fiction. For non-fiction, academic texts, or custom projects, contact us."
+
+### Implementation: Fiction/Non-Fiction Flag
+
+Pipeline wrapper script (future):
+```bash
+# Fiction (default) — runs all 3 POCs
+python pipeline.py --book path/to/novel.epub --genre fiction
+
+# Non-fiction — skips POC-3, goes straight to single-voice SSML
+python pipeline.py --book path/to/textbook.epub --genre non-fiction
+```
+
+**For now:** Process fiction only. Non-fiction support is deferred until demand validates it.
+
+---
+
 ## Voice Approach Refresher
 
-### Single Voice
+### Single Voice (Non-Fiction Use Case)
 - One voice reads everything
-- Linguistic accuracy ~80%, flaws easily detected — listener has no "reset" point
-- Sounds robotic on long content
-- No text processing beyond chapter splitting
-- **Use case:** Non-fiction, educational, reference material where no dialogue exists
-- **Not a product** — anyone with Azure access can do this, zero differentiation
+- No text processing beyond chapter splitting (POC-1 → POC-2 → SSML)
+- **Use case:** Non-fiction where citations/quotes are references, not dialogue
+- **Not a core product** — deferred until validated
 
-### Two Voice (Narrator + Dialogue) — PRIMARY GOAL
+### Two Voice (Narrator + Dialogue) — PRIMARY GOAL (Fiction)
 - Narrator voice for narration, different voice for all dialogue
 - Voice switching creates a "listener attention reset" that masks TTS pronunciation artifacts
 - Only requires binary classification: "Is this narration or dialogue?"
-- Existing colon-based detection already achieves 100% dialogue detection rate
+- Existing colon-based detection achieves 100% dialogue detection rate on fiction
 - No character attribution needed — just detect that *someone* is speaking
 - Manual review effort: 5-15 min per book (verify narration/dialogue boundaries)
-- **Use case:** Fiction, stories, any book with dialogue
+- **Use case:** Fiction, stories, novels with dialogue
 - **This is the goal.** Good enough for 70-80% of fiction books
 
-### Multi Voice (Per-Character) — STRETCH
+### Multi Voice (Per-Character) — STRETCH (Fiction)
 - Unique voice per character, gender-matched, dialect-aware
 - The "beast" — character attribution is the hard unsolved problem (63.5% automated, 36.5% manual)
 - 7 prototype iterations already invested, competitive with English SOTA (53-69%)
