@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ArabicTTS.iml" filepath="$PROJECT_DIR$/.idea/ArabicTTS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/sawt.iml" filepath="$PROJECT_DIR$/.idea/sawt.iml" />
     </modules>
   </component>
 </project>
