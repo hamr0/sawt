@@ -51,19 +51,40 @@ Sawt/
 │
 ├── src/audiobook/                     # ACTIVE - audiobook production pipeline
 │   ├── __init__.py
-│   ├── ingest.py                      # POC-1: PDF/TXT → clean text
-│   ├── chapters.py                    # POC-2: clean text → chapter files
-│   ├── dialogue.py                    # POC-3: chapters → narrator/dialogue segments
-│   ├── azure_client.py                # Azure SDK wrapper (evolved from archive/)
-│   ├── voice_pool.py                  # Voice selection, gender matching
-│   ├── ssml.py                        # SSML generation
-│   └── review.py                      # CSV export at every pipeline stage
+│   ├── ingest/                        # POC-1: File ingestion (PDF/TXT/EPUB → text)
+│   │   ├── __init__.py
+│   │   └── core.py                    # Main ingestion logic
+│   ├── chapters/                      # POC-2: Chapter splitting
+│   │   ├── __init__.py
+│   │   └── core.py                    # Chapter detection and splitting
+│   ├── dialogue/                      # POC-3: Dialogue detection
+│   │   ├── __init__.py
+│   │   └── core.py                    # Narrator/dialogue segmentation
+│   ├── ssml/                          # POC-4: SSML generation (stub)
+│   │   ├── __init__.py
+│   │   └── core.py                    # SSML template generation
+│   ├── voice_pool/                    # POC-5: Voice assignment (stub)
+│   │   ├── __init__.py
+│   │   └── core.py                    # Voice selection, gender matching
+│   └── shared/                        # Shared utilities
+│       ├── __init__.py
+│       ├── azure_client.py            # Azure SDK wrapper
+│       └── review.py                  # CSV export at every stage
 │
 ├── tests/audiobook/                   # ACTIVE - audiobook-specific tests
-│   ├── test_ingest.py                 # POC-1 tests
-│   ├── test_chapters.py               # POC-2 tests
-│   ├── test_dialogue.py               # POC-3 tests
-│   └── test_ssml.py                   # SSML generation tests
+│   ├── __init__.py
+│   ├── ingest/                        # POC-1 tests
+│   │   ├── __init__.py
+│   │   └── test_core.py
+│   ├── chapters/                      # POC-2 tests
+│   │   ├── __init__.py
+│   │   └── test_core.py
+│   ├── dialogue/                      # POC-3 tests
+│   │   ├── __init__.py
+│   │   └── test_core.py
+│   └── ssml/                          # POC-4 tests
+│       ├── __init__.py
+│       └── test_core.py
 │
 ├── data/books/                        # ACTIVE - test book inputs
 │   ├── awalad-7aretna.txt             # MOVED from docs/02-features/azure-audiobooks/reference/
@@ -151,22 +172,26 @@ Review workflow: run POC → open CSV → fix issues → re-run → next POC.
 | POC-2 | `chapters.csv` | Chapter boundaries, split points, naming |
 | POC-3 | `chapter_XX.csv` | Narration/dialogue tags per segment (per chapter) |
 
-### 3. One file per POC (start simple)
+### 3. Package-based POCs (scalable structure)
 
-Each POC starts as a single Python file. If it grows beyond ~300 LOC,
-split it into a package (directory with `__init__.py`).
+Each POC is organized as a Python package (directory with `__init__.py` and `core.py`).
+This provides room for future growth without refactoring:
 
-- `ingest.py` → handles both PDF and TXT (if PDF gets complex, split later)
-- `chapters.py` → detection + splitting in one file
-- `dialogue.py` → starts as binary classifier (two-voice), character attribution added later
+- `ingest/` → can add `pdf_parser.py`, `epub_parser.py`, `validators.py` as needed
+- `chapters/` → can add `strategies.py`, `validators.py` for different splitting approaches
+- `dialogue/` → can add `llm_detector.py`, `patterns.py`, `rules.py` for multi-strategy detection
 
-### 4. Voice/SSML are shared utilities, not POCs
+The `__init__.py` exports the main API, keeping imports clean: `from src.audiobook.ingest import ingest`
 
-These are commodity code that all voice approaches share:
+### 4. Shared utilities in shared/ package
+
+Common code used across POCs lives in `src/audiobook/shared/`:
 - `azure_client.py` — Azure SDK wrapper (evolved from `azure_integration.py`)
-- `voice_pool.py` — voice selection, gender matching (from `character_voice_assignment.py`)
-- `ssml.py` — SSML template generation (from `character_voice_assignment.py`)
 - `review.py` — CSV export (shared by all POCs)
+
+Voice and SSML are POC packages (they're pipeline stages, not utilities):
+- `voice_pool/` — voice selection, gender matching (POC 5)
+- `ssml/` — SSML template generation (POC 4)
 
 ### 5. Archive is reference, not active code
 

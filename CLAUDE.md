@@ -52,8 +52,14 @@ Text processing IS the product. SSML is just markup. Let Azure handle pronunciat
 
 | Path | Purpose |
 |------|---------|
-| src/audiobook/ | Pipeline modules (one file per POC) |
-| tests/audiobook/ | Tests per POC |
+| src/audiobook/ | Pipeline modules (packaged POCs) |
+| ├── ingest/ | POC 1: File ingestion (PDF/TXT/EPUB → text) |
+| ├── chapters/ | POC 2: Chapter splitting |
+| ├── dialogue/ | POC 3: Dialogue detection |
+| ├── ssml/ | POC 4: SSML generation (stub) |
+| ├── voice_pool/ | POC 5: Voice assignment (stub) |
+| └── shared/ | Shared utilities (review, azure_client) |
+| tests/audiobook/ | Tests per POC (mirrored structure) |
 | data/books/ | Input books (txt/, pdf/, epub/) |
 | output/ | Per-book working output (gitignored) |
 
@@ -73,9 +79,11 @@ Prototype history (7 iterations) -- `docs/02-features/azure-audiobooks/reference
 ## Commands
 
 ```bash
-pytest tests/audiobook/ -v        # Run audiobook tests
-pytest tests/audiobook/test_ingest.py -v  # Run single POC tests
-pip install -r requirements.txt   # Install dependencies
+pytest tests/audiobook/ -v                    # Run all audiobook tests
+pytest tests/audiobook/ingest/ -v             # Run POC 1 tests
+pytest tests/audiobook/chapters/ -v           # Run POC 2 tests
+pytest tests/audiobook/dialogue/ -v           # Run POC 3 tests
+pip install -r requirements.txt               # Install dependencies
 ```
 
 ## Docs
