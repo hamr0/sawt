@@ -567,31 +567,133 @@ and makes every boundary obvious.
 - Review was painful in prototypes — lots of CSV rows to verify
 - This is an active research problem globally, not just for Arabic
 
-**Scope:**
-- Layer character attribution on TOP of Phase A's narration/dialogue segments
-- Use external character name list (from Wikipedia, book info)
-- Apply existing detection: colon patterns, verb+name extraction, gender from verb form
-- Everything that doesn't match → "Unknown" → manual CSV review
-- Voice assignment: gender-matched, unique per character from Azure voice pool
+**What Arabic gives us for free:**
+- Attribution is ALWAYS before the quote (`قال محمد:` not `"hello" said Muhammad`)
+- Gender on speech verbs: `قال` (he said) vs `قالت` (she said) — free disambiguation
+- The narrator segment before each colon already contains the speaker identity
+
+---
+
+##### Step 1: Per-Book Character Registry (Extract Names Upfront)
+
+**Source: Wikipedia / book metadata — NOT heuristic extraction from text.**
+Prototype iteration 04 proved heuristic name extraction has 19% false positive rate.
+External name lists are more reliable and faster to build.
+
+**For each book, build a character registry CSV:**
+
+| character_id | display_name | aliases | gender | notes |
+|-------------|-------------|---------|--------|-------|
+| hussein | حسين | حسين كرشة | M | barber's son |
+| hamida | حميدة | | F | protagonist |
+| um_hamida | أم حميدة | أمه, والدته | F | Hamida's mother |
+| saniyya | الست سنية | سنية عفيفي, ست سنية | F | landlady |
+
+**Name complexity to handle:**
+- **Multi-word names:** أم حميدة (Um Hamida), الست سنية عفيفي (al-Sitt Saniyya Afifi)
+- **Titles + names:** السيد رضوان الحسيني, المعلم كرشة, الدكتور بوشي
+- **Nicknames / short forms:** حميدة vs الست حميدة, حسين vs حسين كرشة
+- **Relational references:** أمه (his mother), والدته (his mother), أخوه (his brother)
+  — map these to specific characters via context or manual review
+- **Occupational references:** الطبيب (the doctor), الشيخ (the sheikh)
+  — map to character if unique, flag if ambiguous
+
+**Registry built once per book (from Wikipedia character list), reviewed as CSV.**
+Hindawi books are mostly Mahfouz novels — Wikipedia has detailed character lists.
+
+---
+
+##### Step 2: Attribution Per Dialogue Segment
+
+**Parse the narrator segment before each dialogue for the speaker name.**
+
+The colon-split already gives us: `narrator_text: // dialogue_text \\`
+The narrator text (attribution) contains the speech verb + speaker name.
+
+**Attribution logic (in priority order):**
+
+1. **Explicit name:** `قال حسين:` → speaker = حسين (match against registry)
+2. **Name before verb:** `حسين قال:` → speaker = حسين (Arabic SVO variant)
+3. **Gendered verb, no name:** `فقال:` (masculine) → carry forward last male speaker
+4. **Gendered verb, no name:** `فقالت:` (feminine) → carry forward last female speaker
+5. **Em-dash dialogue (no attribution):** `– نعم` → carry forward last speaker
+6. **Plain continuation:** short paragraph in IN_DIALOGUE state → carry forward last speaker
+7. **No match:** → tag as `?` for manual review
+
+**"Carry forward" rule:** If no name is found and a dialogue follows, continue with the
+last named character of matching gender. This handles the common pattern:
+```
+قال حسين: مرحبا            ← speaker: حسين
+فقالت: أهلا                 ← no name, feminine → last female = حميدة
+فقال: كيف حالك؟             ← no name, masculine → last male = حسين
+– بخير                      ← em-dash, no attribution → carry forward = حسين
+```
+
+**Corner cases:**
+- `وقال له:` / `وقالت لها:` — "told him/her" — speaker is the verb subject, not the pronoun
+- `فأجاب:` / `فأجابت:` — "answered" — carry forward, gender from verb
+- `وتمتم:` / `وهمس:` — emotion verbs — carry forward, gender from verb
+- Multiple names in attribution: `قال حسين لأم حميدة:` → speaker = حسين (subject of verb)
+
+---
+
+##### Step 3: Review Format
+
+**Add character name to the `//` `\\` markers in review text:**
+
+```
+قال حسين في شيء من الارتباك
+//حسين: جئتُ أستودِعُكم اللهَ قبل عودتي إلى طنطا غدًا. \\
+فابتسم فريد أفندي ابتسامتَه الرقيقة وقال
+//فريد: مع سلامة الله، وإن شاء الله نسمع قريبًا عن نقلك إلى القاهرة. \\
+فقال حسين برجاء
+//حسين: أرجو أن يتمَّ هذا في العطلة القادمة. \\
+```
+
+**Unknown attribution:**
+```
+//?: من أنت؟ \\
+```
+
+**Editing:** change the name between `//` and `:` to fix misattribution.
+
+---
+
+##### Step 4: Voice Mapping
+
+**Separate config per book: character → Azure voice ID.**
+
+| character_id | voice_id | rationale |
+|-------------|----------|-----------|
+| _narrator_ | ar-EG-ShakirNeural | Egyptian male, neutral tone |
+| hussein | ar-SA-HamedNeural | Saudi male, young |
+| hamida | ar-EG-SalmaNeural | Egyptian female, young |
+| um_hamida | ar-EG-SalmaNeural (pitch -5%) | Same voice, pitched down for age |
+| _default_ | ar-EG-ShakirNeural | Fallback for unknown/minor characters |
+
+Top 3-5 characters get unique voices. Minor characters and `?` get narrator voice.
+14+ Azure Arabic neural voices across 7 dialects available.
+
+---
 
 **Output per chapter:**
-- Segmented CSV with character column added → `output/{book}/segments/chapter_01.csv`
-  - Columns: segment_number, type, character [name or "Unknown"], gender, char_count, text
+- Segmented CSV with character column → `output/{book}/segments/ssml/chapter_01.csv`
+  - Columns: segment_number, type, character [name or "?"], gender, char_count, text
+- Review text with character markers → `output/{book}/segments/review/chapter_01.txt`
 - Character summary: detected characters, gender, dialogue count, assigned voice
 
 **Review gate (per chapter):**
-- Review CSV focusing on "Unknown" rows
-- Assign character to each Unknown based on context
-- Verify gender detection is correct
+- Review text focusing on `?` markers — assign character from context
+- Verify gender detection is correct (قال vs قالت)
+- Check carry-forward attribution makes sense in dialogue exchanges
 - Review cadence: chapter by chapter, same as Phase A
 - Expect 15-40 min review per book at current accuracy
 
-**Definition of done:** Multi-voice audiobook with distinct character voices. Listener can tell which character is speaking. Attribution is correct (verified via CSV review).
+**Definition of done:** Multi-voice audiobook with distinct character voices. Listener can tell which character is speaking. Attribution is correct (verified via review text).
 
 **Scaling strategy (future):**
-- LLM-assisted name extraction: $0.07-0.15 per book
-- Cross-book knowledge base: reuse resolved patterns
-- Review interface with context display and quick-pick buttons
+- LLM-assisted name extraction from text: $0.07-0.15 per book (for books not on Wikipedia)
+- Cross-book knowledge base: reuse resolved patterns for same author
 - Goal: reduce manual review from 15-40 min to 5-10 min
 
 ---
