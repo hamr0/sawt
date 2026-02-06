@@ -11,6 +11,14 @@ venv/
 *.h5
 *.model
 
+# Audio files (generated outputs)
+*.mp3
+*.wav
+*.ogg
+*.flac
+*.m4a
+*.aac
+
 # Book files (binary, large — not versioned)
 data/books/epub/
 data/books/docx/
@@ -19,7 +27,18 @@ data/books/txt/
 
 # Outputs (per-book working data, audio, CSVs)
 /output/
+output/
 /tmp/
+tmp/
+*.log
+*.csv
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.benchmarks/
 
 # IDE
 .vscode/
