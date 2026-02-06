@@ -45,17 +45,17 @@ set AZURE_SPEECH_KEY=your-key-here
 python3 -c "import azure.cognitiveservices.speech as speechsdk; print('Azure SDK installed')"
 ```
 
-### 3. Verify Existing ArabicTTS Setup
+### 3. Verify Existing Sawt Setup
 
 ```bash
 # Make sure you're in the project root
-cd /home/hamr/PycharmProjects/ArabicTTS
+cd /home/hamr/PycharmProjects/Sawt
 
 # Run tests to ensure pipeline works
 pytest tests/ -v
 
 # Test the main TTS engine
-python3 -c "from src.main import ArabicTTS; tts = ArabicTTS(); print('ArabicTTS ready')"
+python3 -c "from src.main import Sawt; tts = Sawt(); print('Sawt ready')"
 ```
 
 ## Quick Start
@@ -65,7 +65,7 @@ python3 -c "from src.main import ArabicTTS; tts = ArabicTTS(); print('ArabicTTS 
 Verify Azure X-SAMPA support works:
 
 ```bash
-cd /home/hamr/PycharmProjects/ArabicTTS
+cd /home/hamr/PycharmProjects/Sawt
 python3 tools/azure_tts/test_azure_hello_world.py
 ```
 
@@ -227,7 +227,7 @@ pip install azure-cognitiveservices-speech
 ### Error: "Arabic TTS pipeline failed"
 **Solution:** Check that you're in the project root and dependencies are installed:
 ```bash
-cd /home/hamr/PycharmProjects/ArabicTTS
+cd /home/hamr/PycharmProjects/Sawt
 pip install -r requirements.txt
 ```
 
@@ -310,5 +310,5 @@ For issues or questions:
 
 **Version:** 1.0
 **Date:** December 18, 2025
-**Author:** ArabicTTS Project
+**Author:** Sawt Project
 **Status:** Ready for testing

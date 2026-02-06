@@ -47,7 +47,7 @@ Everything above moves to `archive/` in one commit. Clean slate for audiobook pi
 ## Proposed Structure
 
 ```
-ArabicTTS/
+Sawt/
 │
 ├── src/audiobook/                     # ACTIVE - audiobook production pipeline
 │   ├── __init__.py

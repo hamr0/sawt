@@ -468,7 +468,7 @@ Transform plays and scripts into audio drama format.
 
 ## 📄 License
 
-Part of ArabicTTS project - see main project LICENSE
+Part of Sawt project - see main project LICENSE
 
 ---
 

@@ -37,7 +37,7 @@ Keep this managed block so 'aur init --config' can refresh the instructions.
 
 <!-- AURORA:END -->
 
-# ArabicTTS - Arabic Audiobook Production
+# Sawt - Arabic Audiobook Production
 
 Produce Arabic audiobooks from raw book files (PDF/TXT/EPUB) using Azure Neural TTS.
 Two-voice (narrator + dialogue) as primary goal. Multi-voice (per-character) as stretch.

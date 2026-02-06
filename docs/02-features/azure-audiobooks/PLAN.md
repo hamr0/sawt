@@ -193,7 +193,7 @@ The IPA pipeline is archived. The audiobook pipeline is the active project.
 Full details in [REPO_STRUCTURE.md](REPO_STRUCTURE.md).
 
 ```
-ArabicTTS/
+Sawt/
 ├── src/audiobook/          # ACTIVE - audiobook production pipeline
 │   ├── ingest.py           #   POC-1: EPUB/DOCX/TXT → clean text
 │   ├── chapters.py         #   POC-2: chapter detection & splitting

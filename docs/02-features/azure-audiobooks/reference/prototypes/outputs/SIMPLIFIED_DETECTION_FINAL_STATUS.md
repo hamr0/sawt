@@ -94,7 +94,7 @@ PENDING NARRATION BUFFER:
 ```
 
 ### Key Files:
-- **Input:** `/home/hamr/Documents/PycharmProjects/ArabicTTS/tools/azure_tts/awalad-7aretna.txt` (2717 words)
+- **Input:** `/home/hamr/Documents/PycharmProjects/Sawt/tools/azure_tts/awalad-7aretna.txt` (2717 words)
 - **Detector:** `06_simplified_detector.py` (~330 LOC)
 - **Output:** `simplified_detection_TIMESTAMP.csv`
 - **Documentation:** This file + `QUOTATION_ATTRIBUTION_RESEARCH_FINDINGS.md`

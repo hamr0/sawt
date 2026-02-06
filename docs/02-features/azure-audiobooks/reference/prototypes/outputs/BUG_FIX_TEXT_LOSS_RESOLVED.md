@@ -301,7 +301,7 @@ The remaining 10 words (0.4%) are negligible and likely due to:
 ## Code Changes
 
 ### Modified File
-`/home/hamr/PycharmProjects/ArabicTTS/tools/azure_tts/prototypes/06_simplified_detector.py`
+`/home/hamr/PycharmProjects/Sawt/tools/azure_tts/prototypes/06_simplified_detector.py`
 
 ### Lines Changed
 Lines 275-290 (added 16 lines including comments)
