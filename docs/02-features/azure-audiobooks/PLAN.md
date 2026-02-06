@@ -122,6 +122,43 @@ Switching languages would mean rewriting all prototype knowledge for zero meanin
 - **Use case:** Dialogue-heavy novels, drama adaptations
 - **Attempt after two-voice is solid.** Don't expect an easy win
 
+### Dialect-Matched Voice Selection
+
+**Principle:** The text IS the dialect. Don't change either — match them.
+
+A Mahfouz novel uses Egyptian literary Arabic with Egyptian colloquial in dialogue.
+Reading it with a Gulf voice is like dubbing a British film in a Texas accent — technically
+intelligible, culturally wrong. The voice dialect must match the book's linguistic origin.
+
+**Matching rules:**
+- **Author's nationality/dialect** → primary signal (Mahfouz → Egyptian, Gibran → Levantine)
+- **Book's setting** → secondary signal (novel set in Baghdad → Iraqi voices even if author is Egyptian)
+- **Publisher origin** → tertiary signal (Hindawi catalog → Egyptian by default)
+- **All voices in a book share the same dialect** — narrator, dialogue, all characters
+- **Never mix dialects within a book** — no Gulf narrator with Egyptian dialogue characters
+
+**Azure Arabic voice inventory (14+ neural voices, 7 dialects):**
+
+| Dialect | Code | Voices | Best for |
+|---------|------|--------|----------|
+| Egyptian | ar-EG | ShakirNeural, SalmaNeural | Mahfouz, Hindawi catalog, most modern fiction |
+| Saudi | ar-SA | HamedNeural, ZariyahNeural | Gulf authors, religious texts |
+| Levantine | ar-SY, ar-JO, ar-LB | Multiple | Levantine authors (Gibran, Darwish) |
+| Maghreb | ar-MA, ar-TN, ar-DZ | Multiple | North African authors |
+| Iraqi | ar-IQ | Multiple | Iraqi authors |
+| MSA | ar-SA (formal) | HamedNeural | Non-fiction, academic, Quranic |
+
+**For the Hindawi catalog (Phase 1: 20-30 books):** All Egyptian → `ar-EG-*` voices.
+
+**Per-book voice config** (in character registry):
+```
+book_dialect: ar-EG
+narrator_voice: ar-EG-ShakirNeural
+dialogue_default_voice: ar-EG-SalmaNeural
+```
+
+This config is set once per book and applies to all pipeline stages.
+
 ---
 
 ## Why Text Processing Is the Product
@@ -262,7 +299,7 @@ output/{format}/book/audio/chapter_*.mp3
 - **Review between chapters:** Every POC produces CSV output for human review
 - **Slice and dice:** Perfect each step before moving to the next
 - **One book first:** Get one book working end-to-end, then generalize
-- **No dialect switching:** A book is a book. One voice profile per book. Arabic expressions change across dialects, not just accent — swapping dialects changes meaning
+- **No dialect switching:** A book is a book. One dialect per book. Arabic expressions change across dialects, not just accent — swapping dialects changes meaning. But **match the dialect to the book's origin** (Egyptian author → Egyptian voices, Levantine → Levantine)
 - **Minimize LLM usage:** Code-first, use LLM only where it demonstrably helps (name extraction)
 - **POCs isolated by data:** Each POC reads from previous POC's file output, not its code. Rewrite any POC without breaking the next one
 
@@ -541,7 +578,7 @@ and makes every boundary obvious.
   - DIALOGUE segments → dialogue voice tag
   - Paragraph breaks → `<break>` tags
 - One voice per role, consistent across the entire book
-- No dialect switching — pick best-sounding voice pair for the book's style
+- No dialect switching — match voice dialect to book's origin (Egyptian author → ar-EG voices)
 
 **Audio output:**
 - Generate audio per chapter → `output/{book}/audio/chapter_01.mp3`
@@ -757,7 +794,7 @@ PDFs kept in `data/books/pdf/` for reference. Output in `output/pdf/`. Not proce
 | **Input formats** | EPUB + DOCX (first-class), TXT (internal) | EPUB = content source, DOCX = author format. PDF descoped — intractable. |
 | Language | Python | EPUB/DOCX libs, Azure SDK, existing prototypes, Arabic text handling |
 | Pronunciation | Let Azure handle it (plain text) | IPA letter-by-letter approach was unusable — validated the hard way |
-| Voice per book | Single profile, no dialect switching | A book is a book. Dialect changes expressions, not just accent |
+| Voice per book | Single dialect, matched to book origin | A book is a book. Dialect changes meaning, not just accent. Match voice dialect to author/setting |
 | Repo structure | Same repo, IPA archived | Zero code overlap. Archive preserves history without interference |
 | Dialogue detection | Code-first (state machine + patterns) | LLM only if code can't solve it |
 | Review workflow | CSV export, chapter-by-chapter review | Proven in prototypes, manageable scope |
