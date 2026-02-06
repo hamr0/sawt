@@ -60,12 +60,9 @@ Sawt/
 │   ├── dialogue/                      # POC-3: Dialogue detection
 │   │   ├── __init__.py
 │   │   └── core.py                    # Narrator/dialogue segmentation
-│   ├── ssml/                          # POC-4: SSML generation (stub)
+│   ├── ssml/                          # POC-4: SSML generation + voice selection
 │   │   ├── __init__.py
-│   │   └── core.py                    # SSML template generation
-│   ├── voice_pool/                    # POC-5: Voice assignment (stub)
-│   │   ├── __init__.py
-│   │   └── core.py                    # Voice selection, gender matching
+│   │   └── core.py                    # SSML templates + dialect-matched voice config
 │   └── shared/                        # Shared utilities
 │       ├── __init__.py
 │       ├── azure_client.py            # Azure SDK wrapper
@@ -189,9 +186,8 @@ Common code used across POCs lives in `src/audiobook/shared/`:
 - `azure_client.py` — Azure SDK wrapper (evolved from `azure_integration.py`)
 - `review.py` — CSV export (shared by all POCs)
 
-Voice and SSML are POC packages (they're pipeline stages, not utilities):
-- `voice_pool/` — voice selection, gender matching (POC 5)
-- `ssml/` — SSML template generation (POC 4)
+SSML is a POC package (pipeline stage, not utility):
+- `ssml/` — SSML generation + voice selection (POC 4, voice_pool folded in)
 
 ### 5. Archive is reference, not active code
 
@@ -207,7 +203,7 @@ Voice and SSML are POC packages (they're pipeline stages, not utilities):
 | Archive file | Becomes | What changes |
 |--------------|---------|--------------|
 | `docs/02-features/azure-audiobooks/reference/azure_integration.py` | `src/audiobook/azure_client.py` | Evolve, clean up, keep Azure SDK calls |
-| `docs/02-features/azure-audiobooks/reference/character_voice_assignment.py` | `src/audiobook/voice_pool.py` + `ssml.py` | Split voice selection from SSML generation |
+| `docs/02-features/azure-audiobooks/reference/character_voice_assignment.py` | `src/audiobook/ssml/core.py` | Voice selection folded into SSML generation (two-voice = simple config) |
 | `docs/02-features/azure-audiobooks/reference/prototypes/06_simplified_detector.py` | `src/audiobook/dialogue.py` | Evolve state machine, adapt for chapter input |
 | `docs/02-features/azure-audiobooks/reference/awalad-7aretna.txt` | `data/books/awalad-7aretna.txt` | Move test books to active data directory |
 | `docs/02-features/azure-audiobooks/reference/book2` | `data/books/book2.txt` | Move test books to active data directory |

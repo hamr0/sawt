@@ -150,14 +150,29 @@ python pipeline.py --book path/to/textbook.epub --genre non-fiction
 - **Use case:** Fiction, stories, novels with dialogue
 - **This is the goal.** Good enough for 70-80% of fiction books
 
-### Multi Voice (Per-Character) — STRETCH (Fiction)
-- Unique voice per character, gender-matched, dialect-aware
-- The "beast" — character attribution is the hard unsolved problem (63.5% automated, 36.5% manual)
-- 7 prototype iterations already invested, competitive with English SOTA (53-69%)
-- Manual review effort: 15-40 min per book
-- Review was painful — developed CSV workflow to make it bearable
-- **Use case:** Dialogue-heavy novels, drama adaptations
-- **Attempt after two-voice is solid.** Don't expect an easy win
+### Multi Voice (Per-Character) — CLOSED (Feb 2026)
+- **Decision:** Skip. Not justified by current Azure Arabic capabilities or listener value.
+- Azure Arabic has only 2 voices per dialect (1M, 1F) — not enough to distinguish characters C through Z
+- Character attribution was 63.5% automated in prototypes — remaining 36.5% needs manual review per book
+- Unnamed characters (the officer, the neighbor, the mayor) need catch-all assignment for marginal gain
+- Heavy dialogue exchanges (10-line em-dash conversations) create rapid voice-switching that sounds robotic in TTS
+- Research consensus: most audiobook listeners prefer a single skilled narrator with tonal shifts over full-cast — multi-voice is the exception (drama adaptations, big-budget productions), not the norm
+- Two-voice (narrator + dialogue) captures 90% of the listening value with 10% of the complexity
+- **If Azure adds more Arabic voices + emotion styles, revisit.** The segment CSVs from Phase A are the right foundation.
+
+### Emotion/Prosody Enhancement — DEFERRED (waiting on Azure Arabic)
+- Azure Arabic voices have **zero** `mstts:express-as` support (no emotion styles)
+- English has 30+ styles (angry, cheerful, sad, whispering); Arabic has none
+- No HD voices for Arabic either
+- When Azure adds emotion support for Arabic, the investment is thin: tag dialogue segments with emotion context, apply `mstts:express-as` style — Phase A segment CSVs are ready for this
+- **Not a pipeline task today — a platform capability gap.** Monitor Azure updates.
+
+### What We CAN Do Now: Prosody Tuning (POC-4)
+- `<prosody rate="+10%">` on dialogue — slightly faster pace signals conversation vs. measured narration
+- `<prosody pitch="+5%">` on dialogue — subtle lift separates dialogue from narrator
+- `<break time="300ms"/>` at narrator↔dialogue transitions — audible pause signals voice switch
+- These are subtle reinforcements on top of the two-voice switch, not character distinction
+- Worth experimenting with in POC-4 SSML generation — a few test renders will calibrate values
 
 ### Dialect-Matched Voice Selection
 
@@ -203,11 +218,11 @@ This config is set once per book and applies to all pipeline stages.
 The actual pipeline difficulty distribution:
 
 ```
-Raw Book (EPUB/DOCX) ──→ Text Extraction & Cleaning      [DONE - POC-1 complete]
-                  ──→ Chapter Detection & Splitting    [DONE - POC-2 complete]
-                  ──→ Narration vs Dialogue Detection  [HARD - 7 iterations, mostly solved]
-                  ──→ Character Attribution             [BEAST - 63.5% automated]
-                  ──→ SSML Generation                   [EASY - just markup templates]
+Raw Book (EPUB/DOCX) ──→ Text Extraction & Cleaning      [DONE - POC-1 ✓]
+                  ──→ Chapter Detection & Splitting    [DONE - POC-2 ✓]
+                  ──→ Narration vs Dialogue Detection  [DONE - POC-3 ✓ ~95% accuracy]
+                  ──→ Character Attribution             [CLOSED - not justified, see Phase B]
+                  ──→ SSML + Voice Selection            [NEXT - POC-4]
                   ──→ Azure TTS API                     [EASY - API call]
                   ──→ Audio Stitching                   [EASY - concatenation]
 ```
@@ -236,8 +251,7 @@ Sawt/
 │   ├── chapters.py         #   POC-2: chapter detection & splitting
 │   ├── dialogue.py         #   POC-3: dialogue detection
 │   ├── azure_client.py     #   Azure SDK wrapper
-│   ├── voice_pool.py       #   Voice selection, gender matching
-│   ├── ssml.py             #   SSML generation
+│   ├── ssml.py             #   POC-4: SSML generation + voice selection (voice_pool folded in)
 │   └── review.py           #   CSV export at every stage
 ├── tests/audiobook/        # ACTIVE - audiobook tests
 ├── data/books/             # ACTIVE - input books
@@ -270,8 +284,8 @@ output/{format}/book/02_chapters/chapter_*.txt + chapters.csv           ← REVI
 output/{format}/book/03_segments/segments.csv                           ← REVIEW (book summary)
 output/{format}/book/03_segments/ssml/chapter_*.csv                     ← machine segments
 output/{format}/book/03_segments/review/chapter_*.txt                   ← human review text
-    ↓ ssml.py
-output/{format}/book/04_ssml/chapter_*.ssml
+    ↓ ssml.py (voice selection + SSML templates)
+output/{format}/book/04_ssml/chapter_*.ssml + voice_config.json
     ↓ azure_client.py
 output/{format}/book/05_audio/chapter_*.mp3
 ```
@@ -646,164 +660,122 @@ and makes every boundary obvious.
 
 ---
 
-#### Phase B: Character Attribution & Multi-Voice (The Beast)
+#### Phase B: Character Attribution & Multi-Voice — CLOSED (Feb 2026)
 
-**Do not start this until Phase A is solid on at least 3 books.**
+**Decision: Skip entirely.** The complexity is not justified by current capabilities or listener value.
 
-**Problem:** Attribute dialogue segments to specific characters for unique voice assignment.
+**Why it was closed:**
 
-**Why this is hard (honest assessment):**
-- Current automated attribution: 63.5% (remaining 36.5% needs manual review)
-- "Unknown" speakers: dialogue without explicit "said X:" attribution
-- Pronoun resolution: "he said" → which male character?
-- Implicit attribution: dialogue that follows narration about a character
-- Arabic-specific challenges: verb-first word order, presentation forms encoding
-- Review was painful in prototypes — lots of CSV rows to verify
-- This is an active research problem globally, not just for Arabic
+1. **Azure Arabic has only 2 voices per dialect (1M, 1F).** Even with perfect attribution, characters C through Z get the same 2 voices. No character distinction possible.
 
-**What Arabic gives us for free:**
-- Attribution is ALWAYS before the quote (`قال محمد:` not `"hello" said Muhammad`)
-- Gender on speech verbs: `قال` (he said) vs `قالت` (she said) — free disambiguation
-- The narrator segment before each colon already contains the speaker identity
+2. **Attribution overhead is high for marginal gain.** 63.5% automated, 36.5% manual review. Unnamed characters (the officer, the mayor, the neighbor) need catch-all assignment. Heavy em-dash exchanges (10 lines between two people) need turn-tracking. All this for a feature most listeners don't prefer.
 
----
+3. **Research consensus: single narrator with tonal shifts beats full-cast for most listeners.** Multi-voice is the exception (drama adaptations, big-budget productions), not the norm. Rapid TTS voice-switching in dialogue-heavy scenes sounds robotic, not dramatic.
 
-##### Step 1: Per-Book Character Registry (Extract Names Upfront)
+4. **Two-voice already captures 90% of the value.** Narrator↔dialogue voice switch signals "someone is speaking" — that's sufficient. Listeners distinguish characters from context, not voice identity.
 
-**Source: Wikipedia / book metadata — NOT heuristic extraction from text.**
-Prototype iteration 04 proved heuristic name extraction has 19% false positive rate.
-External name lists are more reliable and faster to build.
-
-**For each book, build a character registry CSV:**
-
-| character_id | display_name | aliases | gender | notes |
-|-------------|-------------|---------|--------|-------|
-| hussein | حسين | حسين كرشة | M | barber's son |
-| hamida | حميدة | | F | protagonist |
-| um_hamida | أم حميدة | أمه, والدته | F | Hamida's mother |
-| saniyya | الست سنية | سنية عفيفي, ست سنية | F | landlady |
-
-**Name complexity to handle:**
-- **Multi-word names:** أم حميدة (Um Hamida), الست سنية عفيفي (al-Sitt Saniyya Afifi)
-- **Titles + names:** السيد رضوان الحسيني, المعلم كرشة, الدكتور بوشي
-- **Nicknames / short forms:** حميدة vs الست حميدة, حسين vs حسين كرشة
-- **Relational references:** أمه (his mother), والدته (his mother), أخوه (his brother)
-  — map these to specific characters via context or manual review
-- **Occupational references:** الطبيب (the doctor), الشيخ (the sheikh)
-  — map to character if unique, flag if ambiguous
-
-**Registry built once per book (from Wikipedia character list), reviewed as CSV.**
-Hindawi books are mostly Mahfouz novels — Wikipedia has detailed character lists.
+**What's preserved for future reference:**
+- 7 prototype iterations in `archive/` and `docs/02-features/azure-audiobooks/reference/prototypes/`
+- Character registry design (Wikipedia-sourced, CSV-based)
+- Attribution logic (carry-forward, gendered verbs, explicit names)
+- Voice mapping design (per-book config, character → voice ID)
+- All reusable if Azure Arabic capabilities improve significantly
 
 ---
 
-##### Step 2: Attribution Per Dialogue Segment
+#### Emotion/Prosody Enhancement — DEFERRED (waiting on platform)
 
-**Parse the narrator segment before each dialogue for the speaker name.**
+**Azure Arabic voices have zero `mstts:express-as` support.** No emotions, no speaking styles, no HD voices. English has 30+ styles; Arabic has none. This is a platform capability gap, not a pipeline task.
 
-The colon-split already gives us: `narrator_text: // dialogue_text \\`
-The narrator text (attribution) contains the speech verb + speaker name.
+**When Azure adds emotion styles for Arabic:**
+- Phase A segment CSVs are the right input — each dialogue segment would need an emotion tag
+- Emotion classification from surrounding narrator context is straightforward (LLM or rule-based)
+- SSML wrapping with `<mstts:express-as style="angry">` is trivial once available
+- This would be higher-value than multi-voice: same 2 voices, but with emotional range
 
-**Attribution logic (in priority order):**
+**What we CAN do now (in POC-4 SSML generation):**
+- `<prosody rate="+10%">` on dialogue — slightly faster pace signals conversation
+- `<prosody pitch="+5%">` on dialogue — subtle lift separates dialogue from narrator
+- `<break time="300ms"/>` at narrator↔dialogue transitions — audible pause for voice switch
+- These are subtle reinforcements, not character distinction — worth testing in POC-4
 
-1. **Explicit name:** `قال حسين:` → speaker = حسين (match against registry)
-2. **Name before verb:** `حسين قال:` → speaker = حسين (Arabic SVO variant)
-3. **Gendered verb, no name:** `فقال:` (masculine) → carry forward last male speaker
-4. **Gendered verb, no name:** `فقالت:` (feminine) → carry forward last female speaker
-5. **Em-dash dialogue (no attribution):** `– نعم` → carry forward last speaker
-6. **Plain continuation:** short paragraph in IN_DIALOGUE state → carry forward last speaker
-7. **No match:** → tag as `?` for manual review
-
-**"Carry forward" rule:** If no name is found and a dialogue follows, continue with the
-last named character of matching gender. This handles the common pattern:
-```
-قال حسين: مرحبا            ← speaker: حسين
-فقالت: أهلا                 ← no name, feminine → last female = حميدة
-فقال: كيف حالك؟             ← no name, masculine → last male = حسين
-– بخير                      ← em-dash, no attribution → carry forward = حسين
-```
-
-**Corner cases:**
-- `وقال له:` / `وقالت لها:` — "told him/her" — speaker is the verb subject, not the pronoun
-- `فأجاب:` / `فأجابت:` — "answered" — carry forward, gender from verb
-- `وتمتم:` / `وهمس:` — emotion verbs — carry forward, gender from verb
-- Multiple names in attribution: `قال حسين لأم حميدة:` → speaker = حسين (subject of verb)
+**Monitor:** Azure Arabic voice updates, HD voice availability, `express-as` style additions.
 
 ---
 
-##### Step 3: Review Format
+### POC-4: SSML Generation + Voice Selection — NEXT
 
-**Add character name to the `//` `\\` markers in review text:**
+**Status:** Not started. POC-5 (voice_pool) folded into POC-4 — for two-voice with per-book dialect config, voice selection is a config lookup, not a separate module.
 
+**Code:** `src/audiobook/ssml/core.py` (stub exists)
+
+**Problem:** Take verified segment CSVs from POC-3 and produce Azure-ready SSML files with dialect-matched voice assignments.
+
+**Input:** `03_segments/ssml/chapter_*.csv` (segment_number, type, char_count, text)
+**Output:** `04_ssml/chapter_*.ssml` (valid Azure SSML, ready for TTS API)
+
+#### What POC-4 builds
+
+**1. Per-book voice config** (simple JSON/YAML):
 ```
-قال حسين في شيء من الارتباك
-//حسين: جئتُ أستودِعُكم اللهَ قبل عودتي إلى طنطا غدًا. \\
-فابتسم فريد أفندي ابتسامتَه الرقيقة وقال
-//فريد: مع سلامة الله، وإن شاء الله نسمع قريبًا عن نقلك إلى القاهرة. \\
-فقال حسين برجاء
-//حسين: أرجو أن يتمَّ هذا في العطلة القادمة. \\
+book_dialect: ar-EG
+narrator_voice: ar-EG-ShakirNeural
+dialogue_voice: ar-EG-SalmaNeural
+```
+- Set once per book, drives all SSML generation
+- Default for Hindawi catalog: Egyptian (ar-EG)
+- Override per book for other dialects (Levantine, Gulf, etc.)
+
+**2. SSML template engine:**
+- Read segment CSV → wrap narrator segments in narrator voice tag, dialogue segments in dialogue voice tag
+- Valid SSML structure: `<speak>` → `<voice>` → text
+- Respect Azure limits: max 50 `<voice>` tags per SSML, ~25K chars per request
+- `<break time="300ms"/>` between narrator↔dialogue transitions
+
+**3. Voice sampling script** (`scripts/sample_voices.py`):
+- Purpose: listen to voice pairs before committing to a default config
+- **Round 1 — Pick the dialect** (6 audio files): same sample text, 3 dialect pairs (ar-EG, ar-SA, ar-SY), male narrates + female dialogue
+- **Round 2 — Pick the direction** (2 audio files): winning dialect, male-narrates vs female-narrates
+- **Round 3 — Test prosody** (only if needed): subtle `<prosody rate/pitch>` tweaks on dialogue
+- Total: 8-10 audio files, ~30K chars, within free tier
+- Output: MP3s with structured filenames, human listens and picks winner
+
+**Why M/F voice switch (not prosody-only):**
+- Azure Arabic prosody has only 3 crude dials: rate, pitch, volume
+- A 10% speed bump on the same voice doesn't signal "someone is speaking" — listener won't register it
+- Real human narrators use dozens of micro-adjustments (breathiness, emphasis, timing) that TTS can't replicate
+- M/F switch is a blunt instrument but creates clear, unambiguous contrast for TTS
+- Voice switching also resets listener attention, masking TTS pronunciation artifacts
+- Prosody polish is optional on top of voice switch, not a substitute for it
+
+**Prosody (optional, test-driven):**
+- `<prosody rate="+10%" pitch="+5%">` on dialogue — only if sampling confirms it helps
+- Not pre-optimized — generate plain two-voice first, tune only what sounds flat
+- Azure Arabic has zero `mstts:express-as` support (no emotions/styles) — prosody knobs are all we have
+
+**Fiction vs non-fiction paths:**
+```python
+# Fiction — two-voice (narrator + dialogue from POC-3 segments)
+narrator segments → narrator_voice tag
+dialogue segments → dialogue_voice tag
+
+# Non-fiction — single voice (skip POC-3, chapters go straight to SSML)
+all text → narrator_voice tag
 ```
 
-**Unknown attribution:**
-```
-//?: من أنت؟ \\
-```
+**Voice inventory for dialect matching:**
 
-**Editing:** change the name between `//` and `:` to fix misattribution.
+| Dialect | Locale | Male | Female | Best for |
+|---------|--------|------|--------|----------|
+| Egyptian | ar-EG | ShakirNeural | SalmaNeural | Mahfouz, Hindawi catalog, modern fiction |
+| Saudi | ar-SA | HamedNeural | ZariyahNeural | Gulf authors, religious texts |
+| Levantine | ar-SY | LaithNeural | AmanyNeural | Levantine authors (Gibran, Darwish) |
+| Jordanian | ar-JO | TaimNeural | SanaNeural | Jordanian authors |
+| Lebanese | ar-LB | RamiNeural | LaylaNeural | Lebanese authors |
+| Iraqi | ar-IQ | BasselNeural | RanaNeural | Iraqi authors |
+| Maghreb | ar-MA | JamalNeural | MounaNeural | North African authors |
 
----
-
-##### Step 4: Voice Mapping
-
-**Separate config per book: character → Azure voice ID.**
-
-| character_id | voice_id | rationale |
-|-------------|----------|-----------|
-| _narrator_ | ar-EG-ShakirNeural | Egyptian male, neutral tone |
-| hussein | ar-SA-HamedNeural | Saudi male, young |
-| hamida | ar-EG-SalmaNeural | Egyptian female, young |
-| um_hamida | ar-EG-SalmaNeural (pitch -5%) | Same voice, pitched down for age |
-| _default_ | ar-EG-ShakirNeural | Fallback for unknown/minor characters |
-
-Top 3-5 characters get unique voices. Minor characters and `?` get narrator voice.
-14+ Azure Arabic neural voices across 7 dialects available.
-
----
-
-**Output per chapter:**
-- Segmented CSV with character column → `output/{book}/segments/ssml/chapter_01.csv`
-  - Columns: segment_number, type, character [name or "?"], gender, char_count, text
-- Review text with character markers → `output/{book}/segments/review/chapter_01.txt`
-- Character summary: detected characters, gender, dialogue count, assigned voice
-
-**Review gate (per chapter):**
-- Review text focusing on `?` markers — assign character from context
-- Verify gender detection is correct (قال vs قالت)
-- Check carry-forward attribution makes sense in dialogue exchanges
-- Review cadence: chapter by chapter, same as Phase A
-- Expect 15-40 min review per book at current accuracy
-
-**Definition of done:** Multi-voice audiobook with distinct character voices. Listener can tell which character is speaking. Attribution is correct (verified via review text).
-
-**Scaling strategy (future):**
-- LLM-assisted name extraction from text: $0.07-0.15 per book (for books not on Wikipedia)
-- Cross-book knowledge base: reuse resolved patterns for same author
-- Goal: reduce manual review from 15-40 min to 5-10 min
-
----
-
-### POC-4: Emotion & Prosody Enhancement (Future Layer)
-
-**Not in scope until POC-3 Phase A is proven.**
-
-**Concept:**
-- Detect exclamation marks → raise pitch
-- Detect question marks → intonation shift
-- Detect speech verbs: صرخ (shouted) → louder, همس (whispered) → softer
-- Add natural pauses between segments
-- Prosody control via SSML `<prosody>` tags
-
-**Applies on top of ANY voice approach** — single, two, or multi.
+**Definition of done:** Valid SSML files that Azure TTS API accepts, with dialect-matched two-voice output for fiction and single-voice for non-fiction. Voice pair selected through sampling. At least one book fully converted to SSML.
 
 ---
 
@@ -857,7 +829,9 @@ PDFs kept in `data/books/pdf/` for reference. Output in `output/pdf/`. Not proce
 | Review workflow | CSV export, chapter-by-chapter review | Proven in prototypes, manageable scope |
 | Character names source | External list (Wikipedia, book info) | Heuristic extraction had 19% false positive rate |
 | POC isolation | Data boundaries between POCs | Each POC reads previous POC's file output, not its code |
-| SSML generation | Templates applied to verified segments | Trivial once text processing is correct |
+| SSML generation | Templates + voice selection in one module | voice_pool folded into ssml — two-voice is a 3-field config, not a separate module |
+| Voice selection | M/F switch per dialect, not prosody-only | Azure Arabic prosody (rate/pitch/volume) too crude to signal dialogue alone; voice switch creates clear contrast |
+| Voice sampling | 8-10 test files across 3 dialects, human picks | Don't pre-optimize — listen first, then commit to defaults |
 | Audio stitching | Per-chapter files, concatenated | Matches review workflow (review by chapter) |
 | PDF handling | Out of scope | No OSS tool extracts Arabic PDF text correctly. See research. |
 
@@ -865,16 +839,18 @@ PDFs kept in `data/books/pdf/` for reference. Output in `output/pdf/`. Not proce
 
 ## Risk Register
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| EPUB paragraph boundaries inconsistent across publishers | Medium | High | Test on 5+ books from different sources |
-| Chapter detection fails on unusual structures | Medium | Medium | Fallback: manual chapter markers or size-based splitting |
-| Quotation conventions vary wildly between books | High | Medium | Build normalizer, test on 3+ books with different styles |
-| Two-voice doesn't sound good enough | Low | High | Already tested in prototypes — voice switching works |
-| Multi-voice review is too painful to scale | High | Medium | Accept it as the cost; improve tooling incrementally |
-| Azure free tier runs out during testing | Low | Low | Monitor usage, ~$8-12/book if needed |
-| Competitor (Lahajati) builds same pipeline | Medium | High | Ship fast, build content moat with published audiobooks |
-| AI narration quality insufficient for fiction | Medium | Medium | Start with non-fiction; two-voice masks artifacts |
+| Risk | Likelihood | Impact | Mitigation | Status |
+|------|-----------|--------|------------|--------|
+| EPUB paragraph boundaries inconsistent across publishers | Medium | High | Test on 5+ books from different sources | ✓ Resolved — tested on 12 books |
+| Chapter detection fails on unusual structures | Medium | Medium | Fallback: manual chapter markers or size-based splitting | ✓ Resolved — size fallback works |
+| Quotation conventions vary wildly between books | High | Medium | Build normalizer, test on 3+ books with different styles | ✓ Resolved — guillemets kept as narrator |
+| Two-voice doesn't sound good enough | Low | High | Already tested in prototypes — voice switching works | Open — validate with POC-4 sampling |
+| Multi-voice review is too painful to scale | High | Medium | ~~Accept it as the cost~~ | ✓ Closed — Phase B skipped entirely |
+| Azure Arabic has no emotion/style support | High | Medium | Wait for Azure updates; prosody knobs are all we have | Open — monitor Azure |
+| Voice pair sounds wrong for a dialect | Medium | Low | Sampling script tests 3 dialects before committing | Open — POC-4 |
+| Azure free tier runs out during testing | Low | Low | Monitor usage, ~$8-12/book if needed | Open |
+| Competitor (Lahajati) builds same pipeline | Medium | High | Ship fast, build content moat with published audiobooks | Open |
+| AI narration quality insufficient for fiction | Medium | Medium | Two-voice masks artifacts; prosody tuning if needed | Open — validate with POC-4 |
 
 ---
 
@@ -908,33 +884,48 @@ $20-40/book. Market via Arabic social media. Success metric: 5+ paying customers
 
 ## Success Criteria
 
-### POC-1 (Book Ingestion) ✓ COMPLETE
+### POC-1 (Book Ingestion) ✓ PRODUCTION READY
 - Clean text extraction from EPUB, DOCX, and TXT
 - All paragraph boundaries verified by human review
 - Tested on 12 books across 3 formats (5 EPUB, 4 DOCX, 3 TXT)
 - 21 tests passing, PDF descoped and removed from pipeline
+- **Results:** `docs/03-logs/POC1_RESULTS.md`
 
-### POC-2 (Chapter Splitting) ✓ COMPLETE
+### POC-2 (Chapter Splitting) ✓ PRODUCTION READY
 - Detect natural structural delimiters (parts, chapters, sections) across 3+ books
 - Respect book's own hierarchy — don't impose rigid "chapter" concept
 - All units under Azure SSML limit (~25K chars), sub-split oversized units at paragraph boundaries
 - No mid-sentence splits
 - Unit files concatenate back to original text
 - 91 tests passing, validated on all 12 books
+- **Results:** `docs/03-logs/POC2_RESULTS.md`
 
-### POC-3 Phase A (Two-Voice) ✓ COMPLETE
+### POC-3 Phase A (Two-Voice) ✓ PRODUCTION READY
 - Dialogue detection on all 12 books, 103 tests passing
+- ~95% accuracy on narrator/dialogue split (human-reviewed on صدى النسيان)
 - 3 dialogue markers: colon, em dash, trailing colon
 - No continuation heuristic (false positives outweighed benefit)
-- Guillemets removed as dialogue markers (typographic, not voice-switching)
+- Guillemets `«»` kept as narrator text — coherent passages mixing inner thoughts and spoken words, splitting would fragment the narration with jarring micro voice-switches
+- Short story titles (مدد, قمر, علي لوز, etc.) left within 25K chapters — titles read aloud naturally as narrator pauses, listener navigation is time-based (30s rewind, bookmarks) not chapter-skip, TOC is complementary not mandatory
 - Dual output: machine CSV + human review text with sync workflow
 - Per-chapter + book-level summary CSV for quality validation
+- **Results:** `docs/03-logs/POC3_RESULTS.md`
 
-### POC-3 Phase B (Multi-Voice) — STRETCH
-- Character attribution on at least 1 real book
-- CSV review completed for Unknown segments
-- Multi-voice audiobook with distinct character voices
-- Honest assessment: is the quality improvement worth the review effort?
+### POC-3 Phase B (Multi-Voice) — CLOSED
+- **Skipped.** Azure Arabic has only 2 voices per dialect (no character distinction possible)
+- Character attribution overhead (36.5% manual review) not justified for 2-voice output
+- Rapid voice-switching in dialogue-heavy scenes sounds robotic in current TTS
+- Most listeners prefer single narrator with tonal shifts over full-cast productions
+- Emotion/prosody enhancement deferred — waiting on Azure to add `express-as` styles for Arabic
+- Segment CSVs from Phase A are the foundation for any future enhancement
+
+### POC-4 (SSML + Voice Selection) — NEXT
+- Valid SSML files accepted by Azure TTS API
+- Dialect-matched voice pairs (Egyptian → ar-EG, Levantine → ar-SY, etc.)
+- Voice sampling script: 8-10 test audio files across 3 dialects, human picks winner
+- Two-voice SSML for fiction (narrator + dialogue), single-voice for non-fiction
+- At least one book fully converted to SSML
+- Prosody tuning: test-driven, only if sampling reveals flat output
 
 ---
 
@@ -953,6 +944,7 @@ $20-40/book. Market via Arabic social media. Success metric: 5+ paying customers
 | Research findings | `docs/02-features/azure-audiobooks/reference/prototypes/outputs/QUOTATION_ATTRIBUTION_RESEARCH_FINDINGS.md` |
 | POC-1 results | `docs/03-logs/POC1_RESULTS.md` |
 | POC-2 results | `docs/03-logs/POC2_RESULTS.md` |
+| POC-3 results | `docs/03-logs/POC3_RESULTS.md` |
 | Azure voice capabilities | `docs/02-features/azure-audiobooks/reference/arabic_voices_capabilities.json` |
 | Hindawi CC corpus | [hindawi.org](https://www.hindawi.org/) — 3,271 books, CC BY 4.0 |
 | Swedish text corpus | [researchdata.se](https://researchdata.se/en/catalogue/dataset/2024-145) — 1,745 books, plain text |

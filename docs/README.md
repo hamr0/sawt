@@ -77,6 +77,9 @@ docs/
 
 | Document | Description |
 |----------|-------------|
+| [POC1_RESULTS.md](03-logs/POC1_RESULTS.md) | POC-1 results: book ingestion (PRODUCTION READY) |
+| [POC2_RESULTS.md](03-logs/POC2_RESULTS.md) | POC-2 results: chapter splitting (PRODUCTION READY) |
+| [POC3_RESULTS.md](03-logs/POC3_RESULTS.md) | POC-3 results: dialogue detection (PRODUCTION READY) |
 | [implementation-log.md](03-logs/implementation-log.md) | What was built, when |
 | [decisions-log.md](03-logs/decisions-log.md) | Architecture decisions with rationale |
 | [bug-log.md](03-logs/bug-log.md) | Bugs, root causes, fixes |

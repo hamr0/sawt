@@ -40,28 +40,26 @@ Keep this managed block so 'aur init --config' can refresh the instructions.
 # Sawt - Arabic Audiobook Production
 
 Produce Arabic audiobooks from raw book files (PDF/TXT/EPUB) using Azure Neural TTS.
-Two-voice (narrator + dialogue) as primary goal. Multi-voice (per-character) as stretch.
+Two-voice (narrator + dialogue) as primary goal. Multi-voice closed (Azure Arabic lacks voices/emotions).
 
 ## Architecture
 
-Pipeline: Raw Book (PDF/TXT/EPUB) → Ingestion → Chapter Splitting → Dialogue Detection → SSML → Azure TTS → Audio
+Pipeline: Raw Book (EPUB/DOCX/TXT) → Ingestion → Chapter Splitting → Dialogue Detection → SSML + Voice Selection → Azure TTS → Audio
 
 Text processing IS the product. SSML is just markup. Let Azure handle pronunciation.
 
-## Active Code
+## Pipeline Status
 
-| Path | Purpose |
-|------|---------|
-| src/audiobook/ | Pipeline modules (packaged POCs) |
-| ├── ingest/ | POC 1: File ingestion (PDF/TXT/EPUB → text) |
-| ├── chapters/ | POC 2: Chapter splitting |
-| ├── dialogue/ | POC 3: Dialogue detection |
-| ├── ssml/ | POC 4: SSML generation (stub) |
-| ├── voice_pool/ | POC 5: Voice assignment (stub) |
-| └── shared/ | Shared utilities (review, azure_client) |
-| tests/audiobook/ | Tests per POC (mirrored structure) |
-| data/books/ | Input books (txt/, pdf/, epub/) |
-| output/ | Per-book working output (gitignored) |
+| Module | Status | Purpose |
+|--------|--------|---------|
+| src/audiobook/ingest/ | COMPLETE | POC 1: File ingestion (EPUB/DOCX/TXT → text) |
+| src/audiobook/chapters/ | COMPLETE | POC 2: Chapter splitting (25K char units) |
+| src/audiobook/dialogue/ | COMPLETE | POC 3: Dialogue detection (~95% accuracy) |
+| src/audiobook/ssml/ | NEXT | POC 4: SSML generation + voice selection + sampling |
+| src/audiobook/shared/ | Active | Shared utilities (review, azure_client) |
+| tests/audiobook/ | 126 tests | Tests per module (mirrored structure) |
+| data/books/ | 12 books | Input books (epub/, docx/, txt/) |
+| output/ | gitignored | Per-book working output |
 
 ## Archive
 
@@ -72,7 +70,9 @@ Prototype history (7 iterations) -- `docs/02-features/azure-audiobooks/reference
 
 - POCs isolated by data boundaries (file output), not code imports
 - CSV review at every pipeline stage, chapter-by-chapter cadence
-- Two-voice first (narrator + dialogue), multi-voice is stretch
+- Two-voice (narrator + dialogue) for fiction, single voice for non-fiction
+- Multi-voice closed (only 2 Arabic voices per dialect, attribution overhead not justified)
+- Dialect-matched voices per book (Egyptian author → ar-EG, Levantine → ar-SY/JO/LB, etc.)
 - Code-first for text processing, LLM only where it demonstrably helps
 - No dialect switching -- a book is a book
 
