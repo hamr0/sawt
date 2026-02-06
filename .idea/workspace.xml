@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="351687aa-e935-4a81-9ea7-0bc9828bfc92" name="Changes" comment="created context contextualization, organized /docs and init the project">
-      <change beforePath="$PROJECT_DIR$/.idea/ArabicTTS.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="351687aa-e935-4a81-9ea7-0bc9828bfc92" name="Changes" comment="created context contextualization, organized /docs and init the project" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -93,6 +89,7 @@
       <workItem from="1769545827723" duration="616000" />
       <workItem from="1770388580094" duration="122000" />
       <workItem from="1770388957424" duration="5000" />
+      <workItem from="1770389108862" duration="22000" />
     </task>
     <task id="LOCAL-00001" summary="created context contextualization, organized /docs and init the project">
       <option name="closed" value="true" />
