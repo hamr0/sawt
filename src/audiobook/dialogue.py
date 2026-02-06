@@ -60,42 +60,80 @@ URL_COLON_RE = re.compile(r"https?:|ftp:|mailto:")
 CSV_COLUMNS = ["segment_number", "type", "char_count", "text"]
 
 
+REVIEW_OPEN = "//"
+REVIEW_CLOSE = "\\\\"
+
+
 def _segments_to_review_text(segments: list[dict]) -> str:
-    """Convert segments to annotated review text with «» around dialogue.
+    """Convert segments to annotated review text with // \\\\ around dialogue.
 
     Each segment becomes a paragraph (double-newline separated).
-    Dialogue segments are wrapped in «» for easy visual scanning and editing.
-    Skips wrapping if text already starts/ends with «» (from colon splits).
+    Dialogue: // text \\\\
+    Narrator: plain text
     """
     lines = []
     for seg in segments:
         if seg["type"] == "dialogue":
-            text = seg["text"]
-            if text.startswith("«") and text.endswith("»"):
-                lines.append(text)
-            else:
-                lines.append(f"«{text}»")
+            lines.append(f"{REVIEW_OPEN} {seg['text']} {REVIEW_CLOSE}")
         else:
             lines.append(seg["text"])
     return "\n\n".join(lines)
 
 
+def _split_at_review_markers(paragraph: str) -> list[tuple[str, str]]:
+    """Split paragraph into segments at // \\\\ dialogue marker boundaries.
+
+    Returns list of (type, text) tuples:
+      - Text outside // \\\\ = "narrator"
+      - Text inside // \\\\ = "dialogue"
+    """
+    segments: list[tuple[str, str]] = []
+    pos = 0
+    while pos < len(paragraph):
+        open_pos = paragraph.find(REVIEW_OPEN, pos)
+        if open_pos == -1:
+            text = paragraph[pos:].strip()
+            if text:
+                segments.append(("narrator", text))
+            break
+
+        before = paragraph[pos:open_pos].strip()
+        if before:
+            segments.append(("narrator", before))
+
+        close_pos = paragraph.find(REVIEW_CLOSE, open_pos + len(REVIEW_OPEN))
+        if close_pos == -1:
+            # Unclosed marker — treat rest as dialogue
+            text = paragraph[open_pos + len(REVIEW_OPEN):].strip()
+            if text:
+                segments.append(("dialogue", text))
+            break
+
+        inner = paragraph[open_pos + len(REVIEW_OPEN):close_pos].strip()
+        if inner:
+            segments.append(("dialogue", inner))
+
+        pos = close_pos + len(REVIEW_CLOSE)
+
+    return segments
+
+
 def parse_review_text(review_text: str) -> list[dict]:
-    """Parse annotated review text (with «» dialogue markers) into segments.
+    """Parse annotated review text (with // \\\\ dialogue markers) into segments.
 
     Inverse of _segments_to_review_text(). Used to read human-edited review
     files back into structured segments for SSML generation.
 
     Each paragraph separated by blank lines becomes one or more segments.
-    Text inside «» = dialogue, everything else = narrator.
+    Text inside // \\\\ = dialogue, everything else = narrator.
     """
     paragraphs = [p.strip() for p in re.split(r"\n\s*\n", review_text) if p.strip()]
     segments: list[dict] = []
     counter = 0
 
     for para in paragraphs:
-        if "«" in para and "»" in para:
-            parts = _split_at_guillemets(para)
+        if REVIEW_OPEN in para and REVIEW_CLOSE in para:
+            parts = _split_at_review_markers(para)
             for part_type, part_text in parts:
                 text = part_text.strip()
                 if text:

@@ -8,6 +8,8 @@ from src.audiobook.dialogue import (
     CONTINUATION_THRESHOLD,
     CSV_COLUMNS,
     EM_DASH_CHARS,
+    REVIEW_OPEN,
+    REVIEW_CLOSE,
     detect_markers,
     segment_paragraphs,
     segment_chapter,
@@ -17,6 +19,7 @@ from src.audiobook.dialogue import (
     _find_dialogue_colon,
     _split_at_colon,
     _split_at_guillemets,
+    _split_at_review_markers,
     _segments_to_review_text,
     _has_speech_attribution,
     _has_trailing_speech,
@@ -646,12 +649,12 @@ class TestSegmentsToReviewText:
             {"type": "dialogue", "text": "مرحبا"},
         ]
         result = _segments_to_review_text(segments)
-        assert result == "نص عادي\n\n«مرحبا»"
+        assert result == "نص عادي\n\n// مرحبا \\\\"
 
     def test_narrator_not_wrapped(self):
         segments = [{"type": "narrator", "text": "نص عادي"}]
         result = _segments_to_review_text(segments)
-        assert "«" not in result
+        assert "//" not in result
         assert result == "نص عادي"
 
     def test_alternating(self):
@@ -663,10 +666,18 @@ class TestSegmentsToReviewText:
         ]
         result = _segments_to_review_text(segments)
         parts = result.split("\n\n")
-        assert parts == ["قال", "«مرحبا»", "ثم أضاف", "«وداعا»"]
+        assert parts == ["قال", "// مرحبا \\\\", "ثم أضاف", "// وداعا \\\\"]
 
     def test_empty_segments(self):
         assert _segments_to_review_text([]) == ""
+
+    def test_guillemets_in_text_preserved(self):
+        """Original «» from source text pass through without collision."""
+        segments = [
+            {"type": "dialogue", "text": "«لا بأس، جميل»"},
+        ]
+        result = _segments_to_review_text(segments)
+        assert result == "// «لا بأس، جميل» \\\\"
 
 
 # ---------------------------------------------------------------------------
@@ -675,7 +686,7 @@ class TestSegmentsToReviewText:
 
 class TestParseReviewText:
     def test_dialogue_unwrapped(self):
-        text = "نص عادي\n\n«مرحبا»"
+        text = "نص عادي\n\n// مرحبا \\\\"
         segments = parse_review_text(text)
         assert len(segments) == 2
         assert segments[0] == {"segment_number": 1, "type": "narrator", "char_count": 7, "text": "نص عادي"}
@@ -687,9 +698,9 @@ class TestParseReviewText:
         assert all(s["type"] == "narrator" for s in segments)
         assert len(segments) == 2
 
-    def test_mixed_guillemets_in_paragraph(self):
-        """Inline «» within a paragraph produce multiple segments."""
-        text = "قالت: «لا بأس» وابتسمت"
+    def test_inline_markers_in_paragraph(self):
+        """Inline // \\\\ within a paragraph produce multiple segments."""
+        text = "قالت: // لا بأس \\\\ وابتسمت"
         segments = parse_review_text(text)
         assert len(segments) == 3
         assert segments[0]["type"] == "narrator"
@@ -712,6 +723,15 @@ class TestParseReviewText:
             assert orig["type"] == back["type"]
             assert orig["text"] == back["text"]
 
+    def test_guillemets_in_text_survive_roundtrip(self):
+        """Original «» from source text survive the roundtrip unchanged."""
+        original = [
+            {"segment_number": 1, "type": "dialogue", "char_count": 14, "text": "«لا بأس، جميل»"},
+        ]
+        review = _segments_to_review_text(original)
+        parsed = parse_review_text(review)
+        assert parsed[0]["text"] == "«لا بأس، جميل»"
+
     def test_empty_text(self):
         assert parse_review_text("") == []
         assert parse_review_text("   \n\n   ") == []
@@ -729,10 +749,10 @@ class TestSyncReview:
         review_dir.mkdir(parents=True)
 
         review_dir.joinpath("chapter_01.txt").write_text(
-            "نص عادي\n\n«مرحبا»", encoding="utf-8"
+            "نص عادي\n\n// مرحبا \\\\", encoding="utf-8"
         )
         review_dir.joinpath("chapter_02.txt").write_text(
-            "«وداعا»\n\nنص آخر", encoding="utf-8"
+            "// وداعا \\\\\n\nنص آخر", encoding="utf-8"
         )
 
         count = sync_review(str(segments_dir))
@@ -763,7 +783,7 @@ class TestSyncReview:
 
         # Corrected review text
         review_dir.joinpath("chapter_01.txt").write_text(
-            "«هذا حوار الآن»", encoding="utf-8"
+            "// هذا حوار الآن \\\\", encoding="utf-8"
         )
 
         sync_review(str(segments_dir))
@@ -815,8 +835,8 @@ class TestSegmentChapter:
         review_path = segments_dir / "review" / "chapter_01.txt"
         assert review_path.exists()
         review_text = review_path.read_text(encoding="utf-8")
-        assert "«مرحبا»" in review_text
-        assert "«نعم»" in review_text
+        assert "// مرحبا \\\\" in review_text
+        assert "// نعم \\\\" in review_text
 
     def test_default_output_dir(self, tmp_path):
         """Without output_dir, segments go to sibling segments/ dir."""
@@ -975,9 +995,9 @@ class TestIntegrationAlLiss:
         review_path = tmp_path / "review" / "chapter_02.txt"
         assert review_path.exists()
         text = review_path.read_text(encoding="utf-8")
-        # Dialogue should be wrapped in «»
-        assert "«" in text
-        assert "»" in text
+        # Dialogue should be wrapped in // \\
+        assert "//" in text
+        assert "\\\\" in text
 
 
 @pytest.mark.skipif(not ZUQAQ_CH02.exists(), reason="Real EPUB data not available")
