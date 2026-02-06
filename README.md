@@ -1,6 +1,6 @@
 # Sawt — كل كتاب له صوت
 
-A script-based pipeline that processes raw Arabic books (EPUB/DOCX/TXT) through text extraction, chapter splitting, and dialogue detection, then generates multi-voice audiobooks automatically via Azure Neural TTS.
+Sawt produces multi-voice audiobooks for Arabic fiction (EPUB/DOCX/TXT) through text extraction, chapter splitting, and dialogue detection, then generates multi-voice audiobooks automatically via Azure Neural TTS. 
 
 ---
 

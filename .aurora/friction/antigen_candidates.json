@@ -1,0 +1,4458 @@
+[
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T16:45:21.963Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/src/aurora_mcp/mem_search_tool.py",
+      "file.py",
+      "orchestrator.py",
+      "packages/context-code/src/aurora_context_code/indexer.py",
+      "soar.py",
+      "src/aurora_mcp/lsp_tool.py",
+      "test_budget_exceeded.py",
+      "test_orchestrator.py",
+      "test_orchestrator_callback.py"
+    ],
+    "tool_sequence": [
+      "Read:error"
+    ],
+    "errors": [],
+    "keywords": [
+      "asshole",
+      "back",
+      "count",
+      "counterargument",
+      "files",
+      "fucking",
+      "gave",
+      "literally",
+      "pushed",
+      "result",
+      "returns",
+      "same",
+      "search",
+      "shit"
+    ],
+    "user_context": [
+      "i just gave you counterargument to that and you literally pushed the same shit back. here is the is the fucking result asshole. this is aur mem search fucking returns in 200ms with LSP count of files and details top 3 file names. i don't fucking want stale data in the db, the whole fucking idea is to be fucking reasonable fast as this. which part you are not getting you fucking idiot. do some fucking research on the fucking code instead of pulling shit out of your ass > aur mem search \"orchestra"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T17:36:57.615Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/lsp/src/aurora_lsp/analysis.py"
+    ],
+    "tool_sequence": [
+      "Grep",
+      "Grep",
+      "Read:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T18:29:02.088Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/src/aurora_mcp/mem_search_tool.py"
+    ],
+    "tool_sequence": [
+      "Read:error",
+      "Read:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T20:14:17.555Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/lsp/src/aurora_lsp/analysis.py",
+      "/home/hamr/PycharmProjects/aurora/packages/lsp/src/aurora_lsp/analysis_poc.py"
+    ],
+    "tool_sequence": [
+      "Read:error",
+      "Read:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T20:54:00.545Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "../../src/aurora_mcp/mem_search_tool.py",
+      "../cli/src/aurora_cli/commands/memory.py",
+      ".aurora/plans/language-abstraction.md",
+      "CODE_INTELLIGENCE_STATUS.md",
+      "__init__.py",
+      "analysis.py",
+      "base.py",
+      "cli/commands/memory.py",
+      "mem_search_tool.py",
+      "python.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 128"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T20:57:42.626Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "packages/context-code/src/aurora_context_code/__init__.py",
+      "packages/context-code/src/aurora_context_code/git.py",
+      "packages/context-code/src/aurora_context_code/knowledge_parser.py",
+      "packages/context-code/src/aurora_context_code/languages/javascript.py",
+      "packages/context-code/src/aurora_context_code/languages/markdown.py",
+      "packages/context-code/src/aurora_context_code/languages/python.py",
+      "packages/context-code/src/aurora_context_code/languages/typescript.py",
+      "packages/context-code/src/aurora_context_code/model_cache.py",
+      "packages/context-code/src/aurora_context_code/parser.py",
+      "packages/context-code/src/aurora_context_code/registry.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 127"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T21:30:45.259Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/docs/02-features/lsp/CODE_INTELLIGENCE_STATUS.md",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_lsp/facade.py",
+      "test.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T21:36:08.625Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/memory.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_mcp/mem_search_tool.py",
+      "packages/cli/src/aurora_cli/memory/retrieval.py",
+      "packages/lsp/src/aurora_lsp/facade.py",
+      "src/aurora_mcp/mem_search_tool.py"
+    ],
+    "tool_sequence": [
+      "Read:error",
+      "Read:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T21:46:41.594Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.aurora/config.js",
+      "/home/hamr/.local/lib/python3.14/site-packages/anyio/_backends/_asyncio.py",
+      "/home/hamr/.local/lib/python3.14/site-packages/anyio/_core/_eventloop.py",
+      "/home/hamr/.local/lib/python3.14/site-packages/fastmcp/server/server.py",
+      "/home/hamr/.local/lib/python3.14/site-packages/nest_asyncio.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_mcp/server.py",
+      "/usr/lib64/python3.14/asyncio/futures.py",
+      "/usr/lib64/python3.14/asyncio/runners.py",
+      "/usr/lib64/python3.14/asyncio/tasks.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Traceback (most recent call last):"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-04T08:49:42.419Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "packages/context-code/.../python.py"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "command",
+      "configuration",
+      "configure",
+      "create",
+      "message",
+      "name",
+      "prompt",
+      "setup",
+      "shell",
+      "stash",
+      "statusline",
+      "task"
+    ],
+    "user_context": [
+      "<command-message>statusline</command-message>\n<command-name>/statusline</command-name>",
+      "Create a Task with subagent_type \"statusline-setup\" and the prompt \"Configure my statusLine from my shell PS1 configuration\"",
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1630-11eb903a",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-04T08:49:42.419Z",
+    "peak_friction": 225.0,
+    "turns_in_window": 6,
+    "files": [
+      "packages/context-code/.../python.py"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "command",
+      "configuration",
+      "configure",
+      "create",
+      "message",
+      "name",
+      "prompt",
+      "setup",
+      "shell",
+      "stash",
+      "statusline",
+      "task"
+    ],
+    "user_context": [
+      "<command-message>statusline</command-message>\n<command-name>/statusline</command-name>",
+      "Create a Task with subagent_type \"statusline-setup\" and the prompt \"Configure my statusLine from my shell PS1 configuration\"",
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T12:30:00.607Z",
+    "peak_friction": 196.0,
+    "turns_in_window": 4,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/aurora/.claude/stash/mcp-lsp-integration-gaps-2026-02-03.md"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "args",
+      "aurora",
+      "below",
+      "caveat",
+      "claude",
+      "clear",
+      "command",
+      "commands",
+      "consider",
+      "documents",
+      "gaps",
+      "generated",
+      "hamr",
+      "home",
+      "integration"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/clear</command-name>\n            <command-message>clear</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout></local-command-stdout>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T12:30:14.962Z",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [
+      ".aurora/AGENTS.md",
+      "/docs/CODE_QUALITY_REPORT.md",
+      "/home/hamr/PycharmProjects/aurora/.aurora/AGENTS.md",
+      "/home/hamr/PycharmProjects/aurora/CLAUDE.md",
+      "/home/hamr/PycharmProjects/aurora/README.md",
+      "/home/hamr/PycharmProjects/aurora/docs/02-features/lsp/LSP.md",
+      "/home/hamr/PycharmProjects/aurora/docs/02-features/mcp/MCP.md",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/doctor.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/memory.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/configurators/mcp/base.py"
+    ],
+    "tool_sequence": [
+      "Read",
+      "Read",
+      "Read:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T12:33:53.824Z",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [
+      "packages/cli/src/aurora_cli/commands/memory.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T13:49:44.841Z",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [
+      "../../.local/lib/python3.14/site-packages/_pytest/assertion/rewrite.py",
+      "../../.local/lib/python3.14/site-packages/_pytest/pathlib.py",
+      "../../.local/lib/python3.14/site-packages/_pytest/python.py",
+      "/home/hamr/PycharmProjects/aurora/tests/unit/cli/test_conflict_detection_resolution.py",
+      "/usr/lib64/python3.14/importlib/__init__.py",
+      "packages/cli/src/aurora_cli/memory/retrieval.py",
+      "packages/context-code/src/aurora_context_code/__init__.py",
+      "packages/context-code/src/aurora_context_code/semantic/__init__.py",
+      "packages/context-code/src/aurora_context_code/semantic/embedding_provider.py",
+      "packages/context-code/src/aurora_context_code/semantic/hybrid_retriever.py"
+    ],
+    "tool_sequence": [
+      "Bash:error",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T14:24:24.242Z",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/configurators/mcp/__init__.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/configurators/mcp/base.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/configurators/mcp/claude.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/configurators/mcp/cline.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/configurators/mcp/continue_.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/configurators/mcp/cursor.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/configurators/mcp/registry.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_mcp/__init__.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_mcp/config.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_mcp/lsp_tool.py"
+    ],
+    "tool_sequence": [
+      "Glob",
+      "Read:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T14:48:59.070Z",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/src/aurora_mcp/mem_search_tool.py",
+      "orchestrator.py"
+    ],
+    "tool_sequence": [
+      "Read:error"
+    ],
+    "errors": [],
+    "keywords": [
+      "apis",
+      "faster",
+      "files",
+      "runs",
+      "same",
+      "scores",
+      "search",
+      "show",
+      "still",
+      "using"
+    ],
+    "user_context": [
+      "it still runs faster on aur mem search for 3 code files with --show-scores. why are you not using the same apis?"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T14:52:11.254Z",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.local/lib/python3.14/site-packages/multilspy/language_servers/jedi_language_server/jedi_server.py",
+      "/home/hamr/.local/lib/python3.14/site-packages/multilspy/lsp_protocol_handler/server.py",
+      "/usr/lib64/python3.14/asyncio/tasks.py",
+      "/usr/lib64/python3.14/contextlib.py",
+      "packages/soar/src/aurora_soar/orchestrator.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "an error occurred during closing of asynchronous generator <async_generator object JediServer.start_server at 0x7f22059d3940>"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T15:13:30.286Z",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T15:13:30.286Z",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-03T13:34:13.656000+00:00",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [
+      "///home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/soar.py",
+      "///home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/planning/core.py",
+      "///home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/query_executor.py",
+      "///home/hamr/PycharmProjects/aurora/packages/examples/smoke_test_soar.py",
+      "///home/hamr/PycharmProjects/aurora/packages/soar/src/aurora_soar/__init__.py",
+      "///home/hamr/PycharmProjects/aurora/packages/soar/src/aurora_soar/orchestrator.py",
+      "///home/hamr/PycharmProjects/aurora/packages/soar/tests/test_early_failure_recovery.py",
+      "///home/hamr/PycharmProjects/aurora/packages/soar/tests/test_orchestrator.py",
+      "///home/hamr/PycharmProjects/aurora/tests/archive/old_verify_tests/test_orchestrator.py",
+      "///home/hamr/PycharmProjects/aurora/tests/archive/performance/test_soar_benchmarks.py"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "aurora",
+      "check",
+      "documents",
+      "hamr",
+      "home",
+      "implemented",
+      "integration",
+      "pycharmprojects",
+      "tasks"
+    ],
+    "user_context": [
+      "can you check tasks.md/home/hamr/Documents/PycharmProjects/aurora/tasks/lsp-mcp-integration/tasks.md  if it was implemented ?"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-03T14:28:08.877000+00:00",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "again",
+      "args",
+      "below",
+      "catch",
+      "caveat",
+      "command",
+      "commands",
+      "consider",
+      "exit",
+      "generated",
+      "later",
+      "local",
+      "message",
+      "messages",
+      "name"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/exit</command-name>\n            <command-message>exit</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout>Catch you later!</local-command-stdout>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-03T14:32:53.763000+00:00",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "again",
+      "args",
+      "command",
+      "exit",
+      "local",
+      "message",
+      "name",
+      "restar",
+      "search",
+      "stdout",
+      "test"
+    ],
+    "user_context": [
+      "<command-name>/exit</command-name>\n            <command-message>exit</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout>Bye!</local-command-stdout>",
+      "test mem search again after restar"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-03T14:42:49.933000+00:00",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "forever",
+      "search",
+      "taking"
+    ],
+    "user_context": [
+      "why mcp aur mem search is taking forever?"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1227-f073391c",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-03T14:51:46.565000+00:00",
+    "peak_friction": 196.0,
+    "turns_in_window": 6,
+    "files": [
+      "orchestrator.py"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1503-a3ab0e5e",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-29T16:12:52.117Z",
+    "peak_friction": 101.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/memory/retrieval.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1503-a3ab0e5e",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-29T16:47:04.307Z",
+    "peak_friction": 101.0,
+    "turns_in_window": 6,
+    "files": [
+      "benchmark_epic2_performance.py",
+      "profile_memory_search.py",
+      "validate_fallback_quality.py",
+      "verify_code_retrieval.py",
+      "verify_optimization.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 2"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1503-a3ab0e5e",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-29T17:08:10.551Z",
+    "peak_friction": 101.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/agent_discovery/scanner.py",
+      "/home/user/.claude/agents/code-developer.md",
+      "/home/user/.claude/agents/quality-assurance.md",
+      "code-developer.md",
+      "orchestrator.md",
+      "packages/cli/src/aurora_cli/agent_discovery/scanner.py",
+      "paths.py",
+      "quality-assurance.md"
+    ],
+    "tool_sequence": [
+      "Grep",
+      "Read:error",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 2"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1503-a3ab0e5e",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-29T15:03:50.832000+00:00",
+    "peak_friction": 101.0,
+    "turns_in_window": 3,
+    "files": [
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/6c57579c-ba58-4246-9a2d-6032d11d2f6f.js",
+      "memory_manager.py",
+      "packages/cli/src/aurora_cli/commands/doctor.py",
+      "packages/cli/src/aurora_cli/commands/init.py",
+      "packages/cli/src/aurora_cli/commands/memory.py",
+      "packages/cli/src/aurora_cli/health_checks.py",
+      "packages/context-code/src/aurora_context_code/semantic/model_utils.py"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "clean",
+      "context",
+      "dependencies",
+      "download",
+      "following",
+      "implement",
+      "mandatory",
+      "model",
+      "optional",
+      "packages",
+      "plan",
+      "problem",
+      "pyproject",
+      "sentence",
+      "summary"
+    ],
+    "user_context": [
+      "Implement the following plan:\n\n# Plan: Make ML Dependencies Mandatory with Clean Model Download\n\n## Problem Summary\n\n1. `sentence-transformers` is optional in `packages/context-code/pyproject.toml`\n2. `install.sh` doesn't install the `[ml]` extras\n3. Model download failure shows misleading \"BM25-only mode\" warning\n4. Code crashes at `memory_manager.py:632` AFTER processing 1171 files\n5. No way to retry just the model download\n\n## Solution Overview\n\n1. Make `sentence-transformers` a required depe"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1503-a3ab0e5e",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-29T15:09:53.790000+00:00",
+    "peak_friction": 101.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1503-a3ab0e5e",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-29T17:23:06.764Z",
+    "peak_friction": 101.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/planning/models.py",
+      "goals.js",
+      "models.py"
+    ],
+    "tool_sequence": [
+      "Grep:error"
+    ],
+    "errors": [],
+    "keywords": [
+      "investigate"
+    ],
+    "user_context": [
+      "yes investigate why"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1635-49450a25",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T16:36:44.195Z",
+    "peak_friction": 100.0,
+    "turns_in_window": 6,
+    "files": [
+      "her/home/hamr/Documents/PycharmProjects/aurora/.claude/stash/friction-analyzer-2026-01-31.md",
+      "readme.md"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "analyzer",
+      "args",
+      "aurora",
+      "below",
+      "capable",
+      "caveat",
+      "claude",
+      "command",
+      "commands",
+      "complex",
+      "consider",
+      "documents",
+      "enhahcnement",
+      "fragmented",
+      "friction"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "Unknown skill: mode",
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1635-49450a25",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T16:42:21.867Z",
+    "peak_friction": 100.0,
+    "turns_in_window": 6,
+    "files": [
+      "README.md",
+      "scripts/friction_analyze.py",
+      "summary.js"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [
+      "again",
+      "clean",
+      "files",
+      "fragmented"
+    ],
+    "user_context": [
+      "clean up all fragmented files and run it again"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1635-49450a25",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T17:13:32.998Z",
+    "peak_friction": 100.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_analyze.py",
+      "analysis.js",
+      "raw.js",
+      "scripts/friction_analyze.py",
+      "summary.js"
+    ],
+    "tool_sequence": [
+      "Edit",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1635-49450a25",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T17:17:52.210Z",
+    "peak_friction": 100.0,
+    "turns_in_window": 6,
+    "files": [
+      "analysis.js",
+      "raw.js",
+      "scripts/friction_analyze.py",
+      "summary.js"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [
+      "antigen",
+      "apply",
+      "below",
+      "command",
+      "does",
+      "inference",
+      "qualify",
+      "reading",
+      "signal",
+      "source",
+      "still",
+      "weight",
+      "weights",
+      "your"
+    ],
+    "user_context": [
+      "what is your reading from this? does the below still apply? does this qualify for antigen? what are the weights? Signal    Source    Weight    Inference\nCommand Repeat    Proxy    +2    The agent is \"stuttering\" (running the same grep 3x).\nUser /stash    User    +10    Critical: The user hit a wall and needed to save state.\nClaim vs. Reality    Proxy    +5    The agent lied about a \"Success\" emoji.\nManual Override    User    +4    You ran a command manually to fix its mess."
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1635-49450a25",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T17:43:10.310Z",
+    "peak_friction": 100.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_analyze.py",
+      "analysis.js",
+      "raw.js",
+      "scripts/friction_analyze.py",
+      "summary.js"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [
+      "analysis",
+      "antigens",
+      "based",
+      "correct",
+      "data",
+      "files",
+      "identifying",
+      "indeed",
+      "json",
+      "model",
+      "monitor",
+      "path",
+      "summary",
+      "take",
+      "threshold"
+    ],
+    "user_context": [
+      "whats's your take on this Based on the data in your `analysis.json` and `summary.json` files, **Model B (Threshold Monitor)** is indeed the correct path for identifying **Antigens**.\n\nBy separating friction from momentum, you\u2019ve successfully isolated the \"gold standard\" signals for antigens\u2014patterns that are so fundamentally broken they cause the user to give up entirely.\n\n### 1. Analysis of Your \"BAD\" Quality Sessions\n\nYour `analysis.json` confirms that your quality assessment accurately flags "
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1635-49450a25",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T17:48:40.945Z",
+    "peak_friction": 100.0,
+    "turns_in_window": 6,
+    "files": [
+      ".aurora/friction.js",
+      "Node.js",
+      "analysis.js",
+      "raw.js",
+      "src/auth.py",
+      "summary.js",
+      "tests/test_auth.py"
+    ],
+    "tool_sequence": [],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [
+      "active",
+      "analysis",
+      "antigen",
+      "antigens",
+      "based",
+      "capture",
+      "correct",
+      "data",
+      "exactly",
+      "files",
+      "hook",
+      "identifying",
+      "indeed",
+      "json",
+      "live"
+    ],
+    "user_context": [
+      "whats's your take on this Based on the data in your `analysis.json` and `summary.json` files, **Model B (Threshold Monitor)** is indeed the correct path for identifying **Antigens**.\n\nBy separating friction from momentum, you\u2019ve successfully isolated the \"gold standard\" signals for antigens\u2014patterns that are so fundamentally broken they cause the user to give up entirely.\n\n### 1. Analysis of Your \"BAD\" Quality Sessions\n\nYour `analysis.json` confirms that your quality assessment accurately flags ",
+      "is this a possible solution? Yes, exactly. To capture the \"Antigen\" while the session is still active, you need a **Streaming Middleware** (a hook) that treats the live stdout/stderr as a sensor array.\n\nSince your tools are CLI-based, this isn't about post-processing a log file anymore; it\u2019s about **Live State Management**.\n\n---\n\n### 1. The \"Pre-Flush\" Hook\n\nWhen an LLM (like Claude or Gemini) streams its response, it often follows a pattern: `Thought` \u2192 `Tool Use` \u2192 `Result` \u2192 `Celebration (Suc"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "hamr/0128-0905-81f57109",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-28T10:28:30.334Z",
+    "peak_friction": 96.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "hamr/0128-0905-81f57109",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-28T18:48:41.532Z",
+    "peak_friction": 96.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 2"
+    ],
+    "keywords": [
+      "back",
+      "diagnoses",
+      "disabling",
+      "downloads",
+      "earlier",
+      "everything",
+      "hamr",
+      "hasn",
+      "hibernate",
+      "home",
+      "never",
+      "proper",
+      "results",
+      "said",
+      "steps"
+    ],
+    "user_context": [
+      "now, back to hibernate, it still hasn't worked. what's the proper diagnoses when you said earlier it was thunderbolt that did the wake up 26s after hibernate, we tried everything from pci disabling to turn off to platform. how can we properly look into this",
+      "/home/hamr/Downloads/hibernate all results from 4 steps are here. hibernate never worked"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "hamr/0128-0905-81f57109",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-28T19:21:13.166Z",
+    "peak_friction": 96.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [
+      "agentic",
+      "clean",
+      "cmdline",
+      "disk",
+      "fedora",
+      "grep",
+      "hibernate",
+      "null",
+      "platform",
+      "power",
+      "proc",
+      "pycharmprojects",
+      "reboot",
+      "shutdown",
+      "suspend"
+    ],
+    "user_context": [
+      ">\n> cat /proc/cmdline | grep no_console_suspend\n> cat /sys/power/disk\n[platform] shutdown reboot suspend test_resume\n> ls -la ~/PycharmProjects/agentic-toolkit/hibernate-clean.sh 2>/dev/null\nls -la ~/PycharmProjects/agentic-toolkit/tools-fedora/disable-wakeup-sources.sh 2>/dev/null\nls -la ~/PycharmProjects/agentic-toolkit/tools-fedora/setup-hibernate-wakeup.sh 2>/dev/null\n-rwxr-xr-x. 1 hamr hamr 1727 Jan 28 11:24 /home/hamr/PycharmProjects/agentic-toolkit/hibernate-clean.sh\n> rm ~/PycharmProject"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "hamr/0128-0905-81f57109",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-29T08:43:41.663000+00:00",
+    "peak_friction": 96.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "anthropic",
+      "args",
+      "below",
+      "caveat",
+      "claude",
+      "command",
+      "commands",
+      "consider",
+      "continue",
+      "generated",
+      "local",
+      "message",
+      "messages",
+      "model",
+      "name"
+    ],
+    "user_context": [
+      "continue",
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/model</command-name>\n            <command-message>model</command-message>\n            <command-args></command-args>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "hamr/0128-0905-81f57109",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-29T11:03:49.038Z",
+    "peak_friction": 96.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "args",
+      "below",
+      "byte",
+      "caveat",
+      "command",
+      "commands",
+      "consider",
+      "edit",
+      "encrypt",
+      "encrypted",
+      "error",
+      "exit",
+      "generated",
+      "hamr",
+      "home"
+    ],
+    "user_context": [
+      "> pass edit amr/turbotax\ngpg: [don't know]: 1st length byte missing\n\n~                                             what is this error?",
+      "> pass edit amr/turbotax\ngpg: [don't know]: 1st length byte missing\n> file ~/.password-store/amr/turbotax.gpg\n/home/hamr/.password-store/amr/turbotax.gpg: PGP RSA encrypted session key - keyid: 2F6F3E71 72A22E75 RSA (Encrypt or Sign) 3072b\n> gpg --decrypt ~/.password-store/amr/turbotax.gpg\ngpg: [don't know]: 1st length byte missing\n> gpg --list-keys\n[keyboxd]\n---------\npub   rsa3072 2025-10-12 [SC] [expires: 2027-10-12]\n5A5671B40C97A3F83609D4AADE58B476E256C606\nuid           [ultimate] avoidacces",
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1014-7504bc46",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T10:19:10.279Z",
+    "peak_friction": 92.5,
+    "turns_in_window": 6,
+    "files": [
+      "/.claude/projects/-home-hamr-PycharmProjects-aurora/930d3fc1-be38-4243-8377-c5585dabeee1.js"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Content: [{'type': 'text', 'text': 'Perfect! Now let me compile the comprehensive findings:\\n\\n## Summary: \"Sibling tool call errored\" Error Analysis\\n\\nBased on my thorough search of the Aurora codeb",
+      "Exit code 5"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1014-7504bc46",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T10:23:25.915Z",
+    "peak_friction": 92.5,
+    "turns_in_window": 6,
+    "files": [
+      ".aurora/friction/antigen_review.md",
+      ".aurora/friction/report.md",
+      "/.claude/projects/-home-hamr-PycharmProjects-aurora/930d3fc1-be38-4243-8377-c5585dabeee1.js",
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/930d3fc1-be38-4243-8377-c5585dabeee1.js",
+      "/home/hamr/PycharmProjects/aurora/scripts/antigen_extract.py",
+      "/home/hamr/PycharmProjects/aurora/scripts/friction.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/commands/friction.py",
+      "/usr/lib/python3.14/site-packages/click/core.py",
+      "/usr/lib/python3.14/site-packages/click/decorators.py",
+      "/usr/lib64/python3.14/pathlib/__init__.py"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [
+      "friction",
+      "pipeline",
+      "verify",
+      "works"
+    ],
+    "user_context": [
+      "did you run aur friction pipeline to verify that all works?"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1014-7504bc46",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T10:24:53.769Z",
+    "peak_friction": 92.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/commands/friction.py",
+      "/usr/lib/python3.14/site-packages/click/core.py",
+      "/usr/lib/python3.14/site-packages/click/decorators.py"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Traceback (most recent call last):"
+    ],
+    "keywords": [
+      "call",
+      "claude",
+      "click",
+      "core",
+      "exit",
+      "friction",
+      "hamr",
+      "home",
+      "last",
+      "line",
+      "local",
+      "module",
+      "most",
+      "packages",
+      "projects"
+    ],
+    "user_context": [
+      "> aur friction ~/.claude/projects\nTraceback (most recent call last):\nFile \"/home/hamr/.local/bin/aur\", line 8, in <module>\nsys.exit(cli())\n~~~^^\nFile \"/usr/lib/python3.14/site-packages/click/core.py\", line 1157, in __call__\nreturn self.main(*args, **kwargs)\n~~~~~~~~~^^^^^^^^^^^^^^^^^\nFile \"/usr/lib/python3.14/site-packages/click/core.py\", line 1078, in main\nrv = self.invoke(ctx)\nFile \"/usr/lib/python3.14/site-packages/click/core.py\", line 1688, in invoke\nreturn _process_result(sub_ctx.command.in"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1014-7504bc46",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T11:08:48.031Z",
+    "peak_friction": 92.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/81c00300-e4e6-4246-9a8b-c95b787daaf4.js"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "21:{\"ts\": \"2026-01-29T17:36:06.161Z\", \"source\": \"tool\", \"signal\": \"exit_error\", \"details\": \"Exit cod",
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1014-7504bc46",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-02T10:15:01.332000+00:00",
+    "peak_friction": 92.5,
+    "turns_in_window": 5,
+    "files": [
+      ".aurora/friction/friction_raw.js",
+      ".aurora/friction/report.md",
+      "/.claude/projects/-home-hamr-PycharmProjects-aurora/930d3fc1-be38-4243-8377-c5585dabeee1.js",
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/930d3fc1-be38-4243-8377-c5585dabeee1.js",
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_analyze.py",
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_config.js",
+      "Report.md"
+    ],
+    "tool_sequence": [
+      "Read"
+    ],
+    "errors": [],
+    "keywords": [
+      "analysis",
+      "call",
+      "detection",
+      "errored",
+      "following",
+      "friction",
+      "implement",
+      "messages",
+      "overview",
+      "plan",
+      "sibling",
+      "tool",
+      "tracking"
+    ],
+    "user_context": [
+      "Implement the following plan:\n\n# Add \"Sibling Tool Call Errored\" Detection to Friction Analysis\n\n## Overview\n\nAdd detection and tracking for \"Sibling tool call errored\" messages in the friction analysis system. These errors occur when Claude Code executes multiple tool calls in parallel and one fails, causing the SDK to cancel the remaining sibling calls in that batch.\n\n## Problem Statement\n\nCurrently, friction analysis detects:\n- Exit code errors (weight +1)\n- User interruptions, curses, negati"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1014-7504bc46",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-02T10:22:01.894000+00:00",
+    "peak_friction": 92.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_analyze.py"
+    ],
+    "tool_sequence": [
+      "Edit",
+      "Read"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1014-7504bc46",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-02T12:13:30.702Z",
+    "peak_friction": 92.5,
+    "turns_in_window": 6,
+    "files": [
+      "/.claude/projects/-home-hamr-PycharmProjects-aurora/930d3fc1-be38-4243-8377-c5585dabeee1.js",
+      "friction.py",
+      "friction_analyze.py",
+      "friction_config.js",
+      "scripts/friction_analyze.py"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [
+      "sibling_tool_error     2   (+1 friction)"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-2012-83a1d5f9",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T20:16:14.855Z",
+    "peak_friction": 84.0,
+    "turns_in_window": 4,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/aurora/.claude/stash/friction-detection-antigens-2026-01-31.md",
+      "CLAUDE.md",
+      "FRICTION_DETECTION.md",
+      "analysis.js",
+      "antigen_extract.py",
+      "candidates.js",
+      "review.md",
+      "src/auth.py",
+      "summary.js"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "antigen",
+      "antigens",
+      "args",
+      "aurora",
+      "below",
+      "caveat",
+      "claude",
+      "clear",
+      "command",
+      "commands",
+      "consider",
+      "continuing",
+      "create",
+      "detection",
+      "direct"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/clear</command-name>\n            <command-message>clear</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout></local-command-stdout>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-2012-83a1d5f9",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T20:37:24.668Z",
+    "peak_friction": 84.0,
+    "turns_in_window": 6,
+    "files": [
+      ".aurora/antigens/review.md",
+      "/home/hamr/PycharmProjects/aurora/docs/guides/FRICTION_DETECTION.md",
+      "CLAUDE.md",
+      "analysis.js",
+      "antigen_extract.py",
+      "candidates.js",
+      "friction.py",
+      "friction_analyze.py",
+      "friction_config.js",
+      "raw.js"
+    ],
+    "tool_sequence": [
+      "Bash:error",
+      "Bash:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-2012-83a1d5f9",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T21:00:19.164Z",
+    "peak_friction": 84.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/main.py"
+    ],
+    "tool_sequence": [
+      "Edit",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-2012-83a1d5f9",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T21:08:58.277Z",
+    "peak_friction": 84.0,
+    "turns_in_window": 6,
+    "files": [
+      ".aurora/friction/antigen_review.md",
+      "/home/hamr/PycharmProjects/aurora/docs/guides/FRICTION_DETECTION.md",
+      "CLAUDE.md",
+      "antigen_review.md",
+      "review.md",
+      "scripts/friction.py"
+    ],
+    "tool_sequence": [
+      "Grep",
+      "Read:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-2012-83a1d5f9",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T21:54:24.705Z",
+    "peak_friction": 84.0,
+    "turns_in_window": 6,
+    "files": [
+      "CLAUDE.md",
+      "antigen_review.md",
+      "friction_analysis.js",
+      "friction_summary.js"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "based",
+      "command",
+      "message",
+      "name",
+      "project",
+      "projects",
+      "split",
+      "stash",
+      "yeah"
+    ],
+    "user_context": [
+      "why is it not for all projects? or this is project based?",
+      "yeah, how would you split them per project",
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-2012-83a1d5f9",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T21:54:24.705Z",
+    "peak_friction": 84.0,
+    "turns_in_window": 6,
+    "files": [
+      "CLAUDE.md",
+      "antigen_review.md",
+      "friction_analysis.js",
+      "friction_summary.js"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "based",
+      "command",
+      "message",
+      "name",
+      "project",
+      "projects",
+      "split",
+      "stash",
+      "yeah"
+    ],
+    "user_context": [
+      "why is it not for all projects? or this is project based?",
+      "yeah, how would you split them per project",
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-2012-83a1d5f9",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-31T20:24:04.618000+00:00",
+    "peak_friction": 84.0,
+    "turns_in_window": 6,
+    "files": [
+      ".aurora/friction/analysis.js",
+      ".aurora/friction/raw.js",
+      "/home/hamr/PycharmProjects/aurora/scripts/antigen_extract.py",
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_analyze.py",
+      "antigen_extract.py",
+      "candidates.js",
+      "friction_analyze.py",
+      "review.md"
+    ],
+    "tool_sequence": [
+      "Read:ok",
+      "Read"
+    ],
+    "errors": [],
+    "keywords": [
+      "artifacts",
+      "candidates",
+      "command",
+      "files",
+      "friction",
+      "generartes",
+      "guess",
+      "including",
+      "json",
+      "jsonl",
+      "maybe",
+      "path",
+      "pipeline",
+      "plan",
+      "read"
+    ],
+    "user_context": [
+      "what will candidates.json do? i guess the plan is to use the friction as a pipeline maybe turn it to cli command that takes path and read jsonl files and it generartes all artifacts including antigen, a whole workflow. then antigen or candidates can be manually fed to llm to ask it to create rules for this. is that what you meant? devil's adv. goal is not to bloat and add too much automation for once in a while task "
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1308-2b80385d",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T13:13:09.089Z",
+    "peak_friction": 82.5,
+    "turns_in_window": 4,
+    "files": [
+      "Node.js",
+      "config.js",
+      "node.js",
+      "rules.js",
+      "session_friction.js"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "agents",
+      "antigen",
+      "args",
+      "below",
+      "borrowing",
+      "caveat",
+      "clear",
+      "command",
+      "commands",
+      "consider",
+      "create",
+      "decides",
+      "feature",
+      "generated",
+      "help"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/clear</command-name>\n            <command-message>clear</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout></local-command-stdout>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1308-2b80385d",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T14:01:17.011Z",
+    "peak_friction": 82.5,
+    "turns_in_window": 6,
+    "files": [
+      ".aurora/session_friction.js",
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/2b80385d-03de-4260-9fd7-bdc785f20926.js",
+      "/home/hamr/PycharmProjects/aurora/packages/soar/src/aurora_soar/orchestrator.py",
+      "00ef1dc0-dfcf-4912-95e6-f79067912fa0.js",
+      "02a81892-a849-40a4-b015-d29f41f116f7.js",
+      "05e82116-d5bc-42c9-9f41-72bdad394c78.js",
+      "068aee5c-fe97-472c-85c2-2ef495e05377.js",
+      "0736f7d1-cc65-4a06-8dfa-a91548e84fa7.js",
+      "0ac06ec1-c9cc-4451-9559-b8765e56353e.js",
+      "0c63b88f-17cd-4dc9-a8f0-04dd5c98de3d.js"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash",
+      "Bash:ok"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1308-2b80385d",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T14:04:49.787Z",
+    "peak_friction": 82.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/a3ab0e5e-19f3-4128-9f3e-5b94d117cd9e.js",
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/sessions-index.js"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 5"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1308-2b80385d",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T14:09:25.927Z",
+    "peak_friction": 82.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.claude/projects/.../2b80385d-....js",
+      "Node.js",
+      "agent-aprompt_suggestion-97438e.js",
+      "agent-aprompt_suggestion-e8c05e.js",
+      "config.js",
+      "friction-watcher.js",
+      "node.js",
+      "sessions-index.js"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "borrowing",
+      "capture",
+      "convo",
+      "critical",
+      "earlier",
+      "first",
+      "layer",
+      "less",
+      "observer",
+      "polite",
+      "question",
+      "work",
+      "your"
+    ],
+    "user_context": [
+      "borrowing from earlier convo, what do we capture first? That is the critical question. To make this work, your **Observer Layer** should act less like a \"polite assistant\" and more like a **Real-Time Supervisor** that doesn't trust the LLM\u2019s internal monologue.\n\nYou are correct: LLMs are \"premature celebrators.\" They will output \"Task complete! \ud83d\ude80\" while the background process is still throwing a stack trace. If your signals only come from the LLM, you are just building a high-speed hallucination"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1308-2b80385d",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T14:41:14.872Z",
+    "peak_friction": 82.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_analyze.py",
+      "scripts/friction_analyze.py",
+      "summary.js"
+    ],
+    "tool_sequence": [
+      "TaskUpdate",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1308-2b80385d",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T16:33:21.886Z",
+    "peak_friction": 82.5,
+    "turns_in_window": 6,
+    "files": [
+      "/.claude/projects/-home-hamr-PycharmProjects-aurora/2b80385d-03de-4260-9fd7-bdc785f20926.js",
+      "Node.js",
+      "session_friction.js"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "{\"parentUuid\":\"e94842df-bf8a-449a-b143-84b3c2beb95f\",\"isSidechain\":false,\"userType\":\"external\",\"cwd\":\"/home/hamr/PycharmProjects/aurora\",\"sessionId\":\"2b80385d-03de-4260-9fd7-bdc785f20926\",\"version\":\"2",
+      "{\"parentUuid\":\"2f9984cb-b4d5-41f4-ac85-d306d105aacd\",\"isSidechain\":false,\"userType\":\"external\",\"cwd\":\"/home/hamr/PycharmProjects/aurora\",\"sessionId\":\"2b80385d-03de-4260-9fd7-bdc785f20926\",\"version\":\"2"
+    ],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1308-2b80385d",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T16:33:21.886Z",
+    "peak_friction": 82.5,
+    "turns_in_window": 6,
+    "files": [
+      "/.claude/projects/-home-hamr-PycharmProjects-aurora/2b80385d-03de-4260-9fd7-bdc785f20926.js",
+      "Node.js",
+      "session_friction.js"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "{\"parentUuid\":\"e94842df-bf8a-449a-b143-84b3c2beb95f\",\"isSidechain\":false,\"userType\":\"external\",\"cwd\":\"/home/hamr/PycharmProjects/aurora\",\"sessionId\":\"2b80385d-03de-4260-9fd7-bdc785f20926\",\"version\":\"2",
+      "{\"parentUuid\":\"2f9984cb-b4d5-41f4-ac85-d306d105aacd\",\"isSidechain\":false,\"userType\":\"external\",\"cwd\":\"/home/hamr/PycharmProjects/aurora\",\"sessionId\":\"2b80385d-03de-4260-9fd7-bdc785f20926\",\"version\":\"2"
+    ],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1824-c1027030",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T18:26:56.988Z",
+    "peak_friction": 82.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/.aurora/friction/raw.jsonl",
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_config.json",
+      "Node.js",
+      "goals.js",
+      "tests/unit/soar/test_phase_verify_lite.py"
+    ],
+    "tool_sequence": [
+      "Read:error",
+      "Read"
+    ],
+    "errors": [
+      "3\u2192    \"exit_error\": 1,"
+    ],
+    "keywords": [
+      "actual",
+      "antigen",
+      "backwards",
+      "everything",
+      "execution",
+      "good",
+      "last",
+      "order",
+      "right",
+      "schema",
+      "solid",
+      "structure",
+      "take",
+      "talked",
+      "value"
+    ],
+    "user_context": [
+      "esc, and that's what you last talked about  My take: The vision is right, but the execution order is backwards.\n\n\nWhat's Good\n\n\n1. Antigen schema - The structure is solid:\n\ntrigger_context \u2192 failure_pattern \u2192 inhibitory_instruction\n\n1. The inhibitory_instruction is the actual value. Everything else is matching logic.\n\n2. Context extraction logic - \"5 turns before anchor\" is the right approach. The anchor is\n\nuser_intervention or false_success.\n\n3. Matching by files + keywords - Simple, would wor"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1824-c1027030",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T18:28:29.464Z",
+    "peak_friction": 82.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_analyze.py",
+      "analysis.js",
+      "raw.js",
+      "summary.js"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [
+      "again",
+      "analysis",
+      "aurora",
+      "capture",
+      "ctrl",
+      "disapprova",
+      "last",
+      "maybe",
+      "others",
+      "session",
+      "signal",
+      "talked",
+      "user"
+    ],
+    "user_context": [
+      "we talked about esc and ctrl+c as user's signal of disapprova and there were 4 others. maybe you can run analysis again to capture last session we had for aurora"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1824-c1027030",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T19:36:47.811Z",
+    "peak_friction": 82.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_analyze.py",
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_config.js",
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_config.json",
+      "analysis.js",
+      "raw.js",
+      "summary.js"
+    ],
+    "tool_sequence": [
+      "Edit",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1824-c1027030",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T20:11:22.281Z",
+    "peak_friction": 82.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/docs/guides/FRICTION_DETECTION.md",
+      "FRICTION_DETECTION.md",
+      "antigen_extract.py",
+      "docs/guides/FRICTION_DETECTION.md",
+      "friction_analyze.py",
+      "friction_config.js",
+      "scripts/README.md"
+    ],
+    "tool_sequence": [
+      "Edit"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1824-c1027030",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T20:11:22.281Z",
+    "peak_friction": 82.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/docs/guides/FRICTION_DETECTION.md",
+      "FRICTION_DETECTION.md",
+      "antigen_extract.py",
+      "docs/guides/FRICTION_DETECTION.md",
+      "friction_analyze.py",
+      "friction_config.js",
+      "scripts/README.md"
+    ],
+    "tool_sequence": [
+      "Edit"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1824-c1027030",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-31T18:25:39.844000+00:00",
+    "peak_friction": 82.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/.aurora/friction/raw.jsonl",
+      "/home/hamr/PycharmProjects/aurora/.aurora/friction/summary.json"
+    ],
+    "tool_sequence": [
+      "Read",
+      "Read",
+      "Read"
+    ],
+    "errors": [
+      "<tool_use_error>Sibling tool call errored</tool_use_error>",
+      "<tool_use_error>Sibling tool call errored</tool_use_error>"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1824-c1027030",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-31T18:30:32.685000+00:00",
+    "peak_friction": 82.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/0736f7d1-cc65-4a06-8dfa-a91548e84fa7.js",
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/2b80385d-03de-4260-9fd7-bdc785f20926.js",
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_analyze.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Read"
+    ],
+    "errors": [
+      "{\"parentUuid\":\"57648407-c996-4321-ac30-53a89609eab6\",\"isSidechain\":false,\"userType\":\"external\",\"cwd\":\"/home/hamr/PycharmProjects/aurora\",\"sessionId\":\"49450a25-417d-484e-993e-e1042838d432\",\"version\":\"2"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1201-111c19f8",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-04T12:08:13.884Z",
+    "peak_friction": 78.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/memory/retrieval.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/memory/__init__.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/memory/retrieval.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_core/chunks/__init__.py"
+    ],
+    "tool_sequence": [
+      "Read",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1201-111c19f8",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-04T13:24:24.452Z",
+    "peak_friction": 78.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/memory/retrieval.py"
+    ],
+    "tool_sequence": [
+      "Edit",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1201-111c19f8",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-04T13:27:25.428Z",
+    "peak_friction": 78.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/memory.py"
+    ],
+    "tool_sequence": [
+      "Grep"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1201-111c19f8",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-04T13:27:25.428Z",
+    "peak_friction": 78.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/memory.py"
+    ],
+    "tool_sequence": [
+      "Grep"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "hamr/0127-1941-0289c457",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-27T20:09:48.697Z",
+    "peak_friction": 77.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.local/share/applications/pycharm.desktop"
+    ],
+    "tool_sequence": [
+      "Edit",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 2"
+    ],
+    "keywords": [
+      "agentic",
+      "pycharmprojects",
+      "toolkit",
+      "under"
+    ],
+    "user_context": [
+      "how do i run dev_tools_menu.sh under ~/PycharmProjects/agentic-toolkit"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "hamr/0127-1941-0289c457",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-27T20:21:48.763Z",
+    "peak_friction": 77.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 127"
+    ],
+    "keywords": [
+      "pass",
+      "working"
+    ],
+    "user_context": [
+      "pass cli is not working"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "hamr/0127-1941-0289c457",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-27T21:57:48.048Z",
+    "peak_friction": 77.5,
+    "turns_in_window": 6,
+    "files": [
+      "FEDORA_SETUP.md",
+      "PASS_INSTALLATION_GUIDE.md",
+      "manual_guide.md",
+      "tools-fedora/CONVERSION_SUMMARY.md",
+      "tools-fedora/FEDORA_SETUP.md",
+      "tools-fedora/GHOSTTY_SETUP_README.md",
+      "tools-fedora/KITTY_README.md",
+      "tools-fedora/PASS_INSTALLATION_GUIDE.md",
+      "tools-fedora/fzf-guide.md",
+      "tools-fedora/ghostty_guide.md"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 128"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "hamr/0127-1941-0289c457",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-27T22:21:09.140Z",
+    "peak_friction": 77.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 2"
+    ],
+    "keywords": [
+      "console",
+      "detected",
+      "during",
+      "every",
+      "getting",
+      "initialization",
+      "instant",
+      "keep",
+      "output",
+      "prompt",
+      "terminal",
+      "using",
+      "warning"
+    ],
+    "user_context": [
+      "i keep getting this every new terminal, why? [WARNING]: Console output during zsh initialization detected.\n\nWhen using Powerlevel10k with instant prompt, console output during zsh\ninitialization may indicate issues.\n\nYou can:\n\n  - Recommended: Change ~/.zshrc so that it does not perform console I/O\n    after the instant prompt preamble. See the link below for details.\n\n    * You will not see this error message again.\n    * Zsh will start quickly and prompt will update smoothly.\n\n  - Suppress thi"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "hamr/0127-1941-0289c457",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-27T22:38:17.677Z",
+    "peak_friction": 77.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.zshrc"
+    ],
+    "tool_sequence": [
+      "Edit"
+    ],
+    "errors": [],
+    "keywords": [
+      "args",
+      "below",
+      "caveat",
+      "command",
+      "commands",
+      "consider",
+      "exit",
+      "generated",
+      "local",
+      "message",
+      "messages",
+      "name",
+      "otherwise",
+      "respond",
+      "running"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/exit</command-name>\n            <command-message>exit</command-message>\n            <command-args></command-args>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1107-f0fd485a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T16:31:00.519Z",
+    "peak_friction": 73.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1107-f0fd485a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T19:28:39.204Z",
+    "peak_friction": 73.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/friction.py"
+    ],
+    "tool_sequence": [
+      "Grep",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 2"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1107-f0fd485a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T19:35:14.405Z",
+    "peak_friction": 73.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/.aurora/friction/friction_analysis.js",
+      "/home/hamr/PycharmProjects/aurora/.aurora/friction/friction_summary.js"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 5"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1107-f0fd485a",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T20:15:25.977Z",
+    "peak_friction": 73.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "npm error permissions of the file and its containing directories, or try running",
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1107-f0fd485a",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-02T20:21:56.027Z",
+    "peak_friction": 73.5,
+    "turns_in_window": 6,
+    "files": [
+      "fix-bugs.md"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "across",
+      "anthropic",
+      "because",
+      "command",
+      "didn",
+      "dont",
+      "orchestrates",
+      "retries",
+      "think",
+      "thought",
+      "tools",
+      "work"
+    ],
+    "user_context": [
+      "orchestrates across tools? it's a cli command, what would it do is work across other tools from cli",
+      "i did it because i thought it didn;t have max retries. this one has it and by Anthropic. dont think it's of use"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1328-9b73a0a3",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-04T13:30:56.679Z",
+    "peak_friction": 72.5,
+    "turns_in_window": 4,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/aurora/.claude/stash/access-count-fix-2026-02-04.md",
+      "goals.js",
+      "mem_search_tool.py",
+      "orchestrator.py",
+      "profile_performance.py",
+      "smoke_test_soar.py",
+      "soar-orchestrator-2026-02-04.md",
+      "test_e2e_search_quality.py",
+      "test_orchestrator.py"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "access",
+      "another",
+      "args",
+      "aurora",
+      "below",
+      "caveat",
+      "claude",
+      "clear",
+      "command",
+      "commands",
+      "consider",
+      "continung",
+      "count",
+      "documents",
+      "generated"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/clear</command-name>\n            <command-message>clear</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout></local-command-stdout>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1328-9b73a0a3",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-04T13:59:16.035Z",
+    "peak_friction": 72.5,
+    "turns_in_window": 6,
+    "files": [
+      "/path/to/module.py",
+      "/usr/lib64/python3.14/ast.py",
+      "packages/cli/src/aurora_cli/agent_discovery/manifest.py",
+      "packages/cli/src/aurora_cli/agent_discovery/models.py",
+      "packages/cli/src/aurora_cli/agent_discovery/parser.py",
+      "packages/cli/src/aurora_cli/agent_discovery/scanner.py",
+      "packages/cli/src/aurora_cli/configurators/agents.py",
+      "packages/cli/src/aurora_cli/configurators/ampcode.py",
+      "packages/cli/src/aurora_cli/configurators/base.py",
+      "packages/cli/src/aurora_cli/configurators/claude.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1328-9b73a0a3",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-04T14:02:33.951Z",
+    "peak_friction": 72.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/soar/tests/test_soar_indexes_as_reas.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_soar/orchestrator.py",
+      "/tmp/tmpycszn5y9.md",
+      "/usr/lib64/python3.14/ast.py",
+      "/usr/lib64/python3.14/unittest/mock.py",
+      "packages/cli/src/aurora_cli/agent_discovery/manifest.py",
+      "packages/cli/src/aurora_cli/agent_discovery/models.py",
+      "packages/cli/src/aurora_cli/agent_discovery/parser.py",
+      "packages/cli/src/aurora_cli/agent_discovery/scanner.py",
+      "packages/cli/src/aurora_cli/configurators/agents.py"
+    ],
+    "tool_sequence": [
+      "Edit",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1328-9b73a0a3",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-04T14:04:14.435Z",
+    "peak_friction": 72.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/soar/tests/test_split_preserves_type.py"
+    ],
+    "tool_sequence": [
+      "Glob",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1328-9b73a0a3",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-04T14:21:54.285Z",
+    "peak_friction": 72.5,
+    "turns_in_window": 6,
+    "files": [
+      "chunk_types.py"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 2"
+    ],
+    "keywords": [
+      "fresh",
+      "index",
+      "test"
+    ],
+    "user_context": [
+      "can i test aur mem index fresh"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1328-9b73a0a3",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-04T14:59:02.990Z",
+    "peak_friction": 72.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 2"
+    ],
+    "keywords": [
+      "index",
+      "search",
+      "test",
+      "types"
+    ],
+    "user_context": [
+      "test aur mem index and search with the new types"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2147-1f196e6f",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T03:50:45.477Z",
+    "peak_friction": 68.0,
+    "turns_in_window": 6,
+    "files": [
+      "/tmp/serena_core/src/solidlsp/ls.py"
+    ],
+    "tool_sequence": [
+      "Bash:error",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2147-1f196e6f",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-03T04:51:07.296Z",
+    "peak_friction": 68.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/lsp/src/aurora_lsp/client.py",
+      "/home/hamr/PycharmProjects/aurora/packages/lsp/test_manual.py",
+      "/usr/lib64/python3.14/asyncio/base_events.py",
+      "/usr/lib64/python3.14/asyncio/runners.py",
+      "packages/core/src/aurora_core/store/sqlite.py",
+      "test_manual.py"
+    ],
+    "tool_sequence": [
+      "Write",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2147-1f196e6f",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T05:37:08.195Z",
+    "peak_friction": 68.0,
+    "turns_in_window": 6,
+    "files": [
+      "../../docs/02-features/lsp/LSP.md",
+      ".aurora/lsp-report.md",
+      "/home/hamr/Documents/PycharmProjects/aurora/.aurora/LSP_IMPLEMENTATION_PLAN.md",
+      "LSP.md",
+      "__init__.py",
+      "analysis.py",
+      "baz.py",
+      "cache.py",
+      "client.py",
+      "config.py"
+    ],
+    "tool_sequence": [
+      "Write:error"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2147-1f196e6f",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T05:37:08.195Z",
+    "peak_friction": 68.0,
+    "turns_in_window": 6,
+    "files": [
+      "../../docs/02-features/lsp/LSP.md",
+      ".aurora/lsp-report.md",
+      "/home/hamr/Documents/PycharmProjects/aurora/.aurora/LSP_IMPLEMENTATION_PLAN.md",
+      "LSP.md",
+      "__init__.py",
+      "analysis.py",
+      "baz.py",
+      "cache.py",
+      "client.py",
+      "config.py"
+    ],
+    "tool_sequence": [
+      "Write:error"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-0942-a44d15d6",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T09:54:34.503Z",
+    "peak_friction": 65.0,
+    "turns_in_window": 6,
+    "files": [
+      "RELEASE.md",
+      "docs/guides/RELEASE.md"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 2"
+    ],
+    "keywords": [],
+    "user_context": [
+      "1"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-0942-a44d15d6",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T10:51:29.404Z",
+    "peak_friction": 65.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/core/src/aurora_core/chunks/code_chunk.py",
+      "code_chunk.py",
+      "tests/unit/core/chunks/test_code_chunk.py"
+    ],
+    "tool_sequence": [
+      "Edit",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 4"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-0942-a44d15d6",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-31T11:31:52.142Z",
+    "peak_friction": 65.0,
+    "turns_in_window": 6,
+    "files": [
+      "packages/context-code/src/aurora_context_code/semantic/__init__.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "ArabicTTS/0205-0755-ea761de4",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-05T07:57:56.859Z",
+    "peak_friction": 60.0,
+    "turns_in_window": 4,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/ArabicTTS/.claude/stash/audiobook-restructure-complete.md",
+      "/home/hamr/Documents/PycharmProjects/ArabicTTS/docs/02-features/azure-audiobooks/PLAN.md"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "archive",
+      "args",
+      "below",
+      "builder",
+      "caveat",
+      "clear",
+      "command",
+      "commands",
+      "consider",
+      "docs",
+      "folder",
+      "fresh",
+      "generated",
+      "ignore",
+      "local"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/clear</command-name>\n            <command-message>clear</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout></local-command-stdout>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "ArabicTTS/0205-0755-ea761de4",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-05T07:57:56.859Z",
+    "peak_friction": 60.0,
+    "turns_in_window": 4,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/ArabicTTS/.claude/stash/audiobook-restructure-complete.md",
+      "/home/hamr/Documents/PycharmProjects/ArabicTTS/docs/02-features/azure-audiobooks/PLAN.md"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "archive",
+      "args",
+      "below",
+      "builder",
+      "caveat",
+      "clear",
+      "command",
+      "commands",
+      "consider",
+      "docs",
+      "folder",
+      "fresh",
+      "generated",
+      "ignore",
+      "local"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/clear</command-name>\n            <command-message>clear</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout></local-command-stdout>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "ArabicTTS/0205-0755-ea761de4",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-05T08:04:57.576Z",
+    "peak_friction": 60.0,
+    "turns_in_window": 6,
+    "files": [
+      "CLAUDE.md",
+      "README.md"
+    ],
+    "tool_sequence": [
+      "TaskUpdate",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "ArabicTTS/0205-0755-ea761de4",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-05T08:47:32.839Z",
+    "peak_friction": 60.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/ArabicTTS/docs/00-context/assumptions.md",
+      "CLAUDE.md",
+      "PLAN.md",
+      "README.md",
+      "docs/00-context/assumptions.md",
+      "docs/00-context/system-state.md",
+      "docs/00-context/vision.md",
+      "docs/01-product/prd.md",
+      "docs/02-features/azure-audiobooks/PLAN.md"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "ArabicTTS/0205-0755-ea761de4",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-05T08:47:32.839Z",
+    "peak_friction": 60.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/ArabicTTS/docs/00-context/assumptions.md",
+      "CLAUDE.md",
+      "PLAN.md",
+      "README.md",
+      "docs/00-context/assumptions.md",
+      "docs/00-context/system-state.md",
+      "docs/00-context/vision.md",
+      "docs/01-product/prd.md",
+      "docs/02-features/azure-audiobooks/PLAN.md"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1146-b25b4ac8",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T12:01:40.072Z",
+    "peak_friction": 59.5,
+    "turns_in_window": 6,
+    "files": [
+      "packages/core/src/aurora_core/chunks/base.py",
+      "packages/core/src/aurora_core/chunks/code_chunk.py",
+      "packages/core/src/aurora_core/chunks/doc_chunk.py",
+      "packages/core/src/aurora_core/chunks/reasoning_chunk.py",
+      "tests/unit/core/chunks/test_doc_chunk.py"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [
+      "test"
+    ],
+    "user_context": [
+      "did you test it?"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1146-b25b4ac8",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T16:46:47.973Z",
+    "peak_friction": 59.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora-doc-memory-type/packages/cli/src/aurora_cli/commands/memory.py"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1146-b25b4ac8",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-31T11:46:18.167000+00:00",
+    "peak_friction": 59.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "TaskCreate",
+      "TaskCreate",
+      "TaskCreate"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1146-b25b4ac8",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-31T17:01:53.794Z",
+    "peak_friction": 59.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash",
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-0956-930d3fc1",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T10:06:13.928Z",
+    "peak_friction": 59.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "EnterPlanMode",
+      "Task"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-0956-930d3fc1",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-02T10:07:48.412000+00:00",
+    "peak_friction": 59.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/930d3fc1-be38-4243-8377-c5585dabeee1.js",
+      "/home/hamr/PycharmProjects/aurora/.aurora/friction/friction_raw.js",
+      "packages/cli/src/aurora_cli/concurrent_executor.py"
+    ],
+    "tool_sequence": [
+      "Task:error",
+      "Task"
+    ],
+    "errors": [
+      "[{'type': 'text', 'text': 'Perfect! Now let me compile the comprehensive findings:\\n\\n## Summary: \"Sibling tool call errored\" Error Analysis\\n\\nBased on my thorough search of the Aurora codebase and s"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-0956-930d3fc1",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-02T10:09:17.174000+00:00",
+    "peak_friction": 59.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_analyze.py",
+      "/home/hamr/PycharmProjects/aurora/scripts/friction_config.js",
+      "scripts/friction_analyze.py",
+      "scripts/friction_config.js"
+    ],
+    "tool_sequence": [
+      "Task:error",
+      "Read"
+    ],
+    "errors": [
+      "[{'type': 'text', 'text': 'Now I have enough understanding of the codebase. Let me design the implementation plan. Based on my exploration:\\n\\n1. The friction analysis system is in `scripts/friction_a"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-0956-930d3fc1",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-02T10:10:28.030Z",
+    "peak_friction": 59.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.claude/plans/refactored-mixing-tiger.md"
+    ],
+    "tool_sequence": [
+      "Write",
+      "ExitPlanMode"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1723-81c00300",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-29T17:36:06.161Z",
+    "peak_friction": 55.0,
+    "turns_in_window": 6,
+    "files": [
+      "VERIFICATION_FAILURE_FIX.md"
+    ],
+    "tool_sequence": [
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [
+      "test"
+    ],
+    "user_context": [
+      "test it"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1723-81c00300",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-29T17:37:09.006Z",
+    "peak_friction": 55.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash:error",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1",
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1723-81c00300",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-29T17:45:33.584000+00:00",
+    "peak_friction": 55.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 137"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1723-81c00300",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-29T19:18:39.697Z",
+    "peak_friction": 55.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/soar.py"
+    ],
+    "tool_sequence": [
+      "Edit",
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-2156-bf5e56ac",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-29T22:11:29.347Z",
+    "peak_friction": 52.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 124"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-2156-bf5e56ac",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-29T21:56:55.974000+00:00",
+    "peak_friction": 52.5,
+    "turns_in_window": 3,
+    "files": [
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/5899964e-1536-4394-b4fc-a9a60e2cbbcd.js",
+      "packages/reasoning/src/aurora_reasoning/decompose.py",
+      "packages/reasoning/src/aurora_reasoning/prompts/decompose.py",
+      "packages/reasoning/src/aurora_reasoning/prompts/examples.py",
+      "packages/soar/src/aurora_soar/phases/decompose.py",
+      "packages/soar/src/aurora_soar/phases/retrieve.py",
+      "packages/soar/src/aurora_soar/phases/verify.py",
+      "tests/unit/reasoning/test_decompose.py"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "created",
+      "decompose",
+      "decomposition",
+      "following",
+      "generates",
+      "implement",
+      "improve",
+      "optimize",
+      "over",
+      "phase",
+      "plan",
+      "problem",
+      "query",
+      "search",
+      "soar"
+    ],
+    "user_context": [
+      "Implement the following plan:\n\n# Plan: Optimize SOAR Decomposition Phase\n\n## Problem\nThe DECOMPOSE phase over-generates subgoals. For query \"how can i improve aur mem search when it starts?\", it created 7 subgoals when 2 would suffice. Root causes:\n1. Complexity not passed to LLM prompt\n2. No subgoal limits enforced\n3. Hardcoded chunk limits ignore complexity\n4. No guidance on parallel vs sequential preference\n5. Too many few-shot examples\n\n## Configuration Table\n\n| Complexity | Shots | Retrieve"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-2156-bf5e56ac",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-29T22:48:05.723Z",
+    "peak_friction": 52.5,
+    "turns_in_window": 6,
+    "files": [
+      "aur-goals.md",
+      "aur-soar.md",
+      "docs/commands/aur-goals.md",
+      "docs/commands/aur-soar.md",
+      "goals.js"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1213-59b90cb7",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T12:24:25.166Z",
+    "peak_friction": 51.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/aurora/tasks/lsp-mcp-integration/LSP_IMPLEMENTATION_PLAN.md",
+      "/home/hamr/Documents/PycharmProjects/aurora/tasks/lsp-mcp-integration/tasks.md",
+      "/home/hamr/PycharmProjects/aurora/.claude/stash/lsp-poc-complete-2026-02-03.md",
+      "__init__.py",
+      "analysis.py",
+      "client.py",
+      "diagnostics.py",
+      "facade.py",
+      "filters.py",
+      "orchestrator.py"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "aurora",
+      "delivered",
+      "documents",
+      "fucking",
+      "hamr",
+      "home",
+      "integration",
+      "memory",
+      "orchestrator",
+      "pycharmprojects",
+      "search",
+      "searching",
+      "tasks"
+    ],
+    "user_context": [
+      "you fucking delivered this /home/hamr/Documents/PycharmProjects/aurora/tasks/lsp-mcp-integration/LSP_IMPLEMENTATION_PLAN.md > aur mem search \"orchestrator.py\"\nSearching memory from /home/hamr/PycharmProjects/aurora/.aurora/memory.db...\n\nFound 5 results for 'orchestrator.py'\n\n\u250f\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513\n\u2503 File                        \u2503 Type    \u2503 Name              \u2503 Lines     \u2503 Commi\u2026 \u2503 Modified  \u2503  Score \u2503\n\u2521\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1213-59b90cb7",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T12:26:18.735Z",
+    "peak_friction": 51.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/memory.py",
+      "tasks.md"
+    ],
+    "tool_sequence": [
+      "Grep"
+    ],
+    "errors": [
+      "492-@handle_errors"
+    ],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1213-59b90cb7",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T12:26:18.735Z",
+    "peak_friction": 51.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/memory.py",
+      "tasks.md"
+    ],
+    "tool_sequence": [
+      "Grep"
+    ],
+    "errors": [
+      "492-@handle_errors"
+    ],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2022-a2a38a69",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T20:27:37.882Z",
+    "peak_friction": 49.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/commands/__init__.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/commands/init.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/commands/init_helpers.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/configurators/__init__.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/configurators/agents.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/main.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/templates/__init__.py"
+    ],
+    "tool_sequence": [
+      "TaskUpdate",
+      "TaskUpdate",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 1"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2022-a2a38a69",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T20:45:42.431Z",
+    "peak_friction": 49.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/docs/guides/BM25_DOCUMENTATION_UPDATE_RECORD.md",
+      "/home/hamr/PycharmProjects/aurora/docs/guides/COST_TRACKING_GUIDE.md",
+      "/home/hamr/PycharmProjects/aurora/docs/guides/EARLY_DETECTION.md",
+      "/home/hamr/PycharmProjects/aurora/docs/guides/FLOWS.md",
+      "/home/hamr/PycharmProjects/aurora/docs/guides/FRICTION_DETECTION.md",
+      "/home/hamr/PycharmProjects/aurora/docs/guides/PERFORMANCE_TUNING.md",
+      "/home/hamr/PycharmProjects/aurora/docs/guides/README.md",
+      "/home/hamr/PycharmProjects/aurora/docs/guides/RELEASE.md"
+    ],
+    "tool_sequence": [
+      "Glob",
+      "Glob",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 2"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2022-a2a38a69",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-02T21:04:24.446Z",
+    "peak_friction": 49.5,
+    "turns_in_window": 6,
+    "files": [
+      "docs/02-features/agents/TOOLS_GUIDE.md",
+      "docs/02-features/cli/CLI_USAGE_GUIDE.md",
+      "docs/02-features/cli/COMMANDS.md",
+      "docs/02-features/soar/SOAR_ARCHITECTURE.md",
+      "docs/04-process/development/CLI_TESTING_GUIDE.md",
+      "docs/04-process/development/ERROR_CATALOG.md",
+      "docs/04-process/development/MIGRATION_GUIDE_v0.3.0.md",
+      "docs/04-process/getting-started/INSTALLATION_VERIFICATION_GUIDE.md",
+      "docs/04-process/getting-started/QUICK_START.md",
+      "docs/04-process/reference/CONFIG_REFERENCE.md"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2022-a2a38a69",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-02T21:04:24.446Z",
+    "peak_friction": 49.5,
+    "turns_in_window": 6,
+    "files": [
+      "docs/02-features/agents/TOOLS_GUIDE.md",
+      "docs/02-features/cli/CLI_USAGE_GUIDE.md",
+      "docs/02-features/cli/COMMANDS.md",
+      "docs/02-features/soar/SOAR_ARCHITECTURE.md",
+      "docs/04-process/development/CLI_TESTING_GUIDE.md",
+      "docs/04-process/development/ERROR_CATALOG.md",
+      "docs/04-process/development/MIGRATION_GUIDE_v0.3.0.md",
+      "docs/04-process/getting-started/INSTALLATION_VERIFICATION_GUIDE.md",
+      "docs/04-process/getting-started/QUICK_START.md",
+      "docs/04-process/reference/CONFIG_REFERENCE.md"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1003-b15b0233",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T10:47:36.314Z",
+    "peak_friction": 49.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 127"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1003-b15b0233",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-02T10:04:19.110000+00:00",
+    "peak_friction": 49.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/plan.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/spawn.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/planning/core.py",
+      "/prd.md",
+      "agents.js",
+      "design.md",
+      "goals.js",
+      "manifest.js",
+      "plan.md",
+      "prd.md"
+    ],
+    "tool_sequence": [
+      "Read",
+      "Read:error",
+      "Read"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1003-b15b0233",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-02T11:06:01.589Z",
+    "peak_friction": 49.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash",
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0130-1245-b16ea7d9",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-30T21:01:49.976000+00:00",
+    "peak_friction": 45.5,
+    "turns_in_window": 6,
+    "files": [
+      "RELEASE.md"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "aurora",
+      "background",
+      "claude",
+      "failed",
+      "hamr",
+      "home",
+      "notification",
+      "output",
+      "pycharmprojects",
+      "status",
+      "summary",
+      "task",
+      "tasks"
+    ],
+    "user_context": [
+      "<task-notification>\n<task-id>b623e0a</task-id>\n<output-file>/tmp/claude-1000/-home-hamr-PycharmProjects-aurora/tasks/b623e0a.output</output-file>\n<status>failed</status>\n<summary>Background command \"Run full local CI checks\" failed with exit code 1</summary>\n</task-notification>\nRead the output file to retrieve the result: /tmp/claude-1000/-home-hamr-PycharmProjects-aurora/tasks/b623e0a.output"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0130-1245-b16ea7d9",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-30T21:27:53.907Z",
+    "peak_friction": 45.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "aurora",
+      "background",
+      "claude",
+      "hamr",
+      "home",
+      "killed",
+      "notification",
+      "output",
+      "pycharmprojects",
+      "status",
+      "summary",
+      "task",
+      "tasks"
+    ],
+    "user_context": [
+      "<task-notification>\n<task-id>b310d22</task-id>\n<output-file>/tmp/claude-1000/-home-hamr-PycharmProjects-aurora/tasks/b310d22.output</output-file>\n<status>killed</status>\n<summary>Background command \"Run all tests\" was killed</summary>\n</task-notification>\nRead the output file to retrieve the result: /tmp/claude-1000/-home-hamr-PycharmProjects-aurora/tasks/b310d22.output"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-2154-d946ec64",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-31T21:58:29.591Z",
+    "peak_friction": 40.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.claude/projects/-home-hamr-PycharmProjects-aurora/6c57579c-ba58-4246-9a2d-6032d11d2f6f.js",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/agent_discovery/scanner.py",
+      "/home/hamr/PycharmProjects/aurora/scripts/antigen_extract.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/memory/retrieval.py",
+      "/home/user/.claude/agents/code-developer.md",
+      "/home/user/.claude/agents/quality-assurance.md",
+      "benchmark_epic2_performance.py",
+      "code-developer.md",
+      "memory_manager.py",
+      "packages/cli/src/aurora_cli/commands/doctor.py"
+    ],
+    "tool_sequence": [
+      "Edit",
+      "Bash:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-2154-d946ec64",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-01-31T22:06:40.255Z",
+    "peak_friction": 40.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/PycharmProjects/aurora/CLAUDE.md",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_cli/memory/retrieval.py",
+      "benchmark_epic2_performance.py",
+      "friction_analysis.js",
+      "friction_raw.js",
+      "friction_summary.js",
+      "profile_memory_search.py",
+      "validate_fallback_quality.py",
+      "verify_code_retrieval.py",
+      "verify_optimization.py"
+    ],
+    "tool_sequence": [
+      "Bash:ok"
+    ],
+    "errors": [
+      "### 1. Exit Codes and Error Handling"
+    ],
+    "keywords": [
+      "breakdown",
+      "compaction",
+      "count",
+      "signal",
+      "total",
+      "weight"
+    ],
+    "user_context": [
+      "Signal Breakdown\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Signal             \u2502 Count  \u2502 Weight \u2502 Total  \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 exit_error         \u2502 109    \u2502 +1     \u2502 109    \u2502\n\u2502 compaction         \u2502 96     \u2502 +0.5   \u2502 48.0   \u2502\n\u2502 request_interrupted \u2502 49     \u2502 +4     \u2502 196    \u2502\n\u2502 long_silence       \u2502 35     \u2502 +0.5   \u2502 17.5   \u2502\n\u2502 user_negation      \u2502 29     \u2502 +0.5   \u2502 14.5   \u2502\n\u2502 repeated_question  \u2502 22     \u2502 +1     \u2502 22     \u2502\n\u2502 false_success      \u2502 21     \u2502 "
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1246-172d14b2",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-04T12:58:47.905Z",
+    "peak_friction": 39.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.claude/settings.json",
+      "benchmark_epic2_performance.py",
+      "profile_memory_search.py",
+      "validate_fallback_quality.py",
+      "verify_code_retrieval.py",
+      "verify_optimization.py"
+    ],
+    "tool_sequence": [
+      "Read",
+      "Task"
+    ],
+    "errors": [],
+    "keywords": [
+      "hook",
+      "implement"
+    ],
+    "user_context": [
+      "yes, implement the hook"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1246-172d14b2",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-04T13:18:30.548Z",
+    "peak_friction": 39.0,
+    "turns_in_window": 6,
+    "files": [
+      "../mcp/MCP.md",
+      ".aurora/config.js",
+      ".aurora/lsp-report.md",
+      "/home/hamr/PycharmProjects/aurora/docs/02-features/lsp/LSP.md",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/init.py",
+      "/home/hamr/PycharmProjects/aurora/packages/lsp/README.md",
+      "AGENTS.md",
+      "CLAUDE.md",
+      "CODE_INTELLIGENCE_STATUS.md",
+      "CODE_QUALITY_REPORT.md"
+    ],
+    "tool_sequence": [
+      "Read:error",
+      "Read",
+      "Read:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-1246-172d14b2",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-04T13:41:09.494Z",
+    "peak_friction": 39.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "push"
+    ],
+    "user_context": [
+      "push it"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1600-62d534d3",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-02-03T16:01:41.702000+00:00",
+    "peak_friction": 31.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "mcp__aurora__mem_search"
+    ],
+    "errors": [],
+    "keywords": [
+      "fucking",
+      "using"
+    ],
+    "user_context": [
+      "where is the fucking mcp? why are you not fucking using it?"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1600-62d534d3",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-03T21:37:45.188Z",
+    "peak_friction": 31.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "args",
+      "below",
+      "caveat",
+      "clear",
+      "command",
+      "commands",
+      "consider",
+      "does",
+      "enrich",
+      "exit",
+      "generated",
+      "local",
+      "message",
+      "messages",
+      "name"
+    ],
+    "user_context": [
+      "what does enrich do?",
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/exit</command-name>\n            <command-message>exit</command-message>\n            <command-args></command-args>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1233-6c57579c",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-01-29T14:56:29.663Z",
+    "peak_friction": 31.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "EnterPlanMode",
+      "Task",
+      "Task"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1233-6c57579c",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-29T14:59:48.699Z",
+    "peak_friction": 31.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.claude/plans/golden-toasting-parnas.md"
+    ],
+    "tool_sequence": [
+      "Write",
+      "ExitPlanMode"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1518-9668a588",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T15:28:46.359Z",
+    "peak_friction": 25.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1518-9668a588",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T15:28:46.359Z",
+    "peak_friction": 25.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2106-cb5ad0e3",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-02T21:10:57.027Z",
+    "peak_friction": 23.5,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/aurora/.claude/stash/headless-and-api-key-removal.md",
+      "CLAUDE.md",
+      "RELEASE.md"
+    ],
+    "tool_sequence": [
+      "Task"
+    ],
+    "errors": [],
+    "keywords": [
+      "aurora",
+      "changes",
+      "check",
+      "claude",
+      "cleanups",
+      "commits",
+      "continuing",
+      "documents",
+      "follow",
+      "hamr",
+      "headless",
+      "home",
+      "many",
+      "pycharmprojects",
+      "release"
+    ],
+    "user_context": [
+      "/home/hamr/Documents/PycharmProjects/aurora/.claude/stash/headless-and-api-key-removal.md continuing from here with many changes and cleanups. check commits and follow RELEASE.md to bump version and release to PyPi as well, stick to pre-commit, update changelog with md clean up, cli commands cleanup"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2106-cb5ad0e3",
+    "anchor_signal": "false_success",
+    "anchor_ts": "2026-02-02T21:12:06.584Z",
+    "peak_friction": 23.5,
+    "turns_in_window": 6,
+    "files": [
+      ".mcp.js",
+      "CLAUDE.md",
+      "README.md",
+      "docs/AGENTS.md",
+      "docs/CODE_QUALITY_REPORT.md",
+      "docs/FIX_SUMMARY.md",
+      "docs/IMPLEMENTATION_SUMMARY.md",
+      "docs/KNOWLEDGE_BASE.md",
+      "docs/ML_INSTALL.md",
+      "docs/OPENCODE.md"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [
+      "Exit code 127"
+    ],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1924-5899964e",
+    "anchor_signal": "interrupt_cascade",
+    "anchor_ts": "2026-01-29T21:53:11.920000+00:00",
+    "peak_friction": 23.0,
+    "turns_in_window": 6,
+    "files": [
+      "decompose.py",
+      "examples/example_decompositions.js",
+      "phases/decompose.py",
+      "phases/retrieve.py",
+      "phases/verify.py",
+      "prompts/decompose.py",
+      "prompts/examples.py",
+      "retrieve.py",
+      "verify.py"
+    ],
+    "tool_sequence": [
+      "Task"
+    ],
+    "errors": [],
+    "keywords": [
+      "complexity",
+      "parallel",
+      "plan",
+      "pref",
+      "regen",
+      "sequential"
+    ],
+    "user_context": [
+      "where is the complexity pref for parallel and sequential? regen plan"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0129-1924-5899964e",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-29T21:54:30.275Z",
+    "peak_friction": 23.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/.claude/plans/stateful-popping-meerkat.md"
+    ],
+    "tool_sequence": [
+      "Write",
+      "ExitPlanMode"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1529-de7a5589",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T15:32:37.876Z",
+    "peak_friction": 23.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/aurora/.claude/stash/mcp-mem-search-perf-fix.md",
+      "/home/hamr/PycharmProjects/aurora/.aurora/AGENTS.md",
+      "/home/hamr/PycharmProjects/aurora/.claude/stash/headless-and-api-key-removal.md",
+      "/home/hamr/PycharmProjects/aurora/.claude/stash/lsp-poc-complete-2026-02-03.md",
+      "/home/hamr/PycharmProjects/aurora/.claude/stash/mcp-lsp-integration-gaps-2026-02-03.md",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/init_helpers.py",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/soar.py",
+      "/home/hamr/PycharmProjects/aurora/packages/soar/src/aurora_soar/orchestrator.py",
+      "/home/hamr/PycharmProjects/aurora/packages/soar/tests/test_orchestrator.py",
+      "orchestrator.py"
+    ],
+    "tool_sequence": [
+      "mcp__aurora__mem_search"
+    ],
+    "errors": [],
+    "keywords": [
+      "agree",
+      "didn",
+      "files",
+      "json",
+      "lines",
+      "name",
+      "names",
+      "provide",
+      "returtned",
+      "score",
+      "testorchestratorsim",
+      "type",
+      "used"
+    ],
+    "user_context": [
+      "what are the file names? didn't we agree to provide file names with json returtned? \u2503 Type   \u2503 File                   \u2503 Name                 \u2503 Lines      \u2503 Used by        \u2503   Score \u2503 \u2521\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2547\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2529 \u2502 code   \u2502 test_orchestrator.py   \u2502 TestOrchestratorSim\u2026 \u2502 192-614    \u2502 1 files(1)     \u2502   0.700 \u2502 \u2502 code   \u2502 orchestrator.py        \u2502 SOAROrchestrator     \u2502 68-2447    \u2502 19 files(43)   \u2502   0.696 \u2502 \u2502 kb     \u2502 mcp-lsp-i"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "ArabicTTS/0204-2129-700025a1",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-05T07:54:32.641Z",
+    "peak_friction": 21.0,
+    "turns_in_window": 6,
+    "files": [
+      "/azure_tests/README.md",
+      "KNOWLEDGE_BASE.md",
+      "app.py",
+      "archive/KNOWLEDGE_BASE.md",
+      "archive/app.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "ArabicTTS/0204-2129-700025a1",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-05T07:54:32.641Z",
+    "peak_friction": 21.0,
+    "turns_in_window": 6,
+    "files": [
+      "/azure_tests/README.md",
+      "KNOWLEDGE_BASE.md",
+      "app.py",
+      "archive/KNOWLEDGE_BASE.md",
+      "archive/app.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "command",
+      "message",
+      "name",
+      "stash"
+    ],
+    "user_context": [
+      "<command-message>stash</command-message>\n<command-name>/stash</command-name>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-2138-539b5398",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-03T21:44:48.071Z",
+    "peak_friction": 18.5,
+    "turns_in_window": 6,
+    "files": [
+      "__init__.py",
+      "agent_registry.py",
+      "assess.py",
+      "collect.py",
+      "commands/soar.py",
+      "decompose.py",
+      "discovery_adapter.py",
+      "orchestrator.py",
+      "planning/core.py",
+      "query_executor.py"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "args",
+      "aurora",
+      "below",
+      "caveat",
+      "command",
+      "commands",
+      "consider",
+      "exit",
+      "failed",
+      "generated",
+      "local",
+      "message",
+      "messages",
+      "name",
+      "otherwise"
+    ],
+    "user_context": [
+      "<command-name>/mcp</command-name>\n            <command-message>mcp</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout>Failed to reconnect to aurora.</local-command-stdout>",
+      "mem search soar file"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0130-0718-9f60e558",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-30T12:38:08.126Z",
+    "peak_friction": 18.5,
+    "turns_in_window": 6,
+    "files": [
+      "collect.py",
+      "docs/auth.md",
+      "src/auth.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash:error"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2025-5c3339da",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-02T20:30:42.119Z",
+    "peak_friction": 17.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "args",
+      "below",
+      "catch",
+      "caveat",
+      "claude",
+      "clear",
+      "command",
+      "commands",
+      "consider",
+      "exit",
+      "generated",
+      "installed",
+      "later",
+      "load",
+      "local"
+    ],
+    "user_context": [
+      "<command-name>/plugin</command-name>\n            <command-message>plugin</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout>\u2713 Installed playwright. Restart Claude Code to load new plugins.</local-command-stdout>",
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-1213-ba003550",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-02T20:23:21.555Z",
+    "peak_friction": 17.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "args",
+      "below",
+      "caveat",
+      "command",
+      "commands",
+      "consider",
+      "exit",
+      "generated",
+      "local",
+      "message",
+      "messages",
+      "name",
+      "otherwise",
+      "respond",
+      "running"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/exit</command-name>\n            <command-message>exit</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout>See ya!</local-command-stdout>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-0541-5b59342b",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T05:42:39.655Z",
+    "peak_friction": 16.5,
+    "turns_in_window": 1,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/aurora/.claude/stash/lsp-poc-complete-2026-02-03.md"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "agains",
+      "aurora",
+      "claude",
+      "complete",
+      "continuing",
+      "documents",
+      "github",
+      "hamr",
+      "home",
+      "https",
+      "liteagents",
+      "openspec",
+      "pycharmprojects",
+      "stash",
+      "test"
+    ],
+    "user_context": [
+      "/home/hamr/Documents/PycharmProjects/aurora/.claude/stash/lsp-poc-complete-2026-02-03.md continuing from here, test lsp code agains js https://github.com/amrhas82/liteagents and ts https://github.com/amrhas82/OpenSpec"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0202-2032-dee558ee",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-02T21:05:53.433Z",
+    "peak_friction": 16.0,
+    "turns_in_window": 6,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/agentic-toolkit/ai/subagentic/ampcode/commands/docs-builder.md",
+      "/home/hamr/Documents/PycharmProjects/agentic-toolkit/ai/subagentic/claude/skills/docs-builder/SKILL.md",
+      "/home/hamr/Documents/PycharmProjects/agentic-toolkit/ai/subagentic/droid/commands/docs-builder.md",
+      "/home/hamr/Documents/PycharmProjects/agentic-toolkit/ai/subagentic/opencode/command/docs-builder.md",
+      "ampcode/commands/docs-builder.md",
+      "claude/skills/docs-builder/SKILL.md",
+      "docs-builder/templates.md",
+      "droid/commands/docs-builder.md",
+      "opencode/command/docs-builder.md",
+      "references/templates.md"
+    ],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1418-76251957",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-03T14:24:46.443Z",
+    "peak_friction": 16.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [
+      "args",
+      "below",
+      "caveat",
+      "command",
+      "commands",
+      "consider",
+      "exit",
+      "generated",
+      "local",
+      "message",
+      "messages",
+      "name",
+      "otherwise",
+      "respond",
+      "running"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/exit</command-name>\n            <command-message>exit</command-message>\n            <command-args></command-args>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0201-0826-db7cef2b",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-02T08:53:26.894Z",
+    "peak_friction": 16.0,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "first",
+      "person"
+    ],
+    "user_context": [
+      "in first person"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0131-1104-5d4ca665",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-01-31T11:30:43.382Z",
+    "peak_friction": 15.5,
+    "turns_in_window": 6,
+    "files": [
+      "ACTR_ACTIVATION.md",
+      "docs/guides/ACTR_ACTIVATION.md",
+      "packages/cli/src/aurora_cli/defaults.js",
+      "packages/context-code/src/aurora_context_code/semantic/hybrid_retriever.py",
+      "packages/core/src/aurora_core/activation/decay.py"
+    ],
+    "tool_sequence": [
+      "Bash",
+      "Bash"
+    ],
+    "errors": [],
+    "keywords": [],
+    "user_context": [],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1542-7e166df0",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-03T15:43:06.529Z",
+    "peak_friction": 15.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "args",
+      "below",
+      "capable",
+      "caveat",
+      "command",
+      "commands",
+      "complex",
+      "consider",
+      "exit",
+      "generated",
+      "local",
+      "message",
+      "messages",
+      "model",
+      "most"
+    ],
+    "user_context": [
+      "<command-name>/model</command-name>\n            <command-message>model</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout>Set model to \u001b[1mDefault (Opus 4.5 \u00b7 Most capable for complex work)\u001b[22m</local-command-stdout>",
+      "search for orchestrator file "
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-2144-83434724",
+    "anchor_signal": "session_abandoned",
+    "anchor_ts": "2026-02-04T08:12:37.272Z",
+    "peak_friction": 15.5,
+    "turns_in_window": 6,
+    "files": [],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "args",
+      "aurora",
+      "below",
+      "caveat",
+      "command",
+      "commands",
+      "consider",
+      "exit",
+      "failed",
+      "generated",
+      "local",
+      "message",
+      "messages",
+      "name",
+      "otherwise"
+    ],
+    "user_context": [
+      "<local-command-stdout>Failed to reconnect to aurora.</local-command-stdout>",
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/mcp</command-name>\n            <command-message>mcp</command-message>\n            <command-args></command-args>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0204-0850-86ca867e",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-04T08:51:54.452Z",
+    "peak_friction": 14.5,
+    "turns_in_window": 4,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/aurora/.claude/stash/lsp-mcp-indexing-2026-02-04.md",
+      "packages/context-code/.../python.py"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "args",
+      "below",
+      "called",
+      "caveat",
+      "clear",
+      "command",
+      "commands",
+      "consider",
+      "context",
+      "continuing",
+      "empty",
+      "found",
+      "full",
+      "generated",
+      "implementation"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/clear</command-name>\n            <command-message>clear</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout></local-command-stdout>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "ArabicTTS/0205-0848-b214d78f",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-05T09:01:32.909Z",
+    "peak_friction": 13.5,
+    "turns_in_window": 4,
+    "files": [
+      "/home/hamr/Documents/PycharmProjects/ArabicTTS/.claude/stash/docs-rebuild-books-added.md",
+      "/home/hamr/Documents/PycharmProjects/ArabicTTS/docs/02-features/azure-audiobooks/PLAN.md"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "added",
+      "arabictts",
+      "args",
+      "based",
+      "below",
+      "books",
+      "caveat",
+      "claude",
+      "clear",
+      "command",
+      "commands",
+      "consider",
+      "continue",
+      "docs",
+      "documents"
+    ],
+    "user_context": [
+      "<local-command-caveat>Caveat: The messages below were generated by the user while running local commands. DO NOT respond to these messages or otherwise consider them in your response unless the user explicitly asks you to.</local-command-caveat>",
+      "<command-name>/clear</command-name>\n            <command-message>clear</command-message>\n            <command-args></command-args>",
+      "<local-command-stdout></local-command-stdout>"
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  },
+  {
+    "session_id": "aurora/0203-1646-5c41d78b",
+    "anchor_signal": "user_intervention",
+    "anchor_ts": "2026-02-03T16:46:45.466Z",
+    "peak_friction": 10.5,
+    "turns_in_window": 1,
+    "files": [
+      "/.claude/mcp_servers.js",
+      "/home/hamr/PycharmProjects/aurora/.claude/stash/mcp-lsp-integration-gaps-2026-02-03.md",
+      "/home/hamr/PycharmProjects/aurora/CLAUDE.md",
+      "/home/hamr/PycharmProjects/aurora/docs/02-features/mcp/MCP.md",
+      "/home/hamr/PycharmProjects/aurora/packages/cli/src/aurora_cli/commands/memory.py",
+      "/home/hamr/PycharmProjects/aurora/packages/lsp/poc_mcp_server.py",
+      "/home/hamr/PycharmProjects/aurora/packages/lsp/src/aurora_lsp/client.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_mcp/mem_search_tool.py",
+      "/home/hamr/PycharmProjects/aurora/src/aurora_mcp/server.py",
+      "/home/hamr/PycharmProjects/aurora/tests/unit/cli/test_doctor.py"
+    ],
+    "tool_sequence": [],
+    "errors": [],
+    "keywords": [
+      "complex",
+      "complexity",
+      "decomposition",
+      "dependent",
+      "domains",
+      "exceed",
+      "execution",
+      "expert",
+      "independent",
+      "mixed",
+      "parallel",
+      "prefer",
+      "query",
+      "reasoning",
+      "rules"
+    ],
+    "user_context": [
+      "You are a query decomposition expert for a code reasoning system.\n\n\nCOMPLEXITY: COMPLEX\nMAX SUBGOALS: 4\nEXECUTION: Prefer mixed - parallel for independent domains, sequential for dependent work\n\nRULES:\n\u2022 Do not exceed 4 subgoals\n\u2022 Research queries (how/why/what): ONE comprehensive subgoal preferred\n\u2022 Same-agent + no dependencies \u2192 merge into one subgoal\n\u2022 Subgoals = independent work, not phases of same task\n\n\nYour task is to break down complex queries into concrete, actionable subgoals that can "
+    ],
+    "inhibitory_instruction": "# TODO: Write prevention instruction based on pattern above"
+  }
+]

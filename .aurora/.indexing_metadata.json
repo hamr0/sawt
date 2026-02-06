@@ -1,0 +1,11 @@
+{
+  "last_indexed": "2026-02-06T11:18:12.352185+00:00",
+  "failed_files": [],
+  "warnings": [],
+  "success_rate": 0.03900709219858156,
+  "files_by_language": {
+    "python": 5,
+    "markdown": 6
+  },
+  "total_parseable": 282
+}
