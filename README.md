@@ -41,18 +41,22 @@ Each step produces a CSV for review. Review chapter by chapter, perfect each ste
 ## Repo Structure
 
 ```
-src/audiobook/          # Pipeline modules
-    ingest/             #   EPUB/DOCX/TXT → clean text
-    chapters/           #   Chapter detection & splitting
-    dialogue/           #   Narrator/dialogue segmentation
-    ssml/               #   SSML generation + voice selection (next)
-    shared/             #   Azure client, CSV review utilities
-
-tests/audiobook/        # Tests per module (126 passing)
-data/books/             # Input books (epub/, docx/, txt/)
-output/                 # Per-book working output (gitignored)
-docs/                   # Documentation
-scripts/                # Utility scripts
+Sawt/
+├── src/audiobook/          # Pipeline modules
+│   ├── ingest/             #   EPUB/DOCX/TXT → clean text
+│   ├── chapters/           #   Chapter detection & splitting
+│   ├── dialogue/           #   Narrator/dialogue segmentation
+│   ├── ssml/               #   SSML generation + voice selection (next)
+│   └── shared/             #   Azure client, CSV review utilities
+├── tests/audiobook/        # Tests per module (126 passing)
+├── data/books/             # Input books (epub/, docx/, txt/)
+│   ├── epub/               #   EPUB books (primary content source)
+│   ├── docx/               #   DOCX books (author submissions)
+│   └── txt/                #   TXT files (internal/corpus use)
+├── output/                 # Per-book working output (gitignored)
+├── docs/                   # Documentation
+├── scripts/                # Utility scripts
+└── archive/                # IPA pipeline (reference only)
 ```
 
 ## Quick Start
