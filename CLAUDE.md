@@ -52,10 +52,10 @@ Text processing IS the product. SSML is just markup. Let Azure handle pronunciat
 
 | Module | Status | Purpose |
 |--------|--------|---------|
-| src/audiobook/ingest/ | COMPLETE | POC 1: File ingestion (EPUB/DOCX/TXT → text) |
-| src/audiobook/chapters/ | COMPLETE | POC 2: Chapter splitting (25K char units) |
-| src/audiobook/dialogue/ | COMPLETE | POC 3: Dialogue detection (~95% accuracy) |
-| src/audiobook/ssml/ | NEXT | POC 4: SSML generation + voice selection + sampling |
+| src/audiobook/ingest/ | PRODUCTION READY | File ingestion (EPUB/DOCX/TXT → text) |
+| src/audiobook/chapters/ | PRODUCTION READY | Chapter splitting (25K char units) |
+| src/audiobook/dialogue/ | PRODUCTION READY | Dialogue detection (~95% accuracy) |
+| src/audiobook/ssml/ | NEXT (POC 4) | SSML generation + voice selection + sampling |
 | src/audiobook/shared/ | Active | Shared utilities (review, azure_client) |
 | tests/audiobook/ | 126 tests | Tests per module (mirrored structure) |
 | data/books/ | 12 books | Input books (epub/, docx/, txt/) |
@@ -80,9 +80,9 @@ Prototype history (7 iterations) -- `docs/02-features/azure-audiobooks/reference
 
 ```bash
 pytest tests/audiobook/ -v                    # Run all audiobook tests
-pytest tests/audiobook/ingest/ -v             # Run POC 1 tests
-pytest tests/audiobook/chapters/ -v           # Run POC 2 tests
-pytest tests/audiobook/dialogue/ -v           # Run POC 3 tests
+pytest tests/audiobook/ingest/ -v             # Run ingestion tests
+pytest tests/audiobook/chapters/ -v           # Run chapter splitting tests
+pytest tests/audiobook/dialogue/ -v           # Run dialogue detection tests
 pip install -r requirements.txt               # Install dependencies
 ```
 
