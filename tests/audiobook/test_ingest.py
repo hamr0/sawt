@@ -163,18 +163,18 @@ class TestExtractDocx:
 class TestIngest:
     def test_ingest_txt_produces_output_files(self, tmp_path):
         result = ingest(str(TXT_BOOK), output_dir=str(tmp_path))
-        book_dir = tmp_path / "txt" / "رحلة-ابن-فطومة" / "ingestion"
+        book_dir = tmp_path / "txt" / "رحلة-ابن-فطومة" / "01_ingestion"
         assert (book_dir / "clean_text.txt").exists()
         assert (book_dir / "paragraphs.csv").exists()
 
     def test_ingest_txt_clean_text_has_no_pres_forms(self, tmp_path):
         ingest(str(TXT_BOOK), output_dir=str(tmp_path))
-        clean_text = (tmp_path / "txt" / "رحلة-ابن-فطومة" / "ingestion" / "clean_text.txt").read_text()
+        clean_text = (tmp_path / "txt" / "رحلة-ابن-فطومة" / "01_ingestion" / "clean_text.txt").read_text()
         assert not _has_presentation_forms(clean_text)
 
     def test_ingest_txt_csv_has_correct_columns(self, tmp_path):
         ingest(str(TXT_BOOK), output_dir=str(tmp_path))
-        csv_path = tmp_path / "txt" / "رحلة-ابن-فطومة" / "ingestion" / "paragraphs.csv"
+        csv_path = tmp_path / "txt" / "رحلة-ابن-فطومة" / "01_ingestion" / "paragraphs.csv"
         with open(csv_path, "r") as f:
             reader = csv.DictReader(f)
             assert set(reader.fieldnames) == {
@@ -192,15 +192,15 @@ class TestIngest:
 
     def test_ingest_idempotent(self, tmp_path):
         ingest(str(TXT_BOOK), output_dir=str(tmp_path))
-        text1 = (tmp_path / "txt" / "رحلة-ابن-فطومة" / "ingestion" / "clean_text.txt").read_text()
+        text1 = (tmp_path / "txt" / "رحلة-ابن-فطومة" / "01_ingestion" / "clean_text.txt").read_text()
         ingest(str(TXT_BOOK), output_dir=str(tmp_path))
-        text2 = (tmp_path / "txt" / "رحلة-ابن-فطومة" / "ingestion" / "clean_text.txt").read_text()
+        text2 = (tmp_path / "txt" / "رحلة-ابن-فطومة" / "01_ingestion" / "clean_text.txt").read_text()
         assert text1 == text2
 
     @pytest.mark.skipif(not EPUB_BOOK.exists(), reason="EPUB test book not available")
     def test_ingest_epub_produces_output(self, tmp_path):
         result = ingest(str(EPUB_BOOK), output_dir=str(tmp_path))
-        book_dir = tmp_path / "epub" / "tharthara-fawq-al-nil-hindawi" / "ingestion"
+        book_dir = tmp_path / "epub" / "tharthara-fawq-al-nil-hindawi" / "01_ingestion"
         assert (book_dir / "clean_text.txt").exists()
         assert (book_dir / "paragraphs.csv").exists()
         clean_text = (book_dir / "clean_text.txt").read_text()
@@ -214,7 +214,7 @@ class TestIngest:
     def test_ingest_docx_produces_output(self, tmp_path):
         docx_file = _first_docx()
         result = ingest(str(docx_file), output_dir=str(tmp_path))
-        book_dir = tmp_path / "docx" / docx_file.stem / "ingestion"
+        book_dir = tmp_path / "docx" / docx_file.stem / "01_ingestion"
         assert (book_dir / "clean_text.txt").exists()
         assert (book_dir / "paragraphs.csv").exists()
         clean_text = (book_dir / "clean_text.txt").read_text()
@@ -234,7 +234,7 @@ class TestIngest:
         result = ingest(str(EPUB_BOOK), output_dir=str(tmp_path))
         assert result["back_matter_removed"] > 0
         clean_text = (
-            tmp_path / "epub" / "tharthara-fawq-al-nil-hindawi" / "ingestion" / "clean_text.txt"
+            tmp_path / "epub" / "tharthara-fawq-al-nil-hindawi" / "01_ingestion" / "clean_text.txt"
         ).read_text()
         assert "الناشر" not in clean_text
 

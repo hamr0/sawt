@@ -3,17 +3,19 @@ POC-3 Phase A: Two-Voice Dialogue Detection
 
 Binary classification of paragraphs into narrator vs dialogue segments.
 
-Input:  output/{format}/{book}/chapters/chapter_*.txt
-Output: output/{format}/{book}/segments/chapter_*.csv
+Input:  output/{format}/{book}/02_chapters/chapter_*.txt
+Output: output/{format}/{book}/03_segments/chapter_*.csv
 
 CSV columns: segment_number, type, char_count, text
   type = "narrator" or "dialogue"
 
-Dialogue markers (Mahfouz EPUB novels):
+Dialogue markers:
   - Colon `:` — split: before = narrator (attribution), after = dialogue
   - Em dash `–/—` at paragraph start — whole paragraph = dialogue
-  - Guillemets `«»` — quoted speech within narration
-  - Plain paragraphs continue previous state (dialogue continuation)
+  - Trailing colon — narrator sets up dialogue for next paragraph (one-shot)
+  - Plain paragraphs are always narrator (no continuation across paragraphs)
+  - Guillemets `«»` are NOT dialogue markers — they are typographic quotation marks
+    (short quotes, inner thoughts, scare quotes). Kept as text, no voice switch.
 """
 import csv
 import logging
@@ -27,22 +29,13 @@ logger = logging.getLogger(__name__)
 # Constants
 # ---------------------------------------------------------------------------
 
-CONTINUATION_THRESHOLD = 200  # Plain paragraph > this many chars exits dialogue
 SPEECH_ATTRIBUTION_LEN = 150  # Before-colon text shorter than this → assume dialogue
 EM_DASH_CHARS = "–—-"  # En dash, em dash, hyphen-minus (used as dialogue dash)
 
 # Arabic diacritics (harakat) — stripped before speech verb matching
 DIACRITICS_RE = re.compile(r"[\u064B-\u065F\u0670]")
 
-# Speech verb patterns — if present in a "plain" paragraph during IN_DIALOGUE,
-# it's likely still dialogue context (attribution or short narration between lines)
-SPEECH_VERB_RE = re.compile(
-    r"(?:قال|قالت|قلت|قلنا|أجاب|أجابت|سأل|سألت|صاح|صاحت|همس|همست"
-    r"|تساءل|تساءلت|صرخ|صرخت|ردَّ|ردَّت|فتمتم|غمغم|غمغمت"
-    r"|تمتم|تمتمت|هتف|هتفت|أضاف|أضافت|تابع|أردف)"
-)
-
-# Broader speech attribution pattern for colon checks (includes present tense + participle)
+# Speech attribution pattern for colon checks (includes present tense + participle)
 # Used with diacritics stripped from text
 COLON_ATTRIBUTION_RE = re.compile(
     r"(?:قال|قالت|قلت|قلنا|يقول|تقول"
@@ -272,7 +265,7 @@ def _has_trailing_speech(text: str) -> bool:
 def detect_markers(paragraph: str) -> str:
     """Classify a paragraph by its primary dialogue marker.
 
-    Returns: "em_dash", "colon", "guillemet", "trailing_colon", or "plain"
+    Returns: "em_dash", "colon", "trailing_colon", or "plain"
     """
     stripped = paragraph.strip()
     if not stripped:
@@ -282,14 +275,9 @@ def detect_markers(paragraph: str) -> str:
     if stripped[0] in EM_DASH_CHARS and len(stripped) > 1 and stripped[1] in (" ", "\u00A0"):
         return "em_dash"
 
-    # Colon check (dialogue attribution) — takes priority over guillemets
-    # Guillemets in colon paragraphs are usually scare quotes, not dialogue
+    # Colon check (dialogue attribution)
     if _find_dialogue_colon(stripped) is not None:
         return "colon"
-
-    # Guillemets — only when no colons present (inner thoughts, quoted speech)
-    if "«" in stripped and "»" in stripped:
-        return "guillemet"
 
     # Trailing colon: paragraph ends with colon, speech verb present → dialogue trigger
     if stripped.endswith(":") and len(stripped) > 1:
@@ -315,56 +303,6 @@ def _split_at_colon(paragraph: str) -> tuple[str, str]:
     before = paragraph[:idx].strip()
     after = paragraph[idx + 1:].strip()
     return before, after
-
-
-def _split_at_guillemets(paragraph: str) -> list[tuple[str, str]]:
-    """Split paragraph into segments at guillemet « » boundaries.
-
-    Returns list of (type, text) tuples:
-      - Text outside «» = "narrator"
-      - Text inside «» = "dialogue"
-    """
-    segments: list[tuple[str, str]] = []
-    pos = 0
-    while pos < len(paragraph):
-        open_pos = paragraph.find("«", pos)
-        if open_pos == -1:
-            # No more guillemets, rest is narrator
-            text = paragraph[pos:].strip()
-            if text:
-                segments.append(("narrator", text))
-            break
-
-        # Text before « is narrator
-        before = paragraph[pos:open_pos].strip()
-        if before:
-            segments.append(("narrator", before))
-
-        # Find matching »
-        close_pos = paragraph.find("»", open_pos + 1)
-        if close_pos == -1:
-            # Unclosed guillemet — treat rest as dialogue
-            text = paragraph[open_pos + 1:].strip()
-            if text:
-                segments.append(("dialogue", text))
-            break
-
-        # Text inside «» is dialogue
-        inner = paragraph[open_pos + 1:close_pos].strip()
-        if inner:
-            segments.append(("dialogue", inner))
-
-        pos = close_pos + 1
-
-    return segments
-
-
-def _is_narrator_paragraph(paragraph: str) -> bool:
-    """Decide if a 'plain' paragraph should break dialogue continuation.
-
-    A plain paragraph exits IN_DIALOGUE when it's long AND has no speech verbs.
-    """
-    return len(paragraph) > CONTINUATION_THRESHOLD and not SPEECH_VERB_RE.search(paragraph)
 
 
 def segment_paragraphs(paragraphs: list[str]) -> list[dict]:
@@ -401,44 +339,29 @@ def segment_paragraphs(paragraphs: list[str]) -> list[dict]:
         if marker == "em_dash":
             dialogue_text = stripped.lstrip(EM_DASH_CHARS).strip()
             _emit("dialogue", dialogue_text)
-            state = "IN_DIALOGUE"
+            state = "NARRATOR"
 
         elif marker == "colon":
             before, after = _split_at_colon(stripped)
             if _has_speech_attribution(before):
                 _emit("narrator", before)
                 _emit("dialogue", after)
-                state = "IN_DIALOGUE"
             else:
                 # Explanatory colon (no speech verb) — not dialogue
                 _emit("narrator", stripped)
-                state = "NARRATOR"
+            state = "NARRATOR"
 
         elif marker == "trailing_colon":
-            # Attribution ending with colon — narrator, but next paragraph is dialogue
+            # Attribution ending with colon — narrator, next paragraph is dialogue
             _emit("narrator", stripped.rstrip(":").strip())
             state = "IN_DIALOGUE"
 
-        elif marker == "guillemet":
-            # Split at « » boundaries: narrator outside, dialogue inside
-            parts = _split_at_guillemets(stripped)
-            for part_type, part_text in parts:
-                _emit(part_type, part_text)
-            # State follows the last emitted segment
-            if parts and parts[-1][0] == "dialogue":
-                state = "IN_DIALOGUE"
-            else:
-                state = "NARRATOR"
-
         elif marker == "plain":
             if state == "IN_DIALOGUE":
-                if _is_narrator_paragraph(stripped):
-                    _emit("narrator", stripped)
-                    state = "NARRATOR"
-                else:
-                    _emit("dialogue", stripped)
+                _emit("dialogue", stripped)
             else:
                 _emit("narrator", stripped)
+            state = "NARRATOR"
 
     return segments
 
@@ -468,7 +391,7 @@ def segment_chapter(chapter_path: str, output_dir: str | None = None) -> dict:
     if output_dir:
         out_path = Path(output_dir)
     else:
-        out_path = ch_path.parent.parent / "segments"
+        out_path = ch_path.parent.parent / "03_segments"
 
     ssml_dir = out_path / "ssml"
     review_dir = out_path / "review"
@@ -519,8 +442,8 @@ def segment_book(chapters_dir: str, output_dir: str | None = None) -> dict:
     """Segment all chapters in a book directory.
 
     Args:
-        chapters_dir: Path to output/{format}/{book}/chapters/
-        output_dir: Override for segments output dir. Defaults to sibling segments/.
+        chapters_dir: Path to output/{format}/{book}/02_chapters/
+        output_dir: Override for segments output dir. Defaults to sibling 03_segments/.
 
     Returns summary dict with per-chapter and aggregate stats.
     """
@@ -535,7 +458,7 @@ def segment_book(chapters_dir: str, output_dir: str | None = None) -> dict:
     if output_dir:
         out_path = Path(output_dir)
     else:
-        out_path = ch_dir.parent / "segments"
+        out_path = ch_dir.parent / "03_segments"
 
     # Clear stale files from previous runs
     if out_path.exists():
@@ -555,6 +478,27 @@ def segment_book(chapters_dir: str, output_dir: str | None = None) -> dict:
     total_narrator = sum(s["narrator_chars"] for s in chapter_summaries)
     total_segments = sum(s["total_segments"] for s in chapter_summaries)
 
+    # Write segments.csv — per-chapter breakdown for quality review
+    summary_csv_columns = [
+        "chapter", "total_segments", "narrator_segments", "dialogue_segments",
+        "total_chars", "narrator_chars", "dialogue_chars", "dialogue_ratio",
+    ]
+    csv_path = out_path / "segments.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=summary_csv_columns)
+        writer.writeheader()
+        for ch in chapter_summaries:
+            writer.writerow({
+                "chapter": ch["chapter"],
+                "total_segments": ch["total_segments"],
+                "narrator_segments": ch["narrator_segments"],
+                "dialogue_segments": ch["dialogue_segments"],
+                "total_chars": ch["total_chars"],
+                "narrator_chars": ch["narrator_chars"],
+                "dialogue_chars": ch["dialogue_chars"],
+                "dialogue_ratio": f"{ch['dialogue_ratio']:.3f}",
+            })
+
     summary = {
         "chapters_dir": str(ch_dir),
         "output_dir": str(out_path),
@@ -564,6 +508,7 @@ def segment_book(chapters_dir: str, output_dir: str | None = None) -> dict:
         "narrator_chars": total_narrator,
         "dialogue_chars": total_dialogue,
         "dialogue_ratio": total_dialogue / total_chars if total_chars > 0 else 0.0,
+        "csv_path": str(csv_path),
         "chapters": chapter_summaries,
     }
 

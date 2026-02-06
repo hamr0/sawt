@@ -3,9 +3,9 @@ POC-2: Chapter Detection & Splitting
 
 Clean text → chapter files, split at paragraph boundaries when exceeding char limits.
 
-Input:  output/{format}/{book}/ingestion/clean_text.txt
-Output: output/{format}/{book}/chapters/chapter_01.txt, ...
-        output/{format}/{book}/chapters/chapters.csv
+Input:  output/{format}/{book}/01_ingestion/clean_text.txt
+Output: output/{format}/{book}/02_chapters/chapter_01.txt, ...
+        output/{format}/{book}/02_chapters/chapters.csv
 
 Hard rules:
   1. Never cut mid-paragraph. Paragraphs are atomic.
@@ -459,7 +459,7 @@ def split_book(ingestion_dir: str, output_dir: str | None = None) -> dict:
     """Read clean_text.txt from POC-1 output, split into units, write files + CSV.
 
     Args:
-        ingestion_dir: Path to output/{format}/{book}/ingestion/ (must contain clean_text.txt)
+        ingestion_dir: Path to output/{format}/{book}/01_ingestion/ (must contain clean_text.txt)
         output_dir: Override for chapters output dir. Defaults to sibling of ingestion_dir.
 
     Returns summary dict.
@@ -474,11 +474,11 @@ def split_book(ingestion_dir: str, output_dir: str | None = None) -> dict:
 
     units = split_into_units(paragraphs)
 
-    # Output directory: sibling "chapters" folder
+    # Output directory: sibling "02_chapters" folder
     if output_dir:
         out_path = Path(output_dir)
     else:
-        out_path = ing_path.parent / "chapters"
+        out_path = ing_path.parent / "02_chapters"
     out_path.mkdir(parents=True, exist_ok=True)
 
     # Clear stale chapter files from previous runs

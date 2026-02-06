@@ -6,12 +6,12 @@ EPUB/DOCX/TXT → clean text with paragraph boundaries.
 Usage:
     from src.audiobook.ingest import ingest
     summary = ingest("data/books/epub/my-book.epub")
-    # Output: output/epub/my-book/ingestion/clean_text.txt
-    #         output/epub/my-book/ingestion/paragraphs.csv
+    # Output: output/epub/my-book/01_ingestion/clean_text.txt
+    #         output/epub/my-book/01_ingestion/paragraphs.csv
 
 Input:  data/books/{epub,docx,txt}/book.*
-Output: output/{epub,docx,txt}/{book}/ingestion/clean_text.txt
-        output/{epub,docx,txt}/{book}/ingestion/paragraphs.csv
+Output: output/{epub,docx,txt}/{book}/01_ingestion/clean_text.txt
+        output/{epub,docx,txt}/{book}/01_ingestion/paragraphs.csv
 """
 import csv
 import logging
@@ -343,9 +343,9 @@ def ingest(book_path: str, output_dir: str = "output") -> dict:
     # Strip publisher boilerplate from end
     paragraphs, back_matter = strip_back_matter(paragraphs)
 
-    # Prepare output directory: output/{format}/{book_slug}/ingestion/
+    # Prepare output directory: output/{format}/{book_slug}/01_ingestion/
     format_subdir = suffix.lstrip(".")
-    out_dir = Path(output_dir) / format_subdir / book_slug / "ingestion"
+    out_dir = Path(output_dir) / format_subdir / book_slug / "01_ingestion"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # Write clean text (paragraphs separated by blank lines)

@@ -257,7 +257,7 @@ class TestSplitBook:
 
         summary = split_book(str(ing_dir))
 
-        chap_dir = ing_dir.parent / "chapters"
+        chap_dir = ing_dir.parent / "02_chapters"
         assert chap_dir.exists()
 
         # Check chapter text files
@@ -293,7 +293,7 @@ class TestSplitBook:
         assert summary["delimiter_type"] == "none (size-based)"
         assert summary["total_units"] >= 2
 
-        chap_dir = ing_dir.parent / "chapters"
+        chap_dir = ing_dir.parent / "02_chapters"
         chapter_files = sorted(chap_dir.glob("chapter_*.txt"))
         assert len(chapter_files) == summary["total_units"]
 
@@ -307,7 +307,7 @@ class TestSplitBook:
         """Re-running split_book removes orphaned chapter files from previous runs."""
         ing_dir = tmp_path / "epub" / "stale-test" / "ingestion"
         ing_dir.mkdir(parents=True)
-        chap_dir = ing_dir.parent / "chapters"
+        chap_dir = ing_dir.parent / "02_chapters"
         chap_dir.mkdir(parents=True)
 
         # Simulate a previous run that produced 5 chapter files

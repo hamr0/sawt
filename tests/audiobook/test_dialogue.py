@@ -5,7 +5,6 @@ from pathlib import Path
 import pytest
 
 from src.audiobook.dialogue import (
-    CONTINUATION_THRESHOLD,
     CSV_COLUMNS,
     EM_DASH_CHARS,
     REVIEW_OPEN,
@@ -18,12 +17,10 @@ from src.audiobook.dialogue import (
     sync_review,
     _find_dialogue_colon,
     _split_at_colon,
-    _split_at_guillemets,
     _split_at_review_markers,
     _segments_to_review_text,
     _has_speech_attribution,
     _has_trailing_speech,
-    _is_narrator_paragraph,
 )
 
 
@@ -100,18 +97,18 @@ class TestDetectMarkers:
     def test_colon_with_attribution(self):
         assert detect_markers("وهي تقول: حلمتُ أنك بعيد") == "colon"
 
-    def test_guillemet(self):
-        assert detect_markers("نظرت إلى المرآة «لا بأس، جميل»") == "guillemet"
+    def test_guillemet_is_plain(self):
+        """Guillemets are typographic quotation marks, not dialogue markers."""
+        assert detect_markers("نظرت إلى المرآة «لا بأس، جميل»") == "plain"
 
     def test_guillemet_only_open_is_plain(self):
-        """Need both « and » for guillemet detection."""
         assert detect_markers("قال «مرحبا ولكن") == "plain"
 
     def test_plain(self):
         assert detect_markers("ذهبت إلى البيت وجلست على الكنبة") == "plain"
 
-    def test_colon_takes_priority_over_guillemet(self):
-        """If paragraph has both colon and guillemet, colon wins."""
+    def test_colon_with_guillemet_still_colon(self):
+        """Colon with guillemets — colon detected, guillemets are just text."""
         text = "قالت: «لا بأس»"
         assert detect_markers(text) == "colon"
 
@@ -195,81 +192,6 @@ class TestSplitAtColon:
 
 
 # ---------------------------------------------------------------------------
-# _split_at_guillemets
-# ---------------------------------------------------------------------------
-
-class TestSplitAtGuillemets:
-    def test_single_block(self):
-        parts = _split_at_guillemets("نص «حوار» نص")
-        assert parts == [("narrator", "نص"), ("dialogue", "حوار"), ("narrator", "نص")]
-
-    def test_only_guillemet(self):
-        parts = _split_at_guillemets("«حوار فقط»")
-        assert parts == [("dialogue", "حوار فقط")]
-
-    def test_multiple_blocks(self):
-        parts = _split_at_guillemets("قبل «أول» وسط «ثاني» بعد")
-        assert len(parts) == 5
-        assert parts[0] == ("narrator", "قبل")
-        assert parts[1] == ("dialogue", "أول")
-        assert parts[2] == ("narrator", "وسط")
-        assert parts[3] == ("dialogue", "ثاني")
-        assert parts[4] == ("narrator", "بعد")
-
-    def test_no_guillemets(self):
-        parts = _split_at_guillemets("نص عادي بدون علامات")
-        assert parts == [("narrator", "نص عادي بدون علامات")]
-
-    def test_guillemet_at_start(self):
-        parts = _split_at_guillemets("«حوار» ثم نص")
-        assert parts[0] == ("dialogue", "حوار")
-        assert parts[1] == ("narrator", "ثم نص")
-
-    def test_guillemet_at_end(self):
-        parts = _split_at_guillemets("نص ثم «حوار»")
-        assert parts[0] == ("narrator", "نص ثم")
-        assert parts[1] == ("dialogue", "حوار")
-
-    def test_unclosed_guillemet(self):
-        parts = _split_at_guillemets("نص «حوار بدون إغلاق")
-        assert parts == [("narrator", "نص"), ("dialogue", "حوار بدون إغلاق")]
-
-    def test_adjacent_blocks(self):
-        parts = _split_at_guillemets("«أول» «ثاني»")
-        assert len(parts) == 2
-        assert parts[0] == ("dialogue", "أول")
-        assert parts[1] == ("dialogue", "ثاني")
-
-    def test_colon_inside_narrator_preserved(self):
-        """Colons in narrator portions are preserved as-is (not used for splitting)."""
-        parts = _split_at_guillemets("وقال لنفسه: «رباه!» وسمع صوتًا")
-        assert parts[0] == ("narrator", "وقال لنفسه:")
-        assert parts[1] == ("dialogue", "رباه!")
-        assert parts[2] == ("narrator", "وسمع صوتًا")
-
-
-# ---------------------------------------------------------------------------
-# _is_narrator_paragraph
-# ---------------------------------------------------------------------------
-
-class TestIsNarratorParagraph:
-    def test_short_paragraph_not_narrator(self):
-        assert not _is_narrator_paragraph("نعم")
-
-    def test_long_paragraph_is_narrator(self):
-        long_text = "أ" * (CONTINUATION_THRESHOLD + 1)
-        assert _is_narrator_paragraph(long_text)
-
-    def test_long_with_speech_verb_not_narrator(self):
-        long_text = "أ" * 100 + " قال " + "أ" * 100
-        assert not _is_narrator_paragraph(long_text)
-
-    def test_exactly_at_threshold_not_narrator(self):
-        text = "أ" * CONTINUATION_THRESHOLD
-        assert not _is_narrator_paragraph(text)
-
-
-# ---------------------------------------------------------------------------
 # segment_paragraphs — state machine
 # ---------------------------------------------------------------------------
 
@@ -310,8 +232,8 @@ class TestSegmentParagraphs:
         assert segments[0]["text"] == "نعم بالطبع"
         assert "—" not in segments[0]["text"]
 
-    def test_colon_then_continuation(self):
-        """Colon → short plain paragraph stays as dialogue (continuation)."""
+    def test_colon_then_plain_resets_to_narrator(self):
+        """Colon → new paragraph resets to narrator (no continuation)."""
         paragraphs = [
             "فقال: مرحبا",
             "كيف حالك؟",
@@ -319,11 +241,11 @@ class TestSegmentParagraphs:
         segments = segment_paragraphs(paragraphs)
         assert segments[0]["type"] == "narrator"   # "فقال"
         assert segments[1]["type"] == "dialogue"    # "مرحبا"
-        assert segments[2]["type"] == "dialogue"    # "كيف حالك؟" (continuation)
+        assert segments[2]["type"] == "narrator"    # "كيف حالك؟" (new paragraph = narrator)
 
-    def test_colon_then_long_narrator_breaks(self):
-        """Long plain paragraph after dialogue → back to narrator."""
-        long_narration = "أ" * (CONTINUATION_THRESHOLD + 50)
+    def test_colon_then_long_paragraph_is_narrator(self):
+        """Any plain paragraph after dialogue → narrator (regardless of length)."""
+        long_narration = "أ" * 250
         paragraphs = [
             "فقال: مرحبا",
             long_narration,
@@ -358,8 +280,8 @@ class TestSegmentParagraphs:
         assert segments[3]["type"] == "dialogue"    # "أهلا"
 
     def test_narrator_then_em_dash_then_narrator(self):
-        """Narrator → em-dash dialogue → long narrator."""
-        long_narration = "أ" * (CONTINUATION_THRESHOLD + 50)
+        """Narrator → em-dash dialogue → narrator."""
+        long_narration = "أ" * 250
         paragraphs = [
             "جلس في المقعد",
             "– كيف الحال؟",
@@ -402,35 +324,33 @@ class TestSegmentParagraphs:
         assert len(segments) == 1
         assert segments[0]["type"] == "narrator"
 
-    def test_speech_verb_keeps_dialogue(self):
-        """Long paragraph with speech verb stays in dialogue."""
+    def test_speech_verb_no_longer_continues_dialogue(self):
+        """Plain paragraph with speech verb is narrator (no continuation)."""
         long_with_verb = "أ" * 100 + " قال " + "أ" * 120
         paragraphs = [
             "قال: مرحبا",
             long_with_verb,
         ]
         segments = segment_paragraphs(paragraphs)
-        assert segments[-1]["type"] == "dialogue"
+        assert segments[-1]["type"] == "narrator"
 
-    def test_guillemet_splits_at_boundaries(self):
-        """Guillemet paragraph splits into N/D at « » boundaries."""
+    def test_guillemet_paragraph_is_narrator(self):
+        """Guillemet paragraph is plain narrator — no voice splitting."""
         text = "«لا بأس، جميل، وأيم الله جميل»"
         paragraphs = [text]
         segments = segment_paragraphs(paragraphs)
         assert len(segments) == 1
-        assert segments[0]["type"] == "dialogue"
-        assert segments[0]["text"] == "لا بأس، جميل، وأيم الله جميل"
+        assert segments[0]["type"] == "narrator"
+        assert "«" in segments[0]["text"]  # guillemets preserved as text
 
-    def test_guillemet_brief_in_narration(self):
-        """Brief guillemet in long narration → N + D + N."""
+    def test_guillemet_in_narration_stays_narrator(self):
+        """Guillemets embedded in narration — whole paragraph is narrator."""
         text = "أ" * 200 + " «نعم» " + "أ" * 200
         paragraphs = [text]
         segments = segment_paragraphs(paragraphs)
-        assert len(segments) == 3
+        assert len(segments) == 1
         assert segments[0]["type"] == "narrator"
-        assert segments[1]["type"] == "dialogue"
-        assert segments[1]["text"] == "نعم"
-        assert segments[2]["type"] == "narrator"
+        assert "«نعم»" in segments[0]["text"]
 
     def test_colon_with_guillemet_after(self):
         """Colon before guillemet — colon splits, guillemets stay in dialogue text."""
@@ -455,8 +375,8 @@ class TestSegmentParagraphs:
         assert "«لماذا؟»" in segments[1]["text"]
         assert "«قُضي عليَّ.»" in segments[1]["text"]
 
-    def test_guillemet_stream_of_consciousness(self):
-        """Long narration with embedded «inner thoughts» — bidaya-wa-nihaya style."""
+    def test_guillemet_stream_of_consciousness_is_narrator(self):
+        """Inner thoughts in «» are narrator — no voice switching for inner monologue."""
         text = (
             "وعاود الشابَّ إحساسُه بالغرابة، "
             + "أ" * 200
@@ -467,10 +387,10 @@ class TestSegmentParagraphs:
         )
         paragraphs = [text]
         segments = segment_paragraphs(paragraphs)
-        types = [s["type"] for s in segments]
-        assert types == ["narrator", "dialogue", "narrator", "dialogue"]
-        assert "لماذا أضطربُ" in segments[1]["text"]
-        assert "لماذا هذا كلُّه" in segments[3]["text"]
+        assert len(segments) == 1
+        assert segments[0]["type"] == "narrator"
+        assert "«لماذا أضطربُ" in segments[0]["text"]
+        assert "«لماذا هذا كلُّه" in segments[0]["text"]
 
     def test_text_preservation(self):
         """All input chars appear in output (minus colon from splits, dashes stripped)."""
@@ -548,8 +468,8 @@ class TestSegmentParagraphs:
         assert not segments[0]["text"].endswith(":")
 
     def test_trailing_colon_then_narrator_resumes(self):
-        """Trailing colon → dialogue → long narration."""
-        long_narration = "أ" * (CONTINUATION_THRESHOLD + 50)
+        """Trailing colon → dialogue (one-shot) → narrator."""
+        long_narration = "أ" * 250
         paragraphs = [
             "فهتف قائلا:",
             "أين الحقيقة؟",
@@ -591,15 +511,15 @@ class TestSegmentParagraphs:
         assert segments[1]["type"] == "dialogue"
         assert "أقول لكم" in segments[1]["text"]
 
-    def test_first_person_verb_keeps_dialogue(self):
-        """First-person قلت in a plain continuation paragraph keeps dialogue state."""
+    def test_first_person_verb_no_longer_continues_dialogue(self):
+        """First-person قلت in a plain paragraph is narrator (no continuation)."""
         long_with_qultu = "أ" * 100 + " وقلت لنفسي " + "أ" * 120
         paragraphs = [
             "قال: مرحبا",
             long_with_qultu,
         ]
         segments = segment_paragraphs(paragraphs)
-        assert segments[-1]["type"] == "dialogue"
+        assert segments[-1]["type"] == "narrator"
 
     def test_colon_whole_paragraph_is_dialogue(self):
         """After colon with speech attribution, everything to end of paragraph is dialogue."""
@@ -847,7 +767,7 @@ class TestSegmentChapter:
 
         summary = segment_chapter(str(ch_file))
 
-        expected_dir = tmp_path / "book" / "segments"
+        expected_dir = tmp_path / "book" / "03_segments"
         assert expected_dir.exists()
         assert (expected_dir / "ssml" / "chapter_01.csv").exists()
         assert (expected_dir / "review" / "chapter_01.txt").exists()
@@ -910,7 +830,7 @@ class TestSegmentBook:
 
         summary = segment_book(str(chapters_dir))
 
-        expected_dir = tmp_path / "book" / "segments"
+        expected_dir = tmp_path / "book" / "03_segments"
         assert expected_dir.exists()
 
     def test_clears_stale_files(self, tmp_path):
@@ -950,9 +870,9 @@ class TestSegmentBook:
 # ---------------------------------------------------------------------------
 
 # Paths to real chapter files from POC-2 output
-AL_LISS_CH02 = Path("output/epub/al-liss-wal-kilab/chapters/chapter_02.txt")
-ZUQAQ_CH02 = Path("output/epub/zuqaq-al-midaqq/chapters/chapter_02.txt")
-THARTHARA_CH02 = Path("output/epub/tharthara-fawq-al-nil-hindawi/chapters/chapter_02.txt")
+AL_LISS_CH02 = Path("output/epub/al-liss-wal-kilab/02_chapters/chapter_02.txt")
+ZUQAQ_CH02 = Path("output/epub/zuqaq-al-midaqq/02_chapters/chapter_02.txt")
+THARTHARA_CH02 = Path("output/epub/tharthara-fawq-al-nil-hindawi/02_chapters/chapter_02.txt")
 
 
 @pytest.mark.skipif(not AL_LISS_CH02.exists(), reason="Real EPUB data not available")
@@ -1010,20 +930,19 @@ class TestIntegrationZuqaq:
         summary = segment_chapter(str(ZUQAQ_CH02), str(tmp_path))
         assert 0.10 < summary["dialogue_ratio"] < 0.80
 
-    def test_has_guillemet_handling(self, tmp_path):
-        """Zuqaq uses guillemets — verify they appear in segments."""
+    def test_guillemets_preserved_in_text(self, tmp_path):
+        """Guillemets pass through as text — not used for voice splitting."""
         text = ZUQAQ_CH02.read_text(encoding="utf-8")
-        has_guillemets = "«" in text and "»" in text
-        if not has_guillemets:
+        if "«" not in text:
             pytest.skip("No guillemets in this chapter")
 
-        summary = segment_chapter(str(ZUQAQ_CH02), str(tmp_path))
+        segment_chapter(str(ZUQAQ_CH02), str(tmp_path))
         csv_path = tmp_path / "ssml" / "chapter_02.csv"
         with open(csv_path, encoding="utf-8") as f:
             rows = list(csv.DictReader(f))
-        # At least some dialogue segments should exist
-        dialogue_texts = [r["text"] for r in rows if r["type"] == "dialogue"]
-        assert len(dialogue_texts) > 0
+        # Guillemets should appear in segment text (preserved, not stripped)
+        all_text = " ".join(r["text"] for r in rows)
+        assert "«" in all_text
 
 
 @pytest.mark.skipif(not THARTHARA_CH02.exists(), reason="Real EPUB data not available")
@@ -1055,7 +974,7 @@ class TestIntegrationTharthara:
 # Integration: full book segmentation
 # ---------------------------------------------------------------------------
 
-AL_LISS_CHAPTERS = Path("output/epub/al-liss-wal-kilab/chapters")
+AL_LISS_CHAPTERS = Path("output/epub/al-liss-wal-kilab/02_chapters")
 
 
 @pytest.mark.skipif(not AL_LISS_CHAPTERS.exists(), reason="Real EPUB data not available")

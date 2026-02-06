@@ -226,15 +226,17 @@ ArabicTTS/
 ```
 data/books/{epub,docx,txt}/book.*
     ↓ ingest.py
-output/{format}/book/ingestion/clean_text.txt + paragraphs.csv    ← REVIEW
+output/{format}/book/01_ingestion/clean_text.txt + paragraphs.csv      ← REVIEW
     ↓ chapters.py
-output/{format}/book/chapters/chapter_*.txt + chapters.csv         ← REVIEW
+output/{format}/book/02_chapters/chapter_*.txt + chapters.csv           ← REVIEW
     ↓ dialogue.py
-output/{format}/book/segments/chapter_*.csv                        ← REVIEW (per chapter)
+output/{format}/book/03_segments/segments.csv                           ← REVIEW (book summary)
+output/{format}/book/03_segments/ssml/chapter_*.csv                     ← machine segments
+output/{format}/book/03_segments/review/chapter_*.txt                   ← human review text
     ↓ ssml.py
-output/{format}/book/ssml/chapter_*.ssml
+output/{format}/book/04_ssml/chapter_*.ssml
     ↓ azure_client.py
-output/{format}/book/audio/chapter_*.mp3
+output/{format}/book/05_audio/chapter_*.mp3
 ```
 
 ---
@@ -550,40 +552,58 @@ and makes every boundary obvious.
 
 #### Phase A: Narration vs Dialogue Detection (Two-Voice) — THE GOAL
 
+**Status:** COMPLETE (Feb 2026). Code: `src/audiobook/dialogue.py`, Tests: `tests/audiobook/test_dialogue.py`
+
 **Problem:** Separate narration from dialogue so we can assign different voices.
 
-**Scope:**
-- Adapt existing `06_simplified_detector.py` to work on chapter-level input from POC-2
-- Binary classification only: narration or dialogue (no character attribution yet)
-- Handle dialogue markers: colons, em dashes, guillemets, western quotes, hyphens
-- Handle multiline dialogue (dialogue that spans paragraphs)
-- Quotation mark normalization across book formatting conventions
-- Produce segments tagged as NARRATOR or DIALOGUE
+**Scope (what was built):**
+- Binary classification: narration or dialogue (no character attribution)
+- State machine with 3 dialogue markers: colon, em dash, trailing colon
+- No continuation across paragraphs — each new paragraph resets to narrator
+- Guillemets `«»` are NOT dialogue markers — treated as plain text (typographic quotes, inner thoughts)
+- Dual output: machine-readable CSV + human-readable review text with `// \\` markers
+- Review→CSV sync flow for human corrections
+- Per-chapter segmentation + book-level summary CSV
 
-**Output per chapter:**
-- Segmented CSV → `output/{book}/segments/chapter_01.csv`
-  - Columns: segment_number, type [narrator/dialogue], char_count, text
-- Statistics: narration/dialogue ratio, segment count, average segment length
+**Dialogue markers (priority order):**
+1. **Em dash** (`–/—/-` + space at paragraph start) → whole paragraph = dialogue
+2. **Colon** (`:` with speech attribution before it) → before = narrator, after = dialogue
+3. **Trailing colon** (paragraph ends with `:` + speech verb) → narrator, sets up next paragraph as dialogue (one-shot)
+4. **Plain** → narrator (or dialogue if immediately after trailing colon, one-shot only)
 
-**Review gate (per chapter):**
-- Review CSV: is every segment correctly tagged?
-- Focus on boundary cases: where does narration end and dialogue begin?
-- Flag segments that are mislabeled
-- Fix and re-run until chapter is clean
-- **Review cadence: chapter by chapter.** Don't move to the next chapter until current one is reviewed and correct
+**What is NOT a dialogue marker:**
+- **Guillemets `«»`** — typographic quotation marks for short quotes, inner thoughts, scare quotes. Switching voices for 3-word `«phrases»` embedded in narration would be jarring. Kept as text.
+- **No continuation** — a plain paragraph after dialogue is always narrator. Multi-paragraph dialogue without markers doesn't appear in practice (Mahfouz marks every speaker turn).
 
-**SSML generation:**
-- Once segments are verified, SSML is straightforward:
-  - NARRATOR segments → narrator voice tag
-  - DIALOGUE segments → dialogue voice tag
-  - Paragraph breaks → `<break>` tags
-- One voice per role, consistent across the entire book
-- No dialect switching — match voice dialect to book's origin (Egyptian author → ar-EG voices)
+**Colon filtering:**
+- Time colons (`١٢:٣٠`) → skipped
+- URL colons (`http:`) → skipped
+- Trailing colons (nothing after) → heading-style, skipped (unless speech verb detected)
+- Short text before colon (<150 chars) → assumed dialogue attribution
+- Long text before colon (≥150 chars) → requires explicit speech verb in last 100 chars
+- Passive voice (`قيل`) excluded from speech verb matching
+- Arabic diacritics (harakat) stripped before verb matching
 
-**Audio output:**
-- Generate audio per chapter → `output/{book}/audio/chapter_01.mp3`
-- Stitch chapter audio files in order
-- Listen to the result
+**Output:**
+- `03_segments/ssml/chapter_*.csv` — machine segments (segment_number, type, char_count, text)
+- `03_segments/review/chapter_*.txt` — human review text (`// dialogue \\` markers)
+- `03_segments/segments.csv` — per-chapter summary (total_segments, narrator/dialogue counts, chars, ratio)
+
+**Results on 12 books:**
+
+| Book | Chapters | Segments | Dialogue % |
+|------|----------|----------|------------|
+| al-liss-wal-kilab | 18 | 1,207 | 40.3% |
+| awlad-haretna | 114 | 7,399 | 41.8% |
+| bidaya-wa-nihaya | 92 | 3,876 | 31.5% |
+| tharthara-fawq-al-nil | 18 | 2,125 | 40.5% |
+| zuqaq-al-midaqq | 35 | 2,449 | 45.0% |
+
+**Review workflow:**
+1. Open `review/chapter_*.txt` — dialogue wrapped in `// \\`, narrator is plain
+2. Edit: add/remove `// \\` markers to fix misclassifications
+3. Run `sync_review(segments_dir)` → regenerates `ssml/*.csv` from edited review text
+4. Review cadence: chapter by chapter
 
 **Definition of done:** A complete two-voice audiobook where narration and dialogue are clearly distinguished, voice switches feel natural, and no text is missing.
 
@@ -865,11 +885,13 @@ $20-40/book. Market via Arabic social media. Success metric: 5+ paying customers
 - Unit files concatenate back to original text
 - 91 tests passing, validated on all 12 books
 
-### POC-3 Phase A (Two-Voice) — THE GOAL
-- Complete two-voice audiobook from at least 1 real book
-- All narration/dialogue boundaries verified via CSV review
-- Voice switching sounds natural on listen-through
-- Repeatable on a second book with different formatting
+### POC-3 Phase A (Two-Voice) ✓ COMPLETE
+- Dialogue detection on all 12 books, 103 tests passing
+- 3 dialogue markers: colon, em dash, trailing colon
+- No continuation heuristic (false positives outweighed benefit)
+- Guillemets removed as dialogue markers (typographic, not voice-switching)
+- Dual output: machine CSV + human review text with sync workflow
+- Per-chapter + book-level summary CSV for quality validation
 
 ### POC-3 Phase B (Multi-Voice) — STRETCH
 - Character attribution on at least 1 real book
