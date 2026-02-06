@@ -54,6 +54,12 @@ Sawt/
 │   ├── docx/               #   DOCX books (author submissions)
 │   └── txt/                #   TXT files (internal/corpus use)
 ├── output/                 # Per-book working output (gitignored)
+│   └── {format}/{book}/
+│       ├── 01_ingestion/   #   clean_text.txt + paragraphs.csv
+│       ├── 02_chapters/    #   chapter_*.txt + chapters.csv
+│       ├── 03_segments/    #   segments.csv + ssml/*.csv + review/*.txt
+│       ├── 04_ssml/        #   chapter_*.ssml (next)
+│       └── 05_audio/       #   chapter_*.mp3 (next)
 ├── docs/                   # Documentation
 ├── scripts/                # Utility scripts
 └── archive/                # IPA pipeline (reference only)
