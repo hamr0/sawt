@@ -107,10 +107,10 @@ class TestDetectMarkers:
     def test_plain(self):
         assert detect_markers("ذهبت إلى البيت وجلست على الكنبة") == "plain"
 
-    def test_guillemet_takes_priority_over_colon(self):
-        """If paragraph has both colon and guillemet, guillemet wins."""
+    def test_colon_takes_priority_over_guillemet(self):
+        """If paragraph has both colon and guillemet, colon wins."""
         text = "قالت: «لا بأس»"
-        assert detect_markers(text) == "guillemet"
+        assert detect_markers(text) == "colon"
 
     def test_em_dash_takes_priority_over_colon(self):
         """Em dash at start takes priority over colon in body."""
@@ -429,26 +429,28 @@ class TestSegmentParagraphs:
         assert segments[1]["text"] == "نعم"
         assert segments[2]["type"] == "narrator"
 
-    def test_guillemet_with_colon_before(self):
-        """Colon before guillemet — guillemet boundaries used, colon stays in narrator."""
+    def test_colon_with_guillemet_after(self):
+        """Colon before guillemet — colon splits, guillemets stay in dialogue text."""
         text = "قالت: «لا بأس، جميل»"
         paragraphs = [text]
         segments = segment_paragraphs(paragraphs)
         assert len(segments) == 2
         assert segments[0]["type"] == "narrator"
-        assert "قالت:" in segments[0]["text"]
+        assert segments[0]["text"] == "قالت"
         assert segments[1]["type"] == "dialogue"
-        assert segments[1]["text"] == "لا بأس، جميل"
+        assert segments[1]["text"] == "«لا بأس، جميل»"
 
-    def test_guillemet_multiple_blocks(self):
-        """Multiple «» blocks produce alternating N/D segments."""
+    def test_colon_with_multiple_guillemets(self):
+        """Colon wins over guillemets — entire post-colon text is dialogue."""
         text = "وتساءل: «لماذا؟» وأغمض عينيه ثم قال لنفسه: «قُضي عليَّ.»"
         paragraphs = [text]
         segments = segment_paragraphs(paragraphs)
         types = [s["type"] for s in segments]
-        assert types == ["narrator", "dialogue", "narrator", "dialogue"]
-        assert segments[1]["text"] == "لماذا؟"
-        assert segments[3]["text"] == "قُضي عليَّ."
+        # Colon splits: narrator + dialogue (paragraph = unit)
+        assert types == ["narrator", "dialogue"]
+        assert segments[0]["text"] == "وتساءل"
+        assert "«لماذا؟»" in segments[1]["text"]
+        assert "«قُضي عليَّ.»" in segments[1]["text"]
 
     def test_guillemet_stream_of_consciousness(self):
         """Long narration with embedded «inner thoughts» — bidaya-wa-nihaya style."""

@@ -65,11 +65,16 @@ def _segments_to_review_text(segments: list[dict]) -> str:
 
     Each segment becomes a paragraph (double-newline separated).
     Dialogue segments are wrapped in «» for easy visual scanning and editing.
+    Skips wrapping if text already starts/ends with «» (from colon splits).
     """
     lines = []
     for seg in segments:
         if seg["type"] == "dialogue":
-            lines.append(f"«{seg['text']}»")
+            text = seg["text"]
+            if text.startswith("«") and text.endswith("»"):
+                lines.append(text)
+            else:
+                lines.append(f"«{text}»")
         else:
             lines.append(seg["text"])
     return "\n\n".join(lines)
@@ -239,13 +244,14 @@ def detect_markers(paragraph: str) -> str:
     if stripped[0] in EM_DASH_CHARS and len(stripped) > 1 and stripped[1] in (" ", "\u00A0"):
         return "em_dash"
 
-    # Guillemets take priority over colons — split at « » boundaries
-    if "«" in stripped and "»" in stripped:
-        return "guillemet"
-
-    # Colon check (dialogue attribution) — only when no guillemets
+    # Colon check (dialogue attribution) — takes priority over guillemets
+    # Guillemets in colon paragraphs are usually scare quotes, not dialogue
     if _find_dialogue_colon(stripped) is not None:
         return "colon"
+
+    # Guillemets — only when no colons present (inner thoughts, quoted speech)
+    if "«" in stripped and "»" in stripped:
+        return "guillemet"
 
     # Trailing colon: paragraph ends with colon, speech verb present → dialogue trigger
     if stripped.endswith(":") and len(stripped) > 1:
