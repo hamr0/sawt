@@ -44,6 +44,9 @@ htmlcov/
 .vscode/
 .idea/
 
+# Aurora friction analysis (generated)
+.aurora/friction/
+
 # OS
 .DS_Store
 Thumbs.db
