@@ -430,7 +430,7 @@ Azure Speech Service limit: **64KB per SSML request** (WebSocket). Arabic UTF-8 
 
 Source: [Azure Speech quotas](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-services-quotas-and-limits)
 
-Additional limits: max 50 `<voice>` tags per SSML, 100K billable characters per file (Standard tier).
+Additional limits: max 50 **distinct** `<voice>` and `<audio>` tags per SSML (not 50 total — reusing the same 2 voices is fine), 100K billable characters per file (Standard tier). Two-voice (narrator + dialogue) uses only 2 distinct voices, well under the limit regardless of how many voice switches occur.
 
 #### Delimiter Hierarchy — Detect, Don't Impose
 
@@ -729,7 +729,7 @@ dialogue_voice: ar-EG-SalmaNeural
 **2. SSML template engine:**
 - Read segment CSV → wrap narrator segments in narrator voice tag, dialogue segments in dialogue voice tag
 - Valid SSML structure: `<speak>` → `<voice>` → text
-- Respect Azure limits: max 50 `<voice>` tags per SSML, ~25K chars per request
+- Respect Azure limits: max 50 **distinct** voice names per SSML (two-voice uses only 2), ~25K chars per request
 - `<break time="300ms"/>` between narrator↔dialogue transitions
 
 **3. Voice sampling script** (`scripts/sample_voices.py`):
