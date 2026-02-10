@@ -39,7 +39,10 @@ SSML_HEADER = (
 )
 SSML_FOOTER = "</speak>"
 
-TRANSITION_BREAK = '<break time="300ms"/>'
+# Break durations between segments
+BREAK_PARAGRAPH = '<break time="500ms"/>'   # narrator→narrator (paragraph boundary)
+BREAK_TRANSITION = '<break time="300ms"/>'  # narrator↔dialogue (voice switch)
+BREAK_DIALOGUE = '<break time="200ms"/>'    # dialogue→dialogue (rapid exchange)
 
 CSV_SUMMARY_COLUMNS = [
     "chapter",
@@ -125,19 +128,20 @@ def build_ssml(segments: list[dict], voice_config: VoiceConfig) -> str:
             else voice_config["dialogue_voice"]
         )
 
+        # Insert appropriate break between segments
+        if prev_type is not None:
+            if prev_type != seg_type:
+                parts.append(BREAK_TRANSITION)    # narrator↔dialogue
+            elif seg_type == "dialogue":
+                parts.append(BREAK_DIALOGUE)      # dialogue→dialogue
+            else:
+                parts.append(BREAK_PARAGRAPH)     # narrator→narrator
+
         if voice != current_voice:
-            # Close previous voice tag
             if current_voice is not None:
                 parts.append("</voice>")
-            # Insert break at narrator↔dialogue transition
-            if prev_type is not None and prev_type != seg_type:
-                parts.append(TRANSITION_BREAK)
             parts.append(f'<voice name="{voice}">')
             current_voice = voice
-        else:
-            # Same voice block — still insert break if type changed
-            if prev_type is not None and prev_type != seg_type:
-                parts.append(TRANSITION_BREAK)
 
         parts.append(seg["text"])
         prev_type = seg_type

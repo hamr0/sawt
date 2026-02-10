@@ -135,7 +135,7 @@ class TestBuildSSML:
         ssml = build_ssml(segments, self.config)
         assert ssml.count("<voice ") == 1
 
-    def test_break_at_transitions(self):
+    def test_break_at_voice_transition(self):
         segments = [
             _seg(1, "narrator", "قال"),
             _seg(2, "dialogue", "مرحبا"),
@@ -143,13 +143,26 @@ class TestBuildSSML:
         ssml = build_ssml(segments, self.config)
         assert '<break time="300ms"/>' in ssml
 
-    def test_no_break_within_same_type(self):
+    def test_paragraph_break_between_narrator(self):
         segments = [
             _seg(1, "narrator", "نص أول"),
             _seg(2, "narrator", "نص ثاني"),
         ]
         ssml = build_ssml(segments, self.config)
-        assert '<break time="300ms"/>' not in ssml
+        assert '<break time="500ms"/>' in ssml
+
+    def test_dialogue_break_between_dialogue(self):
+        segments = [
+            _seg(1, "dialogue", "مرحبا"),
+            _seg(2, "dialogue", "أهلا"),
+        ]
+        ssml = build_ssml(segments, self.config)
+        assert '<break time="200ms"/>' in ssml
+
+    def test_no_break_before_first_segment(self):
+        segments = [_seg(1, "narrator", "نص")]
+        ssml = build_ssml(segments, self.config)
+        assert "<break" not in ssml
 
     def test_valid_xml(self):
         segments = [

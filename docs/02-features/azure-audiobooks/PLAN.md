@@ -730,7 +730,10 @@ dialogue_voice: ar-EG-SalmaNeural
 - Read segment CSV → wrap narrator segments in narrator voice tag, dialogue segments in dialogue voice tag
 - Valid SSML structure: `<speak>` → `<voice>` → text
 - Respect Azure limits: max 50 **distinct** voice names per SSML (two-voice uses only 2), ~25K chars per request
-- `<break time="300ms"/>` between narrator↔dialogue transitions
+- Context-aware breaks between segments:
+  - `<break time="500ms"/>` — narrator→narrator (paragraph boundary)
+  - `<break time="300ms"/>` — narrator↔dialogue (voice transition)
+  - `<break time="200ms"/>` — dialogue→dialogue (rapid exchange)
 
 **3. Voice sampling script** (`scripts/sample_voices.py`):
 - Purpose: listen to voice pairs before committing to a default config
