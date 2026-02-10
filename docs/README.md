@@ -95,6 +95,40 @@ docs/
 
 ---
 
+## Audiobook Best Practices Compliance
+
+Based on research from professional narrators, ACX/Audible standards, and Storytel/Kitab Sawti production practices. Full research: [research/audiobook_best_practices.md](02-features/research/audiobook_best_practices.md)
+
+### Met
+
+| Practice | What the industry does | How Sawt does it |
+|----------|----------------------|------------------|
+| **Said tags with narrator** | "He said/she said" always stays with narrator voice — only quoted speech switches | Colon-split detection puts attribution as narrator, speech after colon as dialogue |
+| **Dialect matching** | Voice dialect matches author's region (Storytel standard: Egyptian author → Egyptian voices) | Per-book dialect config. Egyptian for Mahfouz, Levantine/Gulf/Maghreb voices available |
+| **Two-voice narrator/dialogue** | MSA narration + dialect dialogue is how modern Egyptian fiction audiobooks are produced | Core architecture — narrator voice for narration, separate voice for all dialogue |
+| **Same-gender pairings** | Same-gender voice pairs produce smoother transitions than M/F switching | FF confirmed as primary pairing in 8-combo listening tests |
+| **Voice contrast balance** | Voices should differ enough to tell apart, not so much it feels like two audiobooks spliced | 83 voices sampled → 19 shortlisted → 8 pairings tested → 5 production pairs selected |
+| **Context-aware pauses** | Different pause lengths for different transitions (voice switch vs paragraph vs rapid exchange) | 500ms narrator→narrator, 300ms narrator↔dialogue, 200ms dialogue→dialogue |
+| **Guillemet coherence** | Inner thoughts + outer speech by same person = one voice to avoid fragmenting narration | Guillemets `«»` deliberately kept as narrator — no jarring micro voice-switches |
+| **Fiction vs non-fiction** | Fiction needs expressive two-voice; non-fiction needs single authoritative voice | Genre flag: fiction runs full pipeline, non-fiction skips dialogue detection |
+| **Full-length testing** | Test 10+ min continuously — uncanny valley compounds over time, spot-checking misses it | Full Chapter 1 (70 segments, ~5 min) generated for all 8 voice pairings |
+
+### Planned
+
+| Practice | What the industry does | Sawt plan |
+|----------|----------------------|-----------|
+| **Pause variation** | Uniform gaps = metronome effect (#1 TTS listener complaint). Vary break durations | Add slight randomization to break durations (±50-100ms) in audio generation |
+| **Proper noun pronunciation** | #1 Arabic TTS failure point — no diacritics in printed Arabic, TTS guesses wrong | Per-book pronunciation dictionary via SSML `<phoneme>` tags for character names |
+| **Prosody variation** | Same rhythm repeating = auditory fatigue over hours of listening | `<prosody>` rate/pitch variations between narrative segments (provider-dependent) |
+
+### Not Applicable
+
+| Practice | Why it doesn't apply |
+|----------|---------------------|
+| **Full-cast production** | Closed — Azure Arabic has only 2 voices/dialect. Two-voice captures 90% of listener value |
+| **Emotion/expression styles** | Waiting on Azure — Arabic has zero `mstts:express-as` support. Monitor for updates |
+| **Human narrator imperfections** | TTS limitation — "embrace imperfection" applies to human narrators, not synthesized voices |
+
 ## Archive
 
 Old documentation (IPA pipeline, Polly, Flask demo) is preserved in [`archive/docs/`](../archive/docs/). The IPA phonological pipeline produced accurate linguistic processing but unusable audio output — the audiobook pipeline takes a fundamentally different approach.

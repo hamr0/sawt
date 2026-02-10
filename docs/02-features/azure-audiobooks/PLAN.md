@@ -1,10 +1,11 @@
-# Azure Arabic Audiobook Production Plan
+# Arabic Audiobook Production Plan
 
 **Date:** February 2026
-**Goal:** Produce Arabic audiobooks from raw book files (EPUB/DOCX) using Azure TTS
-**Target:** Two-voice audiobooks (narrator + dialogue) as primary deliverable
-**Stretch:** Multi-voice (per-character) after two-voice is proven solid
-**Cost:** ~$8-12 per 150-page book, free tier available (5M chars/month, 12 months)
+**Goal:** Produce Arabic audiobooks from raw book files (EPUB/DOCX) using Neural TTS
+**Providers:** Google Chirp3-HD (primary, $1.16/book) + ElevenLabs (premium, $21.74/book) + Azure (baseline)
+**Target:** Two-voice audiobooks (narrator + dialogue), FF pairing is smoothest
+**Stretch:** Multi-voice (per-character) after two-voice is proven solid — CLOSED (not justified)
+**Cost:** Google ~$1-2/book, ElevenLabs ~$20-25/book, Azure ~$8-12/book
 
 ---
 
@@ -284,10 +285,14 @@ output/{format}/book/02_chapters/chapter_*.txt + chapters.csv           ← REVI
 output/{format}/book/03_segments/segments.csv                           ← REVIEW (book summary)
 output/{format}/book/03_segments/ssml/chapter_*.csv                     ← machine segments
 output/{format}/book/03_segments/review/chapter_*.txt                   ← human review text
-    ↓ ssml.py (voice selection + SSML templates)
+    ↓ [OPTIONAL] ssml.py (Azure only — voice selection + SSML templates)
 output/{format}/book/04_ssml/chapter_*.ssml + voice_config.json
-    ↓ azure_client.py
-output/{format}/book/05_audio/chapter_*.mp3
+    ↓ audio_gen.py (multi-provider: Google/ElevenLabs/Azure)
+output/{format}/book/05_audio/{provider}/chapter_*.mp3
+
+Step 3 segments CSV is the universal hand-off point.
+Google/ElevenLabs skip step 4 — plain text per segment + silence concatenation.
+Azure can use step 4 SSML or build it inline from step 3.
 ```
 
 ---
@@ -703,9 +708,9 @@ and makes every boundary obvious.
 
 ---
 
-### POC-4: SSML Generation + Voice Selection — NEXT
+### POC-4: SSML Generation + Voice Selection — DONE
 
-**Status:** Not started. POC-5 (voice_pool) folded into POC-4 — for two-voice with per-book dialect config, voice selection is a config lookup, not a separate module.
+**Status:** Complete. SSML generation production-ready. POC-4a validated 4 TTS providers — Google Chirp3-HD and ElevenLabs are viable alternatives to Azure. See `docs/03-logs/POC4_RESULTS.md`.
 
 **Code:** `src/audiobook/ssml/core.py` (stub exists)
 
@@ -922,15 +927,74 @@ $20-40/book. Market via Arabic social media. Success metric: 5+ paying customers
 - Emotion/prosody enhancement deferred — waiting on Azure to add `express-as` styles for Arabic
 - Segment CSVs from Phase A are the foundation for any future enhancement
 
-### POC-4 (SSML + Voice Selection) — NEXT
-- Valid SSML files accepted by Azure TTS API
-- Dialect-matched voice pairs (Egyptian → ar-EG, Levantine → ar-SY, etc.)
-- Voice sampling script: 8-10 test audio files across 3 dialects, human picks winner
-- Two-voice SSML for fiction (narrator + dialogue), single-voice for non-fiction
-- At least one book fully converted to SSML
-- Prosody tuning: test-driven, only if sampling reveals flat output
+### POC-4 (SSML + Voice Selection) ✓ DONE
+- Valid SSML files accepted by Azure TTS API — all 12 books converted
+- 30 tests passing, `src/audiobook/ssml/core.py` (280 lines)
+- Dialect-matched voice pairs with context-aware breaks (500/300/200ms)
+- Voice coalescing reduces voice tag count — 50-tag limit is distinct names, not total elements
+- POC-4a: multi-provider comparison (Azure, Google, OpenAI, ElevenLabs)
+  - OpenAI not viable (no Arabic voices)
+  - Google Chirp3-HD: 30 Arabic voices, natural, same cost as Azure ($1.16/book)
+  - ElevenLabs: best quality, 20x cost ($21.74/book), 10 user-approved Arabic voices
+  - Mishkal diacritization makes pronunciation worse — plain text stays
+- POC-4b: voice pairing tests (8 combos: 4 gender pairs × 2 providers)
+  - **FF is the smoothest pairing** — less jarring voice transitions
+  - Female narrator over male dialogue better than reverse
+  - Same-gender pairings (MM, FF) produce most cohesive audio
+  - Tested on Chapter 1 of Tharthara Fawq al-Nil
+- **Results:** `docs/03-logs/POC4_RESULTS.md`
+
+### POC-5: Audio Generation (Multi-Provider) — NEXT
+- **Goal:** Full book/chapter audio generation from segments CSV (step 3 output)
+- Segments CSV is the universal hand-off point for all providers
+- SSML (step 4) is optional — Azure uses it natively, Google/ElevenLabs skip it
+- Providers send plain text per segment, concatenate with silence files
+
+**Provider architecture:**
+
+| Provider | Input | Voice Switch | Pauses | SSML |
+|----------|-------|-------------|--------|------|
+| Azure | Segments CSV → SSML inline | Multi-voice in 1 request | `<break>` tags | Full |
+| Google Chirp3-HD | Segments CSV → plain text | 1 API call per segment | Silence WAV concat | Limited (no `<break>`, no `<voice>`) |
+| ElevenLabs | Segments CSV → plain text | 1 API call per segment | `<break>` within segment + silence WAV concat | `<break>` only (no `<voice>`) |
+
+**Settled voice pairings (V Liked, pairing-tested):**
+
+| Provider | Combo | Narrator | Dialogue | Notes |
+|----------|-------|----------|----------|-------|
+| Google | FF (primary) | Sulafat | Leda | Smoothest, very good narrator |
+| Google | MM | Enceladus | Sadaltager | Good narrator, ok dialogue |
+| ElevenLabs | FF (primary) | Sara (MSA) | Alice (Egyptian) | Both interesting, good contrast |
+| ElevenLabs | MM | Yahya (MSA) | Karim (MSA) | Very good narrator, ok dialogue |
+| ElevenLabs | MF | Moncellence (Egyptian) | Alice (Egyptian) | Both good, dialect-matched |
+
+Full voice inventory: `docs/02-features/research/final_voices.csv` (19 voices, pairing-tested)
+
+**Scope:**
+- Parameterized script: book, chapter range, provider, voice pairing
+- Pause variation (randomized within ranges, not fixed durations)
+- Full book generation (all chapters → concat → final MP3)
+- Output: `output/{format}/{book}/05_audio/{provider}/chapter_*.mp3`
 
 ---
+
+## Audiobook Best Practices — How Sawt Meets Them
+
+Research: `docs/02-features/research/audiobook_best_practices.md`
+
+| Best Practice | Industry Standard | Sawt Status |
+|---------------|-------------------|-------------|
+| **Pause variation** | Vary breaks to avoid metronome effect (#1 TTS complaint) | ✅ Context-aware breaks (500/300/200ms by transition type). TODO: add slight randomization |
+| **Said tags with narrator** | "He said" stays with narrator voice, not dialogue | ✅ Colon-split puts attribution before colon as narrator, quoted speech as dialogue |
+| **Dialect matching** | Match voice to author's region (Storytel/Kitab Sawti standard) | ✅ Per-book dialect config, Egyptian for Mahfouz, Levantine voices available |
+| **Two-voice model** | MSA narration + dialect dialogue is how Egyptian fiction is produced | ✅ Core architecture — narrator voice + dialogue voice |
+| **Same-gender pairings smoothest** | Less jarring transitions than M/F switching | ✅ FF confirmed as primary pairing in listening tests |
+| **Voice contrast** | Enough to distinguish, not so much it feels spliced | ✅ Tested 8 pairings, selected voices with complementary warmth/expressiveness |
+| **Guillemets as narrator** | Inner thoughts + speech by same person = one voice for cohesion | ✅ Deliberate design decision — avoids jarring micro voice-switches |
+| **Long-form testing** | Test 10+ min continuously, not spot checks | ✅ Full chapter 1 (70 segments) generated for all 8 pairings |
+| **Proper noun pronunciation** | #1 Arabic TTS failure point (no diacritics in print) | ⚠️ Future: per-book pronunciation dictionary via SSML `<phoneme>` |
+| **Prosody monotony** | Vary rhythm to avoid auditory fatigue | ⚠️ Future: `<prosody>` rate/pitch variation between narrative segments |
+| **Fiction vs non-fiction** | Fiction = expressive two-voice; non-fiction = single authoritative voice | ✅ Genre flag in pipeline design, non-fiction skips dialogue detection |
 
 ## References
 
@@ -948,6 +1012,7 @@ $20-40/book. Market via Arabic social media. Success metric: 5+ paying customers
 | POC-1 results | `docs/03-logs/POC1_RESULTS.md` |
 | POC-2 results | `docs/03-logs/POC2_RESULTS.md` |
 | POC-3 results | `docs/03-logs/POC3_RESULTS.md` |
+| POC-4 results | `docs/03-logs/POC4_RESULTS.md` |
 | Azure voice capabilities | `docs/02-features/azure-audiobooks/reference/arabic_voices_capabilities.json` |
 | Hindawi CC corpus | [hindawi.org](https://www.hindawi.org/) — 3,271 books, CC BY 4.0 |
 | Swedish text corpus | [researchdata.se](https://researchdata.se/en/catalogue/dataset/2024-145) — 1,745 books, plain text |
