@@ -1,0 +1,12 @@
+[
+  {
+    "provider": "openai",
+    "output_file": "ch15_openai.mp3",
+    "total_chars": 4026,
+    "duration_sec": 169.9,
+    "cost_estimate_usd": 0.1208,
+    "file_size_kb": 3218.0,
+    "voice_config": "tts-1-hd: narrator=onyx, dialogue=nova",
+    "notes": "Coalesced 86 segments → 49 groups"
+  }
+]

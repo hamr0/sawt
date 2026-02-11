@@ -55,7 +55,7 @@ Text processing IS the product. SSML is just markup. Let Azure handle pronunciat
 | src/audiobook/ingest/ | PRODUCTION READY | File ingestion (EPUB/DOCX/TXT → text) |
 | src/audiobook/chapters/ | PRODUCTION READY | Chapter splitting (25K char units) |
 | src/audiobook/dialogue/ | PRODUCTION READY | Dialogue detection (~95% accuracy) |
-| src/audiobook/ssml/ | NEXT (POC 4) | SSML generation + voice selection + sampling |
+| src/audiobook/ssml/ | DONE (POC 4) | SSML generation + voice selection (30 tests) |
 | src/audiobook/shared/ | Active | Shared utilities (review, azure_client) |
 | tests/audiobook/ | 126 tests | Tests per module (mirrored structure) |
 | data/books/ | 12 books | Input books (epub/, docx/, txt/) |
