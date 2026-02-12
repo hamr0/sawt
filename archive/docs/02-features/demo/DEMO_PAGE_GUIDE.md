@@ -359,6 +359,6 @@ This order ensures:
 ## Contact & Support
 
 For issues or feature requests:
-- GitHub Issues: https://github.com/amrhas82/ArabicTTS/issues
+- GitHub Issues: https://github.com/hamr0/ArabicTTS/issues
 - Questions about the demo page: See ARCHITECTURE.md for system design details
 
