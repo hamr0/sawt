@@ -1,3 +1,13 @@
+```
+ ███████╗ █████╗ ██╗    ██╗████████╗
+ ██╔════╝██╔══██╗██║    ██║╚══██╔══╝  ))
+ ███████╗███████║██║ █╗ ██║   ██║    )))
+ ╚════██║██╔══██║██║███╗██║   ██║   ))))
+ ███████║██║  ██║╚███╔███╔╝   ██║    )))
+ ╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝   ╚═╝     ))
+          كل كتاب له صوت
+```
+
 # Sawt — كل كتاب له صوت
 
 Sawt produces two-voice Arabic audiobooks from raw book files (EPUB/DOCX/TXT). Text extraction, chapter splitting, and dialogue detection are production ready. SSML generation with dialect-matched Azure Neural TTS voices is next.
