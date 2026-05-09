@@ -10,6 +10,11 @@
 
 # Sawt — كل كتاب له صوت
 
+<p align="center">
+  <img src="https://img.shields.io/github/package-json/v/hamr0/sawt?label=version&color=2a4f8c" alt="version (auto from package.json)">
+  <img src="https://img.shields.io/badge/license-Apache%202.0-2a4f8c" alt="license: Apache 2.0">
+</p>
+
 Sawt produces two-voice Arabic audiobooks from raw book files (EPUB/DOCX/TXT). Text extraction, chapter splitting, and dialogue detection are production ready. SSML generation with dialect-matched Azure Neural TTS voices is next.
 
 ---

@@ -1,0 +1,11 @@
+{
+  "name": "sawt",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Two-voice Arabic audiobooks from raw book files (EPUB/DOCX/TXT).",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamr0/sawt.git"
+  },
+  "license": "Apache-2.0"
+}
