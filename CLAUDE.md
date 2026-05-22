@@ -54,7 +54,7 @@ Two-voice (narrator + dialogue) as primary goal. Multi-voice closed (Azure Arabi
 
 **Open-source only.** No vendor lock-in. Every line of code must have a purpose — no speculative code, no premature abstractions.
 
-For full development and testing standards, see `/home/hamr/Documents/PycharmProjects/gitdone/.claude/memory/AGENT_RULES.md`.
+For full development and testing standards, see `.claude/memory/AGENT_RULES.md`.
 
 ## Architecture
 
