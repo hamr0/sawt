@@ -18,6 +18,10 @@ restarting from zero. Two eras:
 
 ## [Unreleased]
 
+### Changed
+
+- **Agent/IDE scratch gitignored and de-tracked.** `.gitignore` now default-denies every dot-directory (`.*/`), re-admitting only what ships (`.github/`). Per-machine agent/IDE state (`.claude/`, `.litectx/`, `.idea/`, …) regenerates locally and only added noise and churn; any already-committed copies are removed from tracking (local files kept on disk). Repo hygiene only.
+
 ### Infrastructure
 - Apache-2.0 LICENSE file added.
 - Root `package.json` added (private; for tooling/metadata, not npm
