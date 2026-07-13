@@ -20,6 +20,23 @@ restarting from zero. Two eras:
 
 ### Changed
 
+- **`CLAUDE.md` rewritten against the built codebase.** The old file had
+  drifted from reality: it claimed 126 tests (the suite has 259), pointed
+  at `docs/02-features/azure-audiobooks/PLAN.md` and
+  `.claude/memory/AGENT_RULES.md` (both moved), described the project as
+  Azure-only (it is multi-provider — Google Chirp3-HD primary, ElevenLabs
+  premium, Azure baseline), omitted POC-5 audio generation as the next
+  stage, and listed `shared/` as active when it and `voice_pool/` are
+  docstring-only stubs. Now also records the numbered output contract
+  (`01_ingestion` → `05_audio`), the `from .core import *` plus
+  explicit private-helper export convention, and a domain-knowledge
+  section covering the decisions that read as bugs but are deliberate
+  (guillemets are not dialogue, no continuation heuristic, non-fiction
+  false positives by design, PDF permanently out of scope, 25K chars
+  derived from the 64KB Azure SSML ceiling). Memory and agent-rules
+  pointers appended as `@` imports; these resolve from local, gitignored
+  `.claude/` state and are intentionally not shipped with the repo.
+
 - **Agent/IDE scratch gitignored and de-tracked.** `.gitignore` now default-denies every dot-directory (`.*/`), re-admitting only what ships (`.github/`). Per-machine agent/IDE state (`.claude/`, `.litectx/`, `.idea/`, …) regenerates locally and only added noise and churn; any already-committed copies are removed from tracking (local files kept on disk). Repo hygiene only.
 
 ### Infrastructure

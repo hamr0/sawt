@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 <!-- AURORA:START -->
 # Aurora Instructions
 
@@ -37,73 +41,164 @@ Keep this managed block so 'aur init --config' can refresh the instructions.
 
 <!-- AURORA:END -->
 
-# Sawt - Arabic Audiobook Production
+# Sawt — Arabic Audiobook Production
 
-Produce Arabic audiobooks from raw book files (PDF/TXT/EPUB) using Azure Neural TTS.
-Two-voice (narrator + dialogue) as primary goal. Multi-voice closed (Azure Arabic lacks voices/emotions).
+Produce Arabic audiobooks from raw book files (EPUB/DOCX/TXT) using neural TTS. Two-voice
+(narrator + dialogue) for fiction is the product. Multi-voice per-character is **closed** —
+Azure Arabic has only 2 voices per dialect, so characters C through Z would share voices anyway.
+
+**Text processing IS the product.** Once text is correctly broken into parts, SSML is just
+markup and TTS is a commodity API call. Let the TTS engine handle pronunciation — we handle
+structure (chapters, paragraphs, dialogue boundaries). An earlier IPA/phoneme pipeline tried to
+control pronunciation letter-by-letter and produced robotic, unintelligible audio. It is
+archived in `archive/` as a learning artifact and shares **zero** code with this pipeline.
 
 ## Dev Rules
 
-**POC first.** Always validate logic with a ~15min proof-of-concept before building. Cover happy path + common edges. POC works → design properly → build with tests. Never ship the POC.
+**POC first.** Validate logic with a ~15min proof-of-concept before building. Cover happy path
++ common edges. POC works → design properly → build with tests. Never ship the POC.
 
-**Build incrementally.** Break work into small independent modules. One piece at a time, each must work on its own before integrating.
+**Build incrementally.** Small independent modules. Each must work on its own before integrating.
 
-**Dependency hierarchy — follow strictly:** vanilla language → standard library → external (only when stdlib can't do it in <100 lines). External deps must be maintained, lightweight, and widely adopted. Exception: always use vetted libraries for security-critical code (crypto, auth, sanitization).
+**Dependency hierarchy — follow strictly:** vanilla language → standard library → external
+(only when stdlib can't do it in <100 lines). External deps must be maintained, lightweight,
+widely adopted. Exception: always use vetted libraries for security-critical code.
 
-**Lightweight over complex.** Fewer moving parts, fewer deps, less config. Express over NestJS, Flask over Django, unless the project genuinely needs the framework. Simple > clever. Readable > elegant.
+**Lightweight over complex.** Fewer moving parts, fewer deps, less config. Simple > clever.
+Readable > elegant.
 
-**Open-source only.** No vendor lock-in. Every line of code must have a purpose — no speculative code, no premature abstractions.
-
-For full development and testing standards, see `.claude/memory/AGENT_RULES.md`.
-
-## Architecture
-
-Pipeline: Raw Book (EPUB/DOCX/TXT) → Ingestion → Chapter Splitting → Dialogue Detection → SSML + Voice Selection → Azure TTS → Audio
-
-Text processing IS the product. SSML is just markup. Let Azure handle pronunciation.
-
-## Pipeline Status
-
-| Module | Status | Purpose |
-|--------|--------|---------|
-| src/audiobook/ingest/ | PRODUCTION READY | File ingestion (EPUB/DOCX/TXT → text) |
-| src/audiobook/chapters/ | PRODUCTION READY | Chapter splitting (25K char units) |
-| src/audiobook/dialogue/ | PRODUCTION READY | Dialogue detection (~95% accuracy) |
-| src/audiobook/ssml/ | DONE (POC 4) | SSML generation + voice selection (30 tests) |
-| src/audiobook/shared/ | Active | Shared utilities (review, azure_client) |
-| tests/audiobook/ | 126 tests | Tests per module (mirrored structure) |
-| data/books/ | 12 books | Input books (epub/, docx/, txt/) |
-| output/ | gitignored | Per-book working output |
-
-## Archive
-
-`archive/` -- previous IPA phonological pipeline (code + old docs). Reference only, not active.
-Prototype history (7 iterations) -- `docs/02-features/azure-audiobooks/reference/prototypes/`
-
-## Key Patterns
-
-- POCs isolated by data boundaries (file output), not code imports
-- CSV review at every pipeline stage, chapter-by-chapter cadence
-- Two-voice (narrator + dialogue) for fiction, single voice for non-fiction
-- Multi-voice closed (only 2 Arabic voices per dialect, attribution overhead not justified)
-- Dialect-matched voices per book (Egyptian author → ar-EG, Levantine → ar-SY/JO/LB, etc.)
-- Code-first for text processing, LLM only where it demonstrably helps
-- No dialect switching -- a book is a book
+**Open-source only.** No vendor lock-in. Every line of code must have a purpose — no
+speculative code, no premature abstractions.
 
 ## Commands
 
 ```bash
-pytest tests/audiobook/ -v                    # Run all audiobook tests
-pytest tests/audiobook/ingest/ -v             # Run ingestion tests
-pytest tests/audiobook/chapters/ -v           # Run chapter splitting tests
-pytest tests/audiobook/dialogue/ -v           # Run dialogue detection tests
-pip install -r requirements.txt               # Install dependencies
+pip install -r requirements.txt
+
+pytest tests/ -v                                    # Full suite (259 tests)
+pytest tests/audiobook/dialogue/ -v                 # One module
+pytest tests/audiobook/dialogue/test_core.py::TestDetectMarkers -v            # One class
+pytest tests/audiobook/dialogue/test_core.py::TestDetectMarkers::test_em_dash -v   # One test
 ```
+
+Note: `.env.example` is stale — it still lists AWS Polly keys. The code uses Azure
+(`AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION`). TTS credentials are only needed for audio
+generation (POC-5); everything through SSML runs offline.
+
+## Pipeline Architecture
+
+Five stages. Each is a package under `src/audiobook/` with the implementation in `core.py`.
+Tests mirror the structure exactly: `tests/audiobook/<module>/test_core.py`.
+
+```
+data/books/{epub,docx,txt}/book.*
+  ├─ ingest/     → output/{format}/{book}/01_ingestion/  clean_text.txt + paragraphs.csv
+  ├─ chapters/   → output/{format}/{book}/02_chapters/   chapter_*.txt + chapters.csv
+  ├─ dialogue/   → output/{format}/{book}/03_segments/   ssml/*.csv + review/*.txt + segments.csv
+  ├─ ssml/       → output/{format}/{book}/04_ssml/       chapter_*.ssml + voice_config.json
+  └─ (POC-5)     → output/{format}/{book}/05_audio/{provider}/chapter_*.mp3
+```
+
+| Module | Status | Entry point |
+|--------|--------|-------------|
+| `ingest/` | Production ready | `ingest(book_path, output_dir)` |
+| `chapters/` | Production ready | `split_book(ingestion_dir)` |
+| `dialogue/` | Production ready (~95%) | `segment_book(chapters_dir)`, `sync_review(segments_dir)` |
+| `ssml/` | Done (POC-4) | `generate_book_ssml()`, `make_voice_config()` |
+| `voice_pool/`, `shared/` | **Stubs** — docstrings only, no code yet | — |
+| POC-5 audio generation | **Next** — not built | — |
+
+`output/` is gitignored working state, not build artifacts. Regenerate freely.
+
+### The two rules that shape everything
+
+**POCs are isolated by DATA boundaries, not code imports.** Each stage reads the previous
+stage's *file output*, never its Python. Any stage can be rewritten without breaking the next.
+Don't add cross-stage imports — that would collapse the property the whole design rests on.
+
+**Every stage emits a CSV for human review**, reviewed chapter by chapter. Don't advance to the
+next stage until the current chapter's output is verified. `03_segments/` is the universal
+hand-off point for all TTS providers.
+
+### Module conventions
+
+`__init__.py` re-exports from `core.py` via `from .core import *`, then explicitly imports the
+underscore-prefixed helpers that tests need (`_find_dialogue_colon`, `_strip_diacritics`,
+`_find_dominant_delimiter`, …). If you add a private helper that tests exercise, add it to that
+explicit import list.
+
+Constants are named, not magic (`MAX_UNIT_CHARS = 25_000`, `SPEECH_ATTRIBUTION_LEN = 150`).
+Errors carry pipeline context (`IngestionError(ValueError)`). Return types are `TypedDict`
+(`NormStats`, `IngestSummary`, `VoiceConfig`). Use `logging`, not `print()`.
+
+## Domain Knowledge (hard-won — don't relitigate)
+
+**Arabic text**
+- NFKC normalization eliminates 100% of Arabic Presentation Forms (U+FE70–FEFF). Ornate
+  parentheses (U+FD3E/FD3F) survive it and are replaced manually.
+- Harakat (diacritics, U+064B–065F, U+0670) must be stripped before any speech-verb regex.
+- **PDF is out of scope, permanently.** Arabic PDFs store word spacing as positional
+  coordinates, not space characters — words extract fused (`أﻗﻄﻊُﻫﺬا`). PyMuPDF closed this
+  wontfix; no OSS tool solves it. PDFs stay in `data/books/pdf/` for reference only.
+
+**Dialogue detection** (`dialogue/core.py`)
+- **The colon `:` is THE universal Arabic dialogue marker** — not quotation marks. Attribution
+  always comes *before* the quote.
+- Marker priority: em dash → colon → trailing colon → plain (narrator).
+- **Guillemets `«»` are NOT dialogue.** They're scare quotes and inner thoughts. Voice-switching
+  for a 3-word `«phrase»` mid-narration is jarring. Deliberate decision — don't "fix" it.
+- **No continuation heuristic.** A plain paragraph after dialogue resets to narrator. Arabic
+  authors mark every speaker turn; the heuristic caused more false positives than it solved.
+- Colon filtering: skip time colons (`١٢:٣٠`), URLs, heading-style trailing colons. Text
+  <150 chars before a colon assumes dialogue; ≥150 chars requires an explicit speech verb in
+  the last 100. Passive `قيل` is excluded from the verb regex.
+
+**Chapter splitting** (`chapters/core.py`)
+- Split on delimiter OR 25K chars, whichever comes first. **Never cut mid-paragraph** —
+  paragraphs are atomic through the entire pipeline.
+- 25K is the Azure ceiling: 64KB SSML/request ÷ ~2 bytes per Arabic UTF-8 char, minus markup.
+  (The 50-tag limit counts *distinct* voice names — two-voice never approaches it.)
+- Detection picks the *dominant* delimiter per book and ignores stray noise. 5 of 12 test books
+  have no delimiters at all — pure size-based fallback is a supported path, not a failure.
+- **EPUB spine is unreliable** (only 1 of 5 Hindawi EPUBs maps cleanly; 3 are single-file).
+  Text-based regex on `clean_text.txt` is primary; spine is a bonus.
+- DOCX Shamela files carry page markers `(1/406)` — filter as noise, never split on them.
+
+**Voice & TTS**
+- **Fiction = two voices. Non-fiction = single voice, skip dialogue detection entirely.**
+  Quranic verses, `قال العلماء:`, and scholarly citations are not dramatic dialogue — the
+  detector produces false positives on them by design.
+- **FF (female narrator + female dialogue) is the smoothest pairing**, validated in listening
+  tests. Same-gender pairings are the most cohesive.
+- **One dialect per book, matched to the book's origin.** Egyptian author → `ar-EG`, Levantine
+  → `ar-SY/JO/LB`. Dialect changes meaning, not just accent. Never mix within a book.
+- Azure Arabic has **zero** `mstts:express-as` support (no emotion styles, no HD voices). Only
+  rate/pitch/volume. Emotion work is blocked on the platform, not on us.
+- Multi-provider: Google Chirp3-HD (~$1.16/book, primary), ElevenLabs (~$21.74/book, premium),
+  Azure (~$8–12/book, baseline). OpenAI has no Arabic voices. Mishkal diacritization makes
+  pronunciation *worse* — send plain text.
 
 ## Docs
 
 | Topic | Location |
 |-------|----------|
-| Documentation hub | docs/README.md |
-| Execution plan (source of truth) | docs/02-features/azure-audiobooks/PLAN.md |
-| Knowledge base (topic index) | docs/KNOWLEDGE_BASE.md |
+| Execution plan (source of truth) | `docs/02-features/PLAN.md` |
+| Product requirements | `docs/01-product/prd.md` |
+| Documentation hub / knowledge base | `docs/README.md`, `docs/KNOWLEDGE_BASE.md` |
+| POC results (1–4) | `docs/03-logs/POC{1,2,3,4}_RESULTS.md` |
+| Voice inventory (19 pairing-tested voices) | `docs/02-features/research/final_voices.csv` |
+
+Some docs still reference the old flat layout (`src/audiobook/ingest.py`,
+`docs/02-features/azure-audiobooks/…`). The tree above is authoritative.
+
+`archive/` holds the superseded IPA phonological pipeline. Reference only — never extend it.
+
+<!-- MEMORY:START -->
+@.claude/remember/MEMORY.md
+<!-- MEMORY:END -->
+
+<!-- AGENT_RULES:START -->
+Consult when building something new or adding a feature — a standards guide, not hot
+context like MEMORY.md above:
+@.claude/remember/AGENT_RULES.md
+<!-- AGENT_RULES:END -->
