@@ -606,7 +606,7 @@ One-liners so the history is not lost:
 - `ingest()` hard-coded its output location (`output/{format}/{book}/`). It got an optional `ingestion_dir` argument so the runner can write to `<book dir>/<name>_sawt/01_ingestion`; this was the one stage change.
 
 ### Look
-- Taken from bareloop's real CSS, not a description of it. Its light-theme colours failed the WCAG contrast check until darkened (contrast-tuned tokens in `DESIGN_PLAN.md`).
+- Bareloop style (DESIGN_PLAN.md); light-theme colours contrast-tuned to the AA checklist in DESIGN_PLAN.md.
 
 ---
 
