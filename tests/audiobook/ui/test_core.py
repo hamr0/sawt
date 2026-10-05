@@ -210,15 +210,14 @@ class TestStartRuns:
         assert {r["name"] for r in client.get("/api/jobs")[1]["jobs"]} == {"one", "two"}
         assert all(r["status"].startswith("ready") for r in client.get("/api/jobs")[1]["jobs"])
 
-    def test_folder_name_collision_is_skipped_not_run(self, client, books):
+    def test_folder_same_stem_gets_free_default_name(self, client, books):
         make_book(books, "same")
         (books / "same.docx").write_bytes(b"x")  # will fail ingest, but shares the stem
         status, data = client.post("/api/runs", {"path": str(books)})
-        assert status == 202 and data["queued"] == ["same"]
-        assert any("already used" in s["reason"] for s in data["skipped"])
+        assert status == 202 and data["queued"] == ["same", "same-2"]  # default names stay unique
         client.wait_idle()
 
-    def test_folder_book_with_taken_name_is_skipped_not_fatal(self, client, books):
+    def test_folder_book_with_taken_default_name_gets_free_name(self, client, books):
         other = books / "elsewhere"
         other.mkdir()
         client.post("/api/runs", {"path": str(make_book(other, "dup"))})
@@ -228,9 +227,16 @@ class TestStartRuns:
         make_book(folder, "dup")
         make_book(folder, "fresh")
         status, data = client.post("/api/runs", {"path": str(folder)})
-        assert status == 202 and data["queued"] == ["fresh"]
-        assert data["skipped"][0]["file"] == "dup.txt" and "already taken" in data["skipped"][0]["reason"]
+        assert status == 202 and data["queued"] == ["dup-2", "fresh"] and data["skipped"] == []
         client.wait_idle()
+
+    def test_explicit_taken_name_is_still_an_error(self, client, books):
+        other = books / "elsewhere"
+        other.mkdir()
+        client.post("/api/runs", {"path": str(make_book(other, "dup"))})
+        client.wait_idle()
+        status, data = client.post("/api/runs", {"path": str(make_book(books, "x")), "name": "dup"})
+        assert status == 400 and data["field"] == "name" and "already taken" in data["error"]
 
     @pytest.mark.parametrize("body,field", [
         ({"path": ""}, "path"),
@@ -526,9 +532,9 @@ if (scanning) global.fetch = function (u, o) {
   var d = u === '/api/status' ? { busy: false, current: null, queued: [] }
     : u === '/api/jobs' ? { jobs: [{ name: 'taken', status: 'imported', date: '', runs: 0 }] }
     : u.indexOf('/api/scan') === 0 ? { kind: 'folder', books: [
-        { path: '/b/one.epub', file: 'one.epub', name: 'one', job: null },
-        { path: '/b/two.txt', file: 'two.txt', name: 'two', job: null },
-        { path: '/b/old.txt', file: 'old.txt', name: 'taken', job: 'taken' }],
+        { path: '/b/one.epub', file: 'one.epub', name: 'one', free_name: 'one', job: null },
+        { path: '/b/two.txt', file: 'two.txt', name: 'two', free_name: 'two', job: null },
+        { path: '/b/old.txt', file: 'old.txt', name: 'taken', free_name: 'taken-2', job: 'taken' }],
       skipped: [{ file: 'scan.pdf', reason: 'unsupported format' }] }
     : u === '/api/runs' ? { queued: ['one'], skipped: [] }
     : { name: 'taken', output: '/x', source: '', runs: [], missing: false };
@@ -707,6 +713,7 @@ class TestStartButtonSync:
         assert out["dupJob"] == [True, "fix the name errors first"]
         assert out["fixed"] == [False, "", "[ start 3 books ]"]
         assert 'data-f="rownew" data-i="2" data-fid="rnew-2" checked' in out["newjob"]
+        assert 'value="taken-2"' in out["newjob"] and "name already taken" not in out["newjob"].split('data-rerr="2"')[1][:80]
         # start sends only ticked rows, in list order
         body = json.loads(next(c[2] for c in out["calls"] if c[1] == "/api/runs"))
         assert body["books"] == [{"path": "/b/two.txt", "name": "two", "new_job": False},
@@ -1221,3 +1228,46 @@ class TestBooksListRun:
         assert client.post("/api/runs", {"books": [book_item(b, "b")]})[0] == 409
         gate.set()
         client.wait_idle()
+
+
+class TestFreeDefaultNames:
+    def _job(self, client, books, sub, stem):
+        d = books / sub
+        d.mkdir(exist_ok=True)
+        client.post("/api/runs", {"path": str(make_book(d, stem))})
+        client.wait_idle()
+
+    def test_scan_taken_stem_gets_dash_2_then_dash_3(self, client, books):
+        self._job(client, books, "old1", "novel")
+        folder = books / "new"
+        folder.mkdir()
+        make_book(folder, "novel")
+        make_book(folder, "other")
+        rows = client.get("/api/scan?path=" + quote(str(folder)))[1]["books"]
+        assert [(r["name"], r["free_name"], r["job"]) for r in rows] == [("novel-2", "novel-2", None), ("other", "other", None)]
+        self._job(client, books, "old2", "novel")  # a job named novel-2 now exists too
+        assert client.get("/api/scan?path=" + quote(str(folder)))[1]["books"][0]["name"] == "novel-3"
+
+    def test_single_file_default(self, client, books):
+        self._job(client, books, "old", "novel")
+        solo = make_book(books, "novel")
+        data = client.get("/api/scan?path=" + quote(str(solo)))[1]
+        assert data["kind"] == "file" and data["books"][0]["name"] == "novel-2"
+        status, out = client.post("/api/runs", {"path": str(solo)})
+        assert status == 202 and out["queued"] == ["novel-2"]
+        client.wait_idle()
+
+    def test_existing_job_row_unchanged_but_offers_free_name_for_new_job(self, client, books):
+        self._job(client, books, "same", "novel")
+        row = client.get("/api/scan?path=" + quote(str(books / "same")))[1]["books"][0]
+        assert row["job"] == "novel" and row["name"] == "novel" and row["free_name"] == "novel-2"
+        # re-running that book without a name keeps targeting the existing job
+        status, out = client.post("/api/runs", {"path": str(books / "same" / "novel.txt"), "confirm": True})
+        assert status == 202 and out["queued"] == ["novel"]
+        client.wait_idle()
+
+    def test_free_job_name_helper(self):
+        data = {"jobs": [{"name": "a"}, {"name": "a-2"}]}
+        assert runner_core.free_job_name(data, "b") == "b"
+        assert runner_core.free_job_name(data, "a") == "a-3"
+        assert runner_core.free_job_name(data, "a", reserved={"a-3"}) == "a-4"

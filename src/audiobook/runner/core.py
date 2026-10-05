@@ -18,7 +18,7 @@ import sys
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Callable, TypedDict
+from typing import Callable, Iterable, TypedDict
 
 from ..chapters import split_book
 from ..dialogue import segment_book
@@ -163,6 +163,16 @@ def save_jobs(data: dict) -> None:
 
 def _find_job(data: dict, name: str) -> Job | None:
     return next((j for j in data["jobs"] if j["name"] == name), None)
+
+
+def free_job_name(data: dict, stem: str, reserved: Iterable[str] = ()) -> str:
+    """``stem`` if no job (or reserved name) uses it, else the first free ``stem-2``, ``stem-3``, ..."""
+    used = {j["name"] for j in data["jobs"]} | set(reserved)
+    name, n = stem, 1
+    while name in used:
+        n += 1
+        name = f"{stem}-{n}"
+    return name
 
 
 # ---------------------------------------------------------------------------

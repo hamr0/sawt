@@ -31,7 +31,7 @@ from urllib.parse import parse_qs, quote, unquote, urlsplit
 
 from ..runner import (
     OVERWRITE_WARNING, RUN_FAILED, RUN_RUNNING, STEP_DIRS, RunnerError,
-    import_existing, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
+    free_job_name, import_existing, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
 )
 from ..runner.core import _resolve_job
 from .page import PAGE
@@ -285,6 +285,8 @@ class _Handler(BaseHTTPRequestHandler):
         data = load_jobs()
         plan, taken = [], set()  # (book, resolved name, existing job, new_job)
         for book, cname, cnew in candidates:
+            if cname is None and not cnew and not any(j["source"] == str(book) for j in data["jobs"]):
+                cname = free_job_name(data, book.stem, taken)  # default name must not collide with another book's job
             try:
                 job, job_name = _resolve_job(data, book, cname, cnew)
             except RunnerError as exc:
@@ -434,12 +436,14 @@ def _books_candidates(items: object) -> list[tuple[Path, str | None, bool]]:
 def _scan_result(raw: object) -> dict:
     raw_path = _absolute(raw, "path")
     books, skipped = _scan(raw_path, "path")
-    jobs = load_jobs()["jobs"]
-    rows = []
+    data = load_jobs()
+    rows, reserved = [], set()
     for b in books:
-        job = next((j for j in jobs if j["source"] == str(b)), None)
-        rows.append({"path": str(b), "file": b.name, "name": job["name"] if job else b.stem,
-                     "job": job["name"] if job else None})
+        job = next((j for j in data["jobs"] if j["source"] == str(b)), None)
+        free = free_job_name(data, b.stem, reserved)
+        reserved.add(free)
+        rows.append({"path": str(b), "file": b.name, "name": job["name"] if job else free,
+                     "job": job["name"] if job else None, "free_name": free})
     return {"kind": "folder" if Path(raw_path).expanduser().is_dir() else "file",
             "books": rows, "skipped": skipped}
 

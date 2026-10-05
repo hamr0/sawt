@@ -203,7 +203,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     skipped: [], queuedNames: [], msg: '', retryErr: '',
     renaming: null, renameVal: '', renameErr: '', focusNext: null,
     files: null, filesErr: '', fexp: {},
-    scan: null  /* folder pick list: { rows: [{path,file,job,stem,on,nm,newJob}], skipped: [] }; null = single file or no path */
+    freeName: '', freeFor: '', scan: null  /* folder pick list: { rows: [{path,file,job,stem,on,nm,newJob}], skipped: [] }; null = single file or no path */
   };
   var polling = false, scanTimer = null, SCAN_DELAY_MS = 250;
 
@@ -537,7 +537,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     if (sc.skipped.length) h += '<div class="lbl">skipped</div>' + sc.skipped.map(function (k) { return '<div class="skiprow">' + nm(k.file) + ' — ' + msgHtml(k.reason) + '</div>'; }).join('');
     return h + '</div>';
   }
-  function namePh() { return stem(state.form.path.trim()) || 'defaults to the file name'; }
+  function namePh() { return (state.freeName && state.freeFor === state.form.path.trim() ? state.freeName : stem(state.form.path.trim())) || 'defaults to the file name'; }
   /* in-place update (no re-render: that would steal focus/caret from the field) */
   function syncStart() {
     var b = el.querySelector('[data-start]'), w = el.querySelector('[data-start-why]'), n = el.querySelector('#f-name');
@@ -682,6 +682,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     api('GET', '/api/scan?path=' + enc(p)).then(function (r) {
       if (state.form.path.trim() !== p) return;  /* typed on since: a newer scan is coming */
       var d = r.data;
+      if (r.ok && d.kind === 'file' && d.books.length && !d.books[0].job) { state.freeName = d.books[0].free_name; state.freeFor = p; syncStart(); }
       if (!r.ok || !d.books || d.kind !== 'folder') { if (state.scan) { state.scan = null; render(); } return; }
       var old = {};
       if (state.scan) state.scan.rows.forEach(function (x) { old[x.path] = x; });
@@ -689,7 +690,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
         skipped: d.skipped || [],
         rows: d.books.map(function (b) {
           var o = old[b.path];
-          return o || { path: b.path, file: b.file, job: b.job, stem: b.file.replace(/\.[^.]*$/, ''), on: true, nm: b.name, newJob: false };
+          return o || { path: b.path, file: b.file, job: b.job, stem: b.file.replace(/\.[^.]*$/, ''), on: true, nm: b.name, free: b.free_name, newJob: false };
         })
       };
       state.overwrite = null; state.generalErr = '';
@@ -755,7 +756,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     else if (f === 'rowon') { state.scan.rows[+e.target.dataset.i].on = e.target.checked; state.overwrite = null; render(); }
     else if (f === 'rownew') {
       var r = state.scan.rows[+e.target.dataset.i];
-      r.newJob = e.target.checked; r.nm = r.newJob ? r.stem : r.job; state.overwrite = null; render();
+      r.newJob = e.target.checked; r.nm = r.newJob ? r.free : r.job; state.overwrite = null; render();
     }
     else if (f === 'sel') selectJob(e.target.value);
   });
