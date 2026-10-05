@@ -20,6 +20,8 @@ restarting from zero. Two eras:
 
 ### Added
 
+- **Local UI shell (PRD module 2).** `python -m src.audiobook.ui` serves a stdlib-only page on 127.0.0.1 (Host-header checked): job cards, new-job panel with inline overwrite warning, live run log with retry, history, rename, light/dark theme. Runs execute one at a time on a worker thread; the artifacts tab is a placeholder until module 3.
+
 - **Runner CLI (PRD module 0).** `python -m src.audiobook.runner <book-or-folder>` chains ingest → chapters → dialogue (→ SSML with `--ssml`) into `<book dir>/<job name>_sawt/`, stops only on an error or at the pre-audio gate, retries from the failed step using only files on disk (`--retry`), and records every run in `~/.config/sawt/jobs.json` (`SAWT_HOME` overrides; `--list`, `--rename`, `--import-existing`). `ingest()` gained an optional `ingestion_dir` argument so the runner can choose the output folder.
 
 - **POC-4c: Gemini TTS evaluated and chosen as the production provider.**

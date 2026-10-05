@@ -75,13 +75,15 @@ speculative code, no premature abstractions.
 ```bash
 pip install -r requirements.txt
 
-pytest tests/ -v                                    # Full suite (284 tests)
+pytest tests/ -v                                    # Full suite (326 tests)
 pytest tests/audiobook/dialogue/ -v                 # One module
 pytest tests/audiobook/dialogue/test_core.py::TestDetectMarkers -v            # One class
 pytest tests/audiobook/dialogue/test_core.py::TestDetectMarkers::test_em_dash -v   # One test
 
 python -m src.audiobook.runner <book-or-folder> [--ssml] [--non-fiction] [--name N]   # Steps 1-4 → <book dir>/<name>_sawt/
 python -m src.audiobook.runner --list | --retry <job> | --import-existing   # History in ~/.config/sawt/jobs.json (SAWT_HOME overrides)
+
+python -m src.audiobook.ui [--port 8765] [--no-open]   # Local UI on http://127.0.0.1:8765 (jobs, live run log, history)
 ```
 
 Note: `.env.example` is stale — it still lists AWS Polly keys. The code uses Azure
@@ -109,6 +111,7 @@ data/books/{epub,docx,txt}/book.*
 | `dialogue/` | Production ready (~95%) | `segment_book(chapters_dir)`, `sync_review(segments_dir)` |
 | `ssml/` | Done (POC-4) | `generate_book_ssml()`, `make_voice_config()` |
 | `runner/` | Done (module 0, CLI only) | `run_book()`, `retry_job()`; `python -m src.audiobook.runner` |
+| `ui/` | Module 2 built (shell; artifacts tab = module 3, not built) | `make_server()`, `serve()`; `python -m src.audiobook.ui` |
 | `voice_pool/`, `shared/` | **Stubs** — docstrings only, no code yet | — |
 | POC-5 audio generation | **Next** — not built | — |
 
