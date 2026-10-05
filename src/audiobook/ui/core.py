@@ -513,12 +513,12 @@ def _step_files(output: Path, base: Path, step_dir: Path) -> list[dict]:
                 real = f.resolve()
                 if not (real.is_relative_to(base) and real.is_file()):
                     continue
-                size = real.stat().st_size
+                st = real.stat()
             except OSError:
                 continue
             rel = f.relative_to(step_dir).as_posix()
             files.append({"name": fname, "rel": rel, "path": f.relative_to(output).as_posix(),
-                          "group": rel.rpartition("/")[0], "size": size})
+                          "group": rel.rpartition("/")[0], "size": st.st_size, "mtime": st.st_mtime})
     return files
 
 
@@ -540,6 +540,7 @@ def _list_files(output: Path) -> dict:
         for f in sorted(files, key=lambda f: (f["group"] != "", f["group"], f["name"])):
             groups.setdefault(f["group"], []).append({k: f[k] for k in ("name", "rel", "path", "size")})
         steps.append({"name": dirname, "present": True, "count": len(files),
+                      "mtime": max((f["mtime"] for f in files), default=None),  # newest file, epoch seconds
                       "groups": [{"dir": g, "files": fs} for g, fs in groups.items()]})
     return {"missing": False, "output": str(output), "steps": steps}
 

@@ -295,7 +295,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       if (r.ok) { state.files = r.data; state.filesErr = ''; } else { state.files = null; state.filesErr = r.data.error || 'could not list files'; }
     });
   }
-  function onTab() { if (state.tab === 3 && state.selected !== null) loadFiles().then(render); }
+  function onTab() { if (state.tab === 3 && state.selected !== null) { state.fexp = {}; loadFiles().then(render); } }
   function refreshAll() {
     var was = state.busy, finished = false;
     return loadStatus().then(function () { finished = was && !state.busy; }).then(loadJobs).then(loadJob).then(function () {
@@ -413,10 +413,15 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   function fileLink(job, f) {
     return '<div class="fcell"><a href="/view?job=' + enc(job) + '&amp;path=' + enc(f.path) + '" target="_blank" rel="noopener" dir="auto" title="' + esc(f.name) + '">' + esc(f.name) + '</a><span class="sz">(' + fmtSize(f.size) + ')</span></div>';
   }
+  function disp(n) { return n.replace(/_/g, ' '); }
+  function fmtTime(sec) {
+    var d = new Date(sec * 1000), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
   function stepHtml(job, s) {
-    if (!s.present) return '<div class="step"><div class="stephead dim">' + esc(s.name) + ' — not produced</div></div>';
-    var k = job + '|' + s.name, open = state.fexp[k] === true;  /* every block starts collapsed; expanded ones are remembered in memory for the page session */
-    var h = '<div class="step"><div class="stephead"><button type="button" class="steptog" data-act="ftoggle" data-arg="' + esc(s.name) + '" aria-expanded="' + open + '">' + (open ? '▾' : '▸') + ' <b>' + esc(s.name) + '</b> <span class="dim">· ' + s.count + ' file' + (s.count === 1 ? '' : 's') + '</span></button>' +
+    if (!s.present) return '<div class="step"><div class="stephead dim">– ' + esc(disp(s.name)) + ' · not produced</div></div>';
+    var k = job + '|' + s.name, open = state.fexp[k] === true;  /* blocks start collapsed; reset on tab open and job change, kept on refresh */
+    var h = '<div class="step"><div class="stephead"><button type="button" class="steptog" data-act="ftoggle" data-arg="' + esc(s.name) + '" aria-expanded="' + open + '">' + (open ? '▾' : '▸') + ' <b>' + esc(disp(s.name)) + '</b> <span class="dim">· ' + s.count + ' file' + (s.count === 1 ? '' : 's') + (s.mtime ? ' · ' + fmtTime(s.mtime) : '') + '</span></button>' +
       '<button type="button" class="btn mini" data-act="openfolder" data-arg="' + esc(s.name) + '">[ open folder ]</button></div>';
     if (open) {
       h += '<div class="stepbody">' + (s.count ? s.groups.map(function (g) {

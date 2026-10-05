@@ -542,11 +542,11 @@ if (scanning) global.fetch = function (u, o) {
 if (arts) global.fetch = function (u, o) {
   global.calls.push([(o && o.method) || 'GET', u, o && o.body]);
   var files = { missing: false, output: '/x/out', steps: [
-    { name: '01_ingestion', present: true, count: 3, groups: [{ dir: '', files: [
+    { name: '01_ingestion', present: true, count: 3, mtime: 1760000000, groups: [{ dir: '', files: [
       { name: 'clean_text.txt', rel: 'clean_text.txt', path: '01_ingestion/clean_text.txt', size: 2048 },
       { name: 'p<b>.csv', rel: 'p<b>.csv', path: '01_ingestion/p<b>.csv', size: 12 }] },
       { dir: 'ssml', files: [{ name: 'c1.csv', rel: 'ssml/c1.csv', path: '01_ingestion/ssml/c1.csv', size: 5 }] }] },
-    { name: '02_chapters', present: true, count: 11, groups: [{ dir: '', files: [] }] },
+    { name: '02_chapters', present: true, count: 11, mtime: null, groups: [{ dir: '', files: [] }] },
     { name: '03_segments', present: false }] };
   var d = u === '/api/status' ? { busy: false, current: null, queued: [] }
     : u === '/api/jobs' ? { jobs: [{ name: '\u0631\u0648\u0627\u064a\u0629', status: 'imported', date: '', runs: 0 }] }
@@ -682,7 +682,12 @@ class TestStartButtonSync:
         assert collapsed.count("[ open folder ]") == 2 and collapsed.count('aria-expanded="false"') == 2
         assert 'aria-expanded="true"' not in collapsed and "/view?job=" not in collapsed and "fgrid" not in collapsed
         assert "· 3 files" in collapsed and "· 11 files" in collapsed
-        assert "03_segments \u2014 not produced" in collapsed
+        assert '<div class="stephead dim">\u2013 03 segments \u00b7 not produced</div>' in collapsed
+        assert "03_segments" not in collapsed.replace('data-arg="03_segments"', "") and "not produced" in collapsed
+        # underscores are display-only: the toggle/open args keep the real folder name, headers show spaces
+        assert "<b>01 ingestion</b>" in collapsed and 'data-arg="01_ingestion"' in collapsed and "<b>01_ingestion" not in collapsed
+        assert re.search(r"· 3 files · \d{4}-\d{2}-\d{2} \d{2}:\d{2}</span>", collapsed)  # date after the count
+        assert "· 11 files</span>" in collapsed  # no files -> no date
         # clicking a header expands just that block
         assert html.count('aria-expanded="true"') == 1 and html.count('aria-expanded="false"') == 1
         assert 'href="/view?job=%D8%B1' in html and 'target="_blank" rel="noopener"' in html
@@ -691,8 +696,8 @@ class TestStartButtonSync:
         # root files first with no subheader; subfolder gets "ssml/ · 1 file" label after them
         assert html.index("clean_text.txt") < html.index('class="gname"') < html.index("c1.csv")
         assert html.count('class="gname"') == 1 and "1 file</div>" in html
-        # expanded state survives a tab switch in the same page session
-        assert out["afterRetab"].count('aria-expanded="true"') == 1 and "c1.csv" in out["afterRetab"]
+        # leaving and re-opening the tab collapses everything again
+        assert 'aria-expanded="true"' not in out["afterRetab"] and "c1.csv" not in out["afterRetab"]
         assert ["POST", "/api/jobs/%D8%B1%D9%88%D8%A7%D9%8A%D8%A9/open", '{"path":"02_chapters"}'] in out["calls"]
         assert "opened 02_chapters" in out["afterOpen"]
 
@@ -823,6 +828,8 @@ class TestArtifactListing:
             ("01_ingestion", True), ("02_chapters", False), ("03_segments", True), ("04_ssml", False)]
         ing = data["steps"][0]
         assert ing["count"] == 2 and "collapsed" not in ing
+        assert ing["mtime"] == max((job / "01_ingestion" / n).stat().st_mtime for n in ("clean_text.txt", "paragraphs.csv"))
+        assert data["steps"][1].get("mtime") is None
         assert [f["name"] for f in ing["groups"][0]["files"]] == ["clean_text.txt", "paragraphs.csv"]
         assert ing["groups"][0]["files"][1] == {"name": "paragraphs.csv", "rel": "paragraphs.csv",
                                                 "path": "01_ingestion/paragraphs.csv", "size": 11}
@@ -1271,3 +1278,28 @@ class TestFreeDefaultNames:
         assert runner_core.free_job_name(data, "b") == "b"
         assert runner_core.free_job_name(data, "a") == "a-3"
         assert runner_core.free_job_name(data, "a", reserved={"a-3"}) == "a-4"
+
+
+class TestStepMtime:
+    def test_newest_file_anywhere_in_step_wins(self, client, job):
+        old, new = 1_600_000_000, 1_700_000_000
+        for f in (job / "03_segments").rglob("*"):
+            if f.is_file():
+                os.utime(f, (old, old))
+        os.utime(job / "03_segments" / "review" / "chapter_0.txt", (new, new))
+        steps = client.get("/api/jobs/bk/files")[1]["steps"]
+        assert steps[2]["mtime"] == new
+
+    def test_symlinked_file_out_does_not_count(self, client, job, tmp_path):
+        outside = tmp_path / "later.txt"
+        outside.write_text("x", encoding="utf-8")
+        for f in (job / "01_ingestion").iterdir():
+            os.utime(f, (1_600_000_000, 1_600_000_000))
+        os.utime(outside, (1_900_000_000, 1_900_000_000))
+        (job / "01_ingestion" / "leak.txt").symlink_to(outside)
+        assert client.get("/api/jobs/bk/files")[1]["steps"][0]["mtime"] == 1_600_000_000
+
+    def test_empty_step_has_no_mtime(self, client, job):
+        (job / "04_ssml").mkdir()
+        step = client.get("/api/jobs/bk/files")[1]["steps"][3]
+        assert step["present"] is True and step["count"] == 0 and step["mtime"] is None
