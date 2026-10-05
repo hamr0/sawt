@@ -55,7 +55,6 @@ PAGE_CSP = (
 # Artifacts tab: step folders in pipeline order (05_audio only when it exists).
 ARTIFACT_STEP_DIRS = (*STEP_DIRS.values(), "05_audio")
 AUDIO_DIR = "05_audio"
-COLLAPSE_OVER_FILES = 10  # a step block with more files than this starts collapsed
 VIEW_MAX_BYTES = 5 * 1024 * 1024
 VIEW_TEXT_EXTS = (".txt", ".ssml", ".json", ".xml")
 VIEW_CSP = "default-src 'none'; style-src 'unsafe-inline'"
@@ -483,7 +482,6 @@ def _list_files(output: Path) -> dict:
         for f in sorted(files, key=lambda f: (f["group"] != "", f["group"], f["name"])):
             groups.setdefault(f["group"], []).append({k: f[k] for k in ("name", "rel", "path", "size")})
         steps.append({"name": dirname, "present": True, "count": len(files),
-                      "collapsed": len(files) > COLLAPSE_OVER_FILES,
                       "groups": [{"dir": g, "files": fs} for g, fs in groups.items()]})
     return {"missing": False, "output": str(output), "steps": steps}
 

@@ -406,7 +406,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   }
   function stepHtml(job, s) {
     if (!s.present) return '<div class="step"><div class="stephead dim">' + esc(s.name) + ' — not produced</div></div>';
-    var k = job + '|' + s.name, open = k in state.fexp ? state.fexp[k] : !s.collapsed;
+    var k = job + '|' + s.name, open = state.fexp[k] === true;  /* every block starts collapsed; expanded ones are remembered in memory for the page session */
     var h = '<div class="step"><div class="stephead"><button type="button" class="steptog" data-act="ftoggle" data-arg="' + esc(s.name) + '" aria-expanded="' + open + '">' + (open ? '▾' : '▸') + ' <b>' + esc(s.name) + '</b> <span class="dim">· ' + s.count + ' file' + (s.count === 1 ? '' : 's') + '</span></button>' +
       '<button type="button" class="btn mini" data-act="openfolder" data-arg="' + esc(s.name) + '">[ open folder ]</button></div>';
     if (open) {
@@ -629,9 +629,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     switch (a) {
       case 'sel': selectJob(arg); return;
       case 'tab': state.tab = +arg; state.msg = ''; onTab(); break;
-      case 'ftoggle': var fk = state.job.name + '|' + arg, cur = fk in state.fexp ? state.fexp[fk] : null;
-        if (cur === null) { var st = state.files && state.files.steps.filter(function (x) { return x.name === arg; })[0]; cur = !(st && st.collapsed); }
-        state.fexp[fk] = !cur; break;
+      case 'ftoggle': var fk = state.job.name + '|' + arg; state.fexp[fk] = !state.fexp[fk]; break;
       case 'openfolder': doOpen(arg); return;
       case 'toggle': var k = (state.job ? state.job.name : '') + '#' + arg; state.open[k] = !state.open[k]; break;
       case 'viewrun': state.view = +arg; state.tab = 1; break;

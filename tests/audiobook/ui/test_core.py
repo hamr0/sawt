@@ -523,11 +523,11 @@ global.calls = [];
 if (arts) global.fetch = function (u, o) {
   global.calls.push([(o && o.method) || 'GET', u, o && o.body]);
   var files = { missing: false, output: '/x/out', steps: [
-    { name: '01_ingestion', present: true, count: 3, collapsed: false, groups: [{ dir: '', files: [
+    { name: '01_ingestion', present: true, count: 3, groups: [{ dir: '', files: [
       { name: 'clean_text.txt', rel: 'clean_text.txt', path: '01_ingestion/clean_text.txt', size: 2048 },
       { name: 'p<b>.csv', rel: 'p<b>.csv', path: '01_ingestion/p<b>.csv', size: 12 }] },
       { dir: 'ssml', files: [{ name: 'c1.csv', rel: 'ssml/c1.csv', path: '01_ingestion/ssml/c1.csv', size: 5 }] }] },
-    { name: '02_chapters', present: true, count: 11, collapsed: true, groups: [{ dir: '', files: [] }] },
+    { name: '02_chapters', present: true, count: 11, groups: [{ dir: '', files: [] }] },
     { name: '03_segments', present: false }] };
   var d = u === '/api/status' ? { busy: false, current: null, queued: [] }
     : u === '/api/jobs' ? { jobs: [{ name: '\u0631\u0648\u0627\u064a\u0629', status: 'imported', date: '', runs: 0 }] }
@@ -565,8 +565,15 @@ setTimeout(function () {
     fire('click', { closest: function () { return { dataset: { act: 'tab', arg: '3' }, disabled: false }; } });
     setTimeout(function () {
       out.html3 = app.innerHTML;
+      fire('click', { closest: function () { return { dataset: { act: 'ftoggle', arg: '01_ingestion' }, disabled: false }; } });
+      out.afterToggle = app.innerHTML;
+      fire('click', { closest: function () { return { dataset: { act: 'tab', arg: '1' }, disabled: false }; } });
+      fire('click', { closest: function () { return { dataset: { act: 'tab', arg: '3' }, disabled: false }; } });
+      setTimeout(function () {
+      out.afterRetab = app.innerHTML;
       fire('click', { closest: function () { return { dataset: { act: 'openfolder', arg: '02_chapters' }, disabled: false }; } });
       setTimeout(function () { out.calls = global.calls; out.afterOpen = app.innerHTML; console.log(JSON.stringify(out)); process.exit(0); }, 100);
+      }, 100);
     }, 100);
     return;
   }
@@ -628,18 +635,23 @@ class TestStartButtonSync:
 
     def test_artifacts_tab_renders_blocks_links_and_open(self, tmp_path):
         out = self._run(tmp_path, "arts")
-        html = out["html3"]
+        collapsed, html = out["html3"], out["afterToggle"]
         assert "files" in " ".join(c[1] for c in out["calls"])
-        assert html.count("[ open folder ]") == 2  # two present step folders
-        assert "03_segments \u2014 not produced" in html
+        # every block starts collapsed: headers only, whatever the file count
+        assert collapsed.count("[ open folder ]") == 2 and collapsed.count('aria-expanded="false"') == 2
+        assert 'aria-expanded="true"' not in collapsed and "/view?job=" not in collapsed and "fgrid" not in collapsed
+        assert "· 3 files" in collapsed and "· 11 files" in collapsed
+        assert "03_segments \u2014 not produced" in collapsed
+        # clicking a header expands just that block
+        assert html.count('aria-expanded="true"') == 1 and html.count('aria-expanded="false"') == 1
         assert 'href="/view?job=%D8%B1' in html and 'target="_blank" rel="noopener"' in html
         assert "01_ingestion%2Fp%3Cb%3E.csv" in html and "p&lt;b&gt;.csv" in html and "<b>.csv" not in html
         assert "(2.0 KB)</span>" in html and 'title="clean_text.txt"' in html and 'class="fgrid"' in html
         # root files first with no subheader; subfolder gets "ssml/ · 1 file" label after them
         assert html.index("clean_text.txt") < html.index('class="gname"') < html.index("c1.csv")
         assert html.count('class="gname"') == 1 and "1 file</div>" in html
-        # 11 files: starts collapsed (no file rows), the 2-file block is expanded
-        assert 'aria-expanded="false"' in html and 'aria-expanded="true"' in html
+        # expanded state survives a tab switch in the same page session
+        assert out["afterRetab"].count('aria-expanded="true"') == 1 and "c1.csv" in out["afterRetab"]
         assert ["POST", "/api/jobs/%D8%B1%D9%88%D8%A7%D9%8A%D8%A9/open", '{"path":"02_chapters"}'] in out["calls"]
         assert "opened 02_chapters" in out["afterOpen"]
 
@@ -746,7 +758,7 @@ class TestArtifactListing:
         assert [(s["name"], s["present"]) for s in data["steps"]] == [
             ("01_ingestion", True), ("02_chapters", False), ("03_segments", True), ("04_ssml", False)]
         ing = data["steps"][0]
-        assert ing["count"] == 2 and ing["collapsed"] is False
+        assert ing["count"] == 2 and "collapsed" not in ing
         assert [f["name"] for f in ing["groups"][0]["files"]] == ["clean_text.txt", "paragraphs.csv"]
         assert ing["groups"][0]["files"][1] == {"name": "paragraphs.csv", "rel": "paragraphs.csv",
                                                 "path": "01_ingestion/paragraphs.csv", "size": 11}
@@ -762,17 +774,6 @@ class TestArtifactListing:
         (job / "05_audio" / "gemini" / "chapter_1.mp3").write_bytes(b"id3")
         steps = client.get("/api/jobs/bk/files")[1]["steps"]
         assert steps[-1]["name"] == "05_audio" and steps[-1]["groups"][0]["dir"] == "gemini"
-
-    def test_more_than_ten_files_starts_collapsed(self, client, job):
-        d = job / "02_chapters"
-        d.mkdir()
-        for i in range(ui_core.COLLAPSE_OVER_FILES):
-            (d / f"c{i}.txt").write_text("x", encoding="utf-8")
-        step = client.get("/api/jobs/bk/files")[1]["steps"][1]
-        assert step["count"] == 10 and step["collapsed"] is False
-        (d / "c10.txt").write_text("x", encoding="utf-8")
-        step = client.get("/api/jobs/bk/files")[1]["steps"][1]
-        assert step["count"] == 11 and step["collapsed"] is True
 
     def test_missing_job_folder(self, client, job):
         shutil.rmtree(job)
