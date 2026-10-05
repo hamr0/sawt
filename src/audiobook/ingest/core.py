@@ -310,8 +310,11 @@ EXTRACTORS = {
 }
 
 
-def ingest(book_path: str, output_dir: str = "output") -> dict:
+def ingest(book_path: str, output_dir: str = "output", ingestion_dir: str | None = None) -> dict:
     """Ingest a book file: extract → normalize → paragraph split → write output.
+
+    Output goes to ``{output_dir}/{format}/{book}/01_ingestion/`` unless
+    ``ingestion_dir`` is given, in which case it is written exactly there.
 
     Returns a summary dict.
     """
@@ -345,7 +348,10 @@ def ingest(book_path: str, output_dir: str = "output") -> dict:
 
     # Prepare output directory: output/{format}/{book_slug}/01_ingestion/
     format_subdir = suffix.lstrip(".")
-    out_dir = Path(output_dir) / format_subdir / book_slug / "01_ingestion"
+    if ingestion_dir:
+        out_dir = Path(ingestion_dir)
+    else:
+        out_dir = Path(output_dir) / format_subdir / book_slug / "01_ingestion"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # Write clean text (paragraphs separated by blank lines)

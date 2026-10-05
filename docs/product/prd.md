@@ -137,7 +137,7 @@ Five stages, each a package under `src/audiobook/` with logic in `core.py`; test
 
 ## 5. Next build: local UI + runner
 
-Status: Spec signed off 2026-10-05 — not built.
+Status: Spec signed off 2026-10-05 — not built. Module 0 built (feat/runner).
 
 ### Problem & goal
 

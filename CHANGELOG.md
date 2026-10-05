@@ -20,6 +20,8 @@ restarting from zero. Two eras:
 
 ### Added
 
+- **Runner CLI (PRD module 0).** `python -m src.audiobook.runner <book-or-folder>` chains ingest → chapters → dialogue (→ SSML with `--ssml`) into `<book dir>/<job name>_sawt/`, stops only on an error or at the pre-audio gate, retries from the failed step using only files on disk (`--retry`), and records every run in `~/.config/sawt/jobs.json` (`SAWT_HOME` overrides; `--list`, `--rename`, `--import-existing`). `ingest()` gained an optional `ingestion_dir` argument so the runner can choose the output folder.
+
 - **POC-4c: Gemini TTS evaluated and chosen as the production provider.**
   `scripts/generate_gemini_sample.py` renders tharthara-fawq-al-nil
   chapter 1 with `gemini-3.8-flash-tts` in native two-speaker mode
