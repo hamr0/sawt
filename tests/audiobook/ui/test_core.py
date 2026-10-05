@@ -568,7 +568,16 @@ global.fetch = function (u) { var d = u === '/api/status' ? { busy: busy, curren
 //DRIVER
 var conflict = process.argv[2] === 'conflict', overwrite = process.argv[2] === 'overwrite';
 var started = process.argv[2] === 'start', arts = process.argv[2] === 'arts';
-var scanning = process.argv[2] === 'scan';
+var scanning = process.argv[2] === 'scan', queueMode = process.argv[2] === 'queue', actsMode = process.argv[2] === 'acts';
+if (queueMode || actsMode) global.fetch = function (u, o) {
+  global.calls.push([(o && o.method) || 'GET', u, o && o.body]);
+  var run = { date: '2026-01-01T00:00:00', status: actsMode ? 'stopped' : 'running', settings: { ssml: false, fiction: true },
+    steps: { ingest: 'ok', chapters: 'pending', dialogue: 'pending', ssml: 'pending' }, log: ['\u2713 ingesting', '\u25a0 stopped by user after ingesting'], errors: [] };
+  var d = u === '/api/status' ? (queueMode ? { busy: true, current: 'a', queued: ['b', 'c'], stopping: false } : { busy: false, current: null, queued: [] })
+    : u === '/api/jobs' ? { jobs: [{ name: actsMode ? 'x' : 'a', status: actsMode ? 'stopped' : 'running', date: '2026-01-01T00:00:00', runs: 1 }] }
+    : u === '/api/stop' ? { dropped: ['b', 'c'] }
+    : { name: actsMode ? 'x' : 'a', output: '/out/x_sawt', source: '/s/x.txt', runs: [run], missing: false };
+  return Promise.resolve({ ok: true, status: 200, json: function () { return Promise.resolve(d); } }); };
 global.calls = [];
 if (scanning) global.fetch = function (u, o) {
   global.calls.push([(o && o.method) || 'GET', u, o && o.body]);
@@ -621,6 +630,24 @@ setTimeout(function () {
       if (overwrite) fire('click', { closest: function () { return { dataset: { act: 'newjob' }, disabled: false }; } });
       out.afterAct = app.innerHTML;
       console.log(JSON.stringify(out)); process.exit(0); }, 100);
+    return;
+  }
+  if (queueMode || actsMode) {
+    var clk = function (act, arg) { fire('click', { closest: function () { return { dataset: { act: act, arg: arg }, disabled: false }; } }); };
+    clk('reload');  /* the page's first refresh ran before this mock was installed */
+    setTimeout(function () {
+    out.first = app.innerHTML;
+    if (queueMode) {
+      clk('sel', 'b'); out.placeholder = app.innerHTML;
+      clk('sel', 'a');
+      setTimeout(function () { out.running = app.innerHTML; clk('stop'); }, 60);
+    } else {
+      clk('delask'); out.ask = app.innerHTML;
+      clk('delno'); out.cancelled = app.innerHTML;
+      clk('delask'); clk('delyes');
+    }
+    setTimeout(function () { out.calls = global.calls; console.log(JSON.stringify(out)); process.exit(0); }, 250);
+    }, 100);
     return;
   }
   if (scanning) {
@@ -766,6 +793,29 @@ class TestStartButtonSync:
         body = json.loads(next(c[2] for c in out["calls"] if c[1] == "/api/runs"))
         assert body["books"] == [{"path": "/b/two.txt", "name": "two", "new_job": False},
                                  {"path": "/b/old.txt", "name": "taken", "new_job": False}]
+
+
+    def test_queue_view_placeholders_and_stop(self, tmp_path):
+        out = self._run(tmp_path, "queue")
+        first = out["first"]
+        assert first.count('<div class="card') == 3 and "queued \u00b7 2 of 3" in first and "queued \u00b7 3 of 3" in first
+        assert "[\u2026]" in first  # queued status mark
+        ph = out["placeholder"]  # selecting a placeholder card: its Run tab, no job entry needed
+        assert "queued \u2014 position 2 of 3" in ph and "[ stop ]" in ph and "[ delete ]" not in ph and "[ rename ]" not in ph.split('class="rhead"')[1]
+        assert not any(c[1] == "/api/jobs/b" for c in out["calls"])  # placeholder never fetches a job
+        running = out["running"]
+        assert "[ stop ]" in running and '[ delete ]</button><span class="dim">running or queued' in running
+        assert ["POST", "/api/stop", "{}"] in out["calls"]
+
+    def test_action_row_retry_delete_confirm(self, tmp_path):
+        out = self._run(tmp_path, "acts")
+        first = out["first"]
+        assert first.index("[ retry ]") < first.index("[ delete ]") < first.index('data-log')  # actions sit above the log
+        assert "[ stop ]" not in first and 'resumes from "splitting chapters"' in first
+        ask = out["ask"]
+        assert "Remove " in ask and "from history? Files on disk stay: " in ask and '<bdi class="pth" dir="ltr">' in ask and 'class="seg">x_sawt</bdi>' in ask
+        assert "[ remove ]" not in out["cancelled"] and "from history?" not in out["cancelled"]
+        assert ["POST", "/api/jobs/x/delete", "{}"] in out["calls"]
 
 
 class TestPathsAndWording:
@@ -1346,3 +1396,156 @@ class TestStepMtime:
         (job / "04_ssml").mkdir()
         step = client.get("/api/jobs/bk/files")[1]["steps"][3]
         assert step["present"] is True and step["count"] == 0 and step["mtime"] is None
+
+
+# ---------------------------------------------------------------------------
+# Job actions: stop, delete, queue view
+# ---------------------------------------------------------------------------
+
+
+class Gate:
+    """Holds the 'ingest' step of every book until released, so a run can be inspected mid-step."""
+
+    def __init__(self, monkeypatch):
+        self.go, self.entered, self.real = threading.Event(), threading.Event(), runner_core._STEP_FUNCS["ingest"]
+        monkeypatch.setitem(runner_core._STEP_FUNCS, "ingest", self)
+
+    def __call__(self, job, run):
+        self.entered.set()
+        self.go.wait(10)
+        return self.real(job, run)
+
+
+class TestStop:
+    def test_stop_clears_queue_and_current_stops_at_step_boundary_then_retry_resumes(self, client, books, monkeypatch):
+        for n in "abc":
+            make_book(books, n)
+        gate = Gate(monkeypatch)
+        assert client.post("/api/runs", {"path": str(books)})[0] == 202
+        assert gate.entered.wait(10)
+        st = client.get("/api/status")[1]
+        assert st["current"] == "a" and st["queued"] == ["b", "c"] and st["stopping"] is False
+        assert [r["name"] for r in client.get("/api/jobs")[1]["jobs"]] == ["a"]  # queued books have no job entry
+        status, data = client.post("/api/stop")
+        assert status == 200 and data == {"dropped": ["b", "c"]}
+        st = client.get("/api/status")[1]
+        assert st["queued"] == [] and st["current"] == "a" and st["stopping"] is True
+        # never killed mid-step: the step is still marked running until it finishes
+        assert client.job("a")["runs"][-1]["steps"]["ingest"] == "running"
+        gate.go.set()
+        client.wait_idle()
+        jobs = client.get("/api/jobs")[1]["jobs"]
+        assert [r["name"] for r in jobs] == ["a"]
+        run = client.job("a")["runs"][-1]
+        assert run["status"] == runner_core.RUN_STOPPED == "stopped"
+        assert run["steps"] == {"ingest": "ok", "chapters": "pending", "dialogue": "pending", "ssml": "pending"}
+        assert run["log"][-1] == "■ stopped by user after ingesting"
+        assert client.get("/api/status")[1]["stopping"] is False
+        # stopped is retryable: resumes from the next undone step, ingest output untouched
+        ing = {p.name: p.stat().st_mtime_ns for p in (books / "a_sawt" / "01_ingestion").iterdir()}
+        assert client.post("/api/jobs/a/retry")[0] == 202
+        client.wait_idle()
+        run = client.job("a")["runs"][-1]
+        assert run["status"] == runner_core.RUN_READY and len(client.job("a")["runs"]) == 1
+        assert {p.name: p.stat().st_mtime_ns for p in (books / "a_sawt" / "01_ingestion").iterdir()} == ing
+
+    def test_stop_while_idle_is_a_noop(self, client):
+        assert client.post("/api/stop") == (200, {"dropped": []})
+
+    def test_stop_during_last_real_step_finishes_normally(self, client, books, monkeypatch):
+        make_book(books, "a")
+        gate, last = threading.Event(), threading.Event()
+        real = runner_core._STEP_FUNCS["dialogue"]
+
+        def slow(job, run):
+            last.set()
+            gate.wait(10)
+            return real(job, run)
+
+        monkeypatch.setitem(runner_core._STEP_FUNCS, "dialogue", slow)
+        client.post("/api/runs", {"path": str(books / "a.txt")})  # ssml off: dialogue is the last step that runs
+        assert last.wait(10)
+        client.post("/api/stop")
+        gate.set()
+        client.wait_idle()
+        assert client.job("a")["runs"][-1]["status"] == runner_core.RUN_READY
+
+    def test_new_run_after_stop_is_not_stopped(self, client, books, monkeypatch):
+        make_book(books, "a")
+        gate = Gate(monkeypatch)
+        client.post("/api/runs", {"path": str(books / "a.txt")})
+        assert gate.entered.wait(10)
+        client.post("/api/stop")
+        gate.go.set()
+        client.wait_idle()
+        assert client.post("/api/jobs/a/retry")[0] == 202
+        client.wait_idle()
+        assert client.job("a")["runs"][-1]["status"] == runner_core.RUN_READY
+
+    def test_stop_rejects_foreign_host_and_needs_json(self, client):
+        assert client.post("/api/stop", host="evil.example.com")[0] == 403
+        assert client.call("POST", "/api/stop", raw=b"{}", ctype="text/plain")[0] == 415
+
+    def test_runner_should_stop_is_polled_between_steps_only(self, home, books):
+        seen = []
+
+        def stop_after_two():
+            seen.append(1)
+            return len(seen) >= 2
+
+        run = runner_core.run_book(make_book(books, "a"), assume_yes=True, emit=lambda m: None, should_stop=stop_after_two)
+        assert run["status"] == "stopped" and run["log"][-1].startswith("■ stopped by user after ")
+        assert [s for s, v in run["steps"].items() if v == "ok"] == ["ingest", "chapters"]
+        # without should_stop (the CLI) nothing changes
+        assert runner_core.run_book(make_book(books, "b"), assume_yes=True, emit=lambda m: None)["status"] == runner_core.RUN_READY
+
+
+class TestDelete:
+    def test_removes_history_only(self, client, books):
+        book = make_book(books, "novel")
+        client.post("/api/runs", {"path": str(book)})
+        client.wait_idle()
+        out = books / "novel_sawt"
+        status, data = client.post("/api/jobs/novel/delete")
+        assert status == 200 and data == {"deleted": "novel"}
+        assert client.get("/api/jobs")[1]["jobs"] == [] and client.get("/api/jobs/novel")[0] == 404
+        assert load_jobs()["jobs"] == []
+        assert (out / "01_ingestion" / "clean_text.txt").is_file() and book.is_file()  # files stay on disk
+
+    def test_unknown_job_404(self, client):
+        assert client.post("/api/jobs/ghost/delete")[0] == 404
+
+    def test_refused_while_running_or_queued_and_while_busy(self, client, books, monkeypatch):
+        for n in "abc":
+            make_book(books, n)
+        client.post("/api/runs", {"path": str(books / "c.txt")})
+        client.wait_idle()
+        gate = Gate(monkeypatch)
+        client.post("/api/runs", {"path": str(books / "a.txt")})
+        assert gate.entered.wait(10)
+        status, data = client.post("/api/jobs/a/delete")  # running
+        assert status == 400 and "running or queued" in data["error"]
+        status, data = client.post("/api/jobs/c/delete")  # other job: jobs.json has one writer, refused while busy
+        assert status == 409 and data["busy"] is True
+        gate.go.set()
+        client.wait_idle()
+        assert {r["name"] for r in client.get("/api/jobs")[1]["jobs"]} == {"a", "c"}
+        # queued: a re-run of c waits behind a gated run of a
+        gate.go.clear()
+        gate.entered.clear()
+        client.post("/api/runs", {"books": [{"path": str(books / "a.txt"), "name": "a"},
+                                             {"path": str(books / "c.txt"), "name": "c"}], "confirm": True})
+        assert gate.entered.wait(10)
+        assert client.get("/api/status")[1]["queued"] == ["c"]
+        status, data = client.post("/api/jobs/c/delete")
+        assert status == 400 and "running or queued" in data["error"]
+        gate.go.set()
+        client.wait_idle()
+        assert client.post("/api/jobs/c/delete")[0] == 200
+
+    def test_runner_delete_job_helper(self, home, books):
+        runner_core.run_book(make_book(books, "a"), assume_yes=True, emit=lambda m: None)
+        runner_core.delete_job("a")
+        assert load_jobs()["jobs"] == []
+        with pytest.raises(runner_core.RunnerError):
+            runner_core.delete_job("a")

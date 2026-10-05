@@ -77,7 +77,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v .opt{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .v .opt input{margin:0;width:16px;height:16px;accent-color:var(--accent)}
 .v .mk{font-weight:700;white-space:nowrap}
-.v .st-ready{color:var(--green)}.v .st-running{color:var(--cyan)}.v .st-failed{color:var(--red)}.v .st-missing{color:var(--amber)}.v .st-imported,.v .st-none{color:var(--textDim)}
+.v .st-ready{color:var(--green)}.v .st-running{color:var(--cyan)}.v .st-failed{color:var(--red)}.v .st-missing{color:var(--amber)}.v .st-imported,.v .st-none{color:var(--textDim)}.v .st-queued{color:var(--cyan)}.v .st-stopped{color:var(--amber)}
 .v .main{display:grid;grid-template-columns:360px minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:100%}
 .v .left{padding:10px;border-right:1px solid var(--border);min-width:0;overflow-y:auto}
 .v .right{padding:10px 16px;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
@@ -190,8 +190,8 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 <script>
 (function () {
   'use strict';
-  var MK = { ready: '[✓]', running: '[▶]', failed: '[×]', missing: '[?]', imported: '[·]', none: '[ ]' };
-  var STX = { ready: 'ready for audio — paused', running: 'running', failed: 'failed', missing: 'missing', imported: 'imported', none: 'no runs' };
+  var MK = { ready: '[✓]', running: '[▶]', failed: '[×]', missing: '[?]', imported: '[·]', none: '[ ]', queued: '[…]', stopped: '[■]' };
+  var STX = { ready: 'ready for audio — paused', running: 'running', failed: 'failed', missing: 'missing', imported: 'imported', none: 'no runs', queued: 'queued', stopped: 'stopped' };
   var LABEL = { ingest: 'ingesting', chapters: 'splitting chapters', dialogue: 'detecting dialogue', ssml: 'generating SSML' };
   var STEPS = ['ingest', 'chapters', 'dialogue', 'ssml'];
   var GATE = 'ready for audio — paused before paid step';
@@ -206,7 +206,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     panel: false, form: { path: '', name: '', fiction: true, ssml: false, newJob: false },
     offerNew: false, formErr: {}, formNote: '', generalErr: '', overwrite: null, starting: false,
     skipped: [], queuedNames: [], msg: '', retryErr: '',
-    renaming: null, renameVal: '', renameErr: '', focusNext: null,
+    renaming: null, renameVal: '', renameErr: '', focusNext: null, stopping: false, confirmDel: null, delErr: '',
     files: null, filesErr: '', fexp: {},
     freeName: '', freeFor: '', scan: null  /* folder pick list: { rows: [{path,file,job,stem,on,nm,newJob}], skipped: [] }; null = single file or no path */
   };
@@ -235,12 +235,28 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     if (s === 'failed') return 'failed';
     if (s === 'running') return 'running';
     if (s === 'imported') return 'imported';
+    if (s === 'stopped') return 'stopped';
     if (s && s.indexOf('ready') === 0) return 'ready';
     return 'none';
   }
   function mk(k) { return '<span class="mk st-' + k + '" title="' + esc(STX[k]) + '">' + MK[k] + '</span>'; }
   function settingsText(r) { return (r.settings.fiction ? 'fiction' : 'non-fiction') + ' · SSML ' + (r.settings.ssml ? 'on' : 'off'); }
   function stale(k) { return k === 'running' && state.statusKnown && !state.busy; }
+  /* queue view: a queued book's card comes from worker status; a book that never ran has no job entry yet */
+  function qinfo(name) {
+    var i = state.queued.indexOf(name);
+    if (i < 0) return null;
+    var base = state.current ? 1 : 0;
+    return { n: base + i + 1, total: base + state.queued.length };
+  }
+  function allRows() {
+    var names = state.jobs.map(function (j) { return j.name; });
+    return state.jobs.concat(state.queued.filter(function (n) { return names.indexOf(n) < 0; }).map(function (n) {
+      return { name: n, status: 'queued', date: '', runs: 0, placeholder: true };
+    }));
+  }
+  function rowKey(r) { return qinfo(r.name) ? 'queued' : key(r.status); }
+  function qtext(q) { return q.n + ' of ' + q.total; }
   function stem(p) {
     var b = p.replace(/\/+$/, '').split('/').pop() || '';
     return b.replace(/\.(epub|docx|txt)$/i, '');
@@ -266,7 +282,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     return api('GET', '/api/status').then(function (r) {
       if (!r.ok) return;
       state.busy = !!r.data.busy; state.current = r.data.current; state.queued = r.data.queued || [];
-      state.runError = r.data.error; state.statusKnown = true;
+      state.runError = r.data.error; state.stopping = !!r.data.stopping; state.statusKnown = true;
     });
   }
   function loadJobs() {
@@ -274,7 +290,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       state.loading = false;
       if (!r.ok) { state.jobsErr = r.data.error || 'could not load jobs'; return; }
       state.jobsErr = ''; state.jobs = r.data.jobs;
-      var names = state.jobs.map(function (j) { return j.name; });
+      var names = allRows().map(function (j) { return j.name; });
       if (state.selected === null || names.indexOf(state.selected) < 0) {
         var want = hashJob();
         state.selected = names.indexOf(want) >= 0 ? want : (names[0] || null);
@@ -285,6 +301,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   function loadJob() {
     var name = state.selected;
     if (name === null) { state.job = null; return Promise.resolve(); }
+    if (!state.jobs.some(function (j) { return j.name === name; })) { state.job = null; state.jobErr = ''; state.jobLoading = false; return Promise.resolve(); }  /* queued placeholder: no job entry yet */
     return api('GET', '/api/jobs/' + enc(name)).then(function (r) {
       if (state.selected !== name) return;
       state.jobLoading = false;
@@ -325,7 +342,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   }
   function selectJob(name) {
     state.selected = name; state.job = null; state.jobLoading = true; state.view = null; state.files = null; state.filesErr = '';
-    state.msg = ''; state.retryErr = ''; state.renaming = null;
+    state.msg = ''; state.retryErr = ''; state.renaming = null; state.confirmDel = null; state.delErr = '';
     try { history.replaceState(null, '', '#job=' + enc(name)); } catch (e) { }
     render();
     loadJob().then(render);
@@ -333,7 +350,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   }
   window.addEventListener('hashchange', function () {
     var h = hashJob();
-    if (h !== null && h !== state.selected && state.jobs.some(function (j) { return j.name === h; })) selectJob(h);
+    if (h !== null && h !== state.selected && allRows().some(function (j) { return j.name === h; })) selectJob(h);
   });
 
   /* ---------- log ---------- */
@@ -375,23 +392,48 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   }
   function failedStep(run) { return STEPS.filter(function (s) { return run.steps[s] === 'failed'; })[0] || null; }
 
+  function resumeStep(run) { return STEPS.filter(function (s) { return run.steps[s] !== 'ok' && run.steps[s] !== 'skipped'; })[0] || null; }
+  /* job actions: retry (restart), stop, delete; job is null for a queued book that has no history yet */
+  function actsHtml(name, job, run, canRetry) {
+    var h = '<div class="acts" data-acts>';
+    if (canRetry) {
+      var why = job.missing ? 'output folder is gone' : state.busy ? 'a run is in progress' : '';
+      var from = resumeStep(run);
+      h += '<button type="button" class="btn pri" data-act="retry" data-fid="retry"' + (why ? ' disabled aria-disabled="true"' : '') + '>[ retry ]</button>' +
+        (why ? '<span class="dim">' + esc(why) + '</span>' : from ? '<span class="dim">resumes from "' + esc(LABEL[from]) + '"</span>' : '');
+    }
+    if (state.busy) {
+      h += '<button type="button" class="btn warn" data-act="stop" data-fid="stop">[ stop ]</button>' +
+        (state.stopping ? '<span class="dim">stopping after the current step…</span>' : '<span class="dim">clears the queue; the running book stops after its current step</span>');
+    }
+    if (job) {
+      var held = state.current === name || state.queued.indexOf(name) >= 0;
+      h += '<button type="button" class="btn" data-act="delask" data-fid="delask"' + (held ? ' disabled aria-disabled="true"' : '') + '>[ delete ]</button>' + (held ? '<span class="dim">running or queued — stop it first</span>' : '');
+    }
+    h += '</div>';
+    if (job && state.confirmDel === name) {
+      h += '<div class="banner b-amber" role="group" aria-label="Confirm delete">Remove ' + nm(name) + ' from history? Files on disk stay: ' + pth(job.output) +
+        '<div class="bacts"><button type="button" class="btn warn" data-act="delyes" data-fid="delyes">[ remove ]</button><button type="button" class="btn" data-act="delno" data-fid="delno">[ cancel ]</button></div></div>';
+    }
+    if (state.delErr) h += '<div class="banner b-red" role="alert">' + msgHtml(state.delErr) + '</div>';
+    return h;
+  }
+  function queuedBody(name) {
+    var q = qinfo(name);
+    return actsHtml(name, null, null, false) + '<div class="empty">queued — position ' + (q ? qtext(q) : '?') + '</div>';
+  }
   function runTab(job) {
-    if (!job.runs.length) return '<div class="empty">no runs yet</div>';
+    if (!job.runs.length) return actsHtml(job.name, job, null, false) + '<div class="empty">no runs yet</div>';
     var latest = job.runs.length - 1;
     var idx = state.view === null || state.view > latest ? latest : state.view;
     var run = job.runs[idx], k = key(run.status), st = stale(k) && idx === latest;
-    var h = '';
+    var h = actsHtml(job.name, job, run, idx === latest && (k === 'failed' || k === 'stopped' || st));
+    var q = qinfo(job.name);
+    if (q) h += '<div class="banner b-cyan">queued — position ' + qtext(q) + '</div>';
+    if (state.retryErr) h += '<div class="banner b-red" role="alert">' + msgHtml(state.retryErr) + '</div>';
     if (idx !== latest) h += '<div class="banner b-cyan">viewing an older run — <button type="button" class="lnk" data-act="latest">[ show latest ]</button></div>';
     if (st) h += '<div class="banner b-amber">no run is active — this run was interrupted. retry resumes from the step that did not finish.</div>';
     h += '<div class="log" data-log role="log" aria-live="polite" tabindex="0" aria-label="Run log" aria-busy="' + (k === 'running' && !st) + '">' + logHtml(run) + '</div>';
-    var canRetry = idx === latest && (k === 'failed' || st);
-    if (canRetry) {
-      var why = job.missing ? 'output folder is gone' : state.busy ? 'a run is in progress' : '';
-      var from = failedStep(run);
-      h += '<div class="acts"><button type="button" class="btn pri" data-act="retry" data-fid="retry"' + (why ? ' disabled aria-disabled="true"' : '') + '>[ retry ]</button>' +
-        (why ? '<span class="dim">' + esc(why) + '</span>' : from ? '<span class="dim">resumes from "' + esc(LABEL[from]) + '"</span>' : '') + '</div>';
-    }
-    if (state.retryErr) h += '<div class="banner b-red" role="alert">' + msgHtml(state.retryErr) + '</div>';
     return h + detailsHtml(job, run);
   }
   function histTab(job) {
@@ -468,17 +510,24 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     var top = banners();
     if (state.jobsErr) return top + '<div class="banner b-red" role="alert">' + msgHtml(state.jobsErr) + ' <button type="button" class="lnk" data-act="reload">[ retry ]</button></div>';
     if (state.loading) return '<div class="empty">loading...</div>';
-    if (!state.jobs.length) {
+    if (!allRows().length) {
       return top + '<div class="empty">no jobs yet — [ + new job ] or [ import existing output/ ]<br>paste the absolute path of a book file or folder; steps 1-4 run straight through, then pause before the paid audio step.' +
         '<div class="bacts"><button type="button" class="btn" data-act="import" data-fid="import"' + (state.busy ? ' disabled aria-disabled="true"' : '') + '>[ import existing output/ ]</button></div></div><div class="msg" role="status">' + esc(state.msg) + '</div>';
     }
-    var row = state.jobs.filter(function (j) { return j.name === state.selected; })[0];
+    var row = allRows().filter(function (j) { return j.name === state.selected; })[0];
     if (!row) return top + '<div class="empty">select a job</div>';
+    if (row.placeholder) {
+      var pq = qinfo(row.name), pb = state.tab === 1 ? queuedBody(row.name) : '<div class="empty">no runs yet</div>';
+      return top + '<div class="rhead">' + mk('queued') + nm(row.name) + '<span class="dim">queued' + (pq ? ' — position ' + qtext(pq) : '') + '</span></div>' + tabsHtml() +
+        '<div class="rpanel" role="tabpanel" id="tabpanel" aria-labelledby="tab-' + state.tab + '">' + pb + '</div><div class="msg" role="status">' + esc(state.msg) + '</div>';
+    }
     var job = state.job;
     var k = key(row.status);
     if (job && job.runs.length && !job.missing) k = key(job.runs[job.runs.length - 1].status);
     if (job && job.missing) k = 'missing';
     var word = stale(k) ? 'running (interrupted)' : STX[k];
+    var rq = qinfo(row.name);
+    if (rq) { k = 'queued'; word = 'queued — position ' + qtext(rq); }
     var h = top + '<div class="rhead">' + mk(k) + nm(row.name) + '<span class="dim">' + esc(word) + '</span><button type="button" class="btn mini hdr-ren" data-act="rename" data-arg="' + esc(row.name) + '">[ rename ]</button></div>';
     if (state.renaming === row.name) h += renameForm('ren-hdr');
     if (job && job.missing) h += '<div class="banner b-amber">output folder is gone — ' + pth(job.output) + '. history is still readable; retry is disabled.</div>';
@@ -491,15 +540,16 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   }
 
   function cardHtml(j) {
-    var sel = j.name === state.selected, name = esc(j.name), k = key(j.status);
+    var sel = j.name === state.selected, name = esc(j.name), k = rowKey(j), cq = qinfo(j.name);
     if (state.renaming === j.name) return '<div class="card sel ren-card">' + renameForm('ren-card-f') + '</div>';
     return '<div class="card' + (sel ? ' sel' : '') + '"><button type="button" class="cardmain" data-act="sel" data-arg="' + name + '" aria-current="' + sel + '"><span>' + mk(k) + ' ' + nm(j.name) +
-      '</span><span class="row2">' + esc(dayOf(j.date)) + ' · ' + esc(STX[k]) + (j.runs ? ' · ' + j.runs + ' run' + (j.runs === 1 ? '' : 's') : '') + '</span></button>' +
-      (sel ? '<button type="button" class="btn mini cardren" data-act="rename" data-arg="' + name + '" aria-label="Rename ' + name + '">[ rename ]</button>' : '') + '</div>';
+      '</span><span class="row2">' + (cq ? 'queued · ' + esc(qtext(cq)) : esc(dayOf(j.date)) + ' · ' + esc(STX[k]) + (j.runs ? ' · ' + j.runs + ' run' + (j.runs === 1 ? '' : 's') : '')) + '</span></button>' +
+      (sel && !j.placeholder ? '<button type="button" class="btn mini cardren" data-act="rename" data-arg="' + name + '" aria-label="Rename ' + name + '">[ rename ]</button>' : '') + '</div>';
   }
   function jobSelect() {
-    return '<select class="field jobsel" data-f="sel" data-fid="sel" aria-label="Select job">' + state.jobs.map(function (j) {
-      return '<option value="' + esc(j.name) + '"' + (j.name === state.selected ? ' selected' : '') + '>' + MK[key(j.status)] + ' ' + esc(j.name) + ' — ' + esc(dayOf(j.date)) + '</option>';
+    return '<select class="field jobsel" data-f="sel" data-fid="sel" aria-label="Select job">' + allRows().map(function (j) {
+      var oq = qinfo(j.name);
+      return '<option value="' + esc(j.name) + '"' + (j.name === state.selected ? ' selected' : '') + '>' + MK[rowKey(j)] + ' ' + esc(j.name) + ' — ' + (oq ? 'queued ' + qtext(oq) : esc(dayOf(j.date))) + '</option>';
     }).join('') + '</select>';
   }
 
@@ -588,10 +638,10 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   }
 
   function layout() {
-    var left = '<div class="lh"><span>jobs (' + state.jobs.length + ')</span>' + (state.panel ? '' : '<button type="button" class="btn pri" data-act="drawer" data-fid="drawer">[ + new job ]</button>') + '</div>';
+    var left = '<div class="lh"><span>jobs (' + allRows().length + ')</span>' + (state.panel ? '' : '<button type="button" class="btn pri" data-act="drawer" data-fid="drawer">[ + new job ]</button>') + '</div>';
     if (state.panel) left += panelHtml();
     if (state.loading) left += '<div class="dim">loading...</div>';
-    else if (state.jobs.length) left += jobSelect() + '<div class="list">' + state.jobs.map(cardHtml).join('') + '</div>';
+    else if (allRows().length) left += jobSelect() + '<div class="list">' + allRows().map(cardHtml).join('') + '</div>';
     else left += '<div class="empty">no jobs yet</div>';
     return '<div class="main"><aside class="left" data-left>' + left + '</aside><section class="right">' + rightHtml() + '</section></div>';
   }
@@ -707,6 +757,24 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       render();
     });
   }
+  function doStop() {
+    api('POST', '/api/stop', {}).then(function (r) {
+      state.msg = r.ok ? 'stop requested' + (r.data.dropped && r.data.dropped.length ? ' — dropped ' + r.data.dropped.length + ' queued' : '') + '; the running book stops after its current step' : (r.data.error || 'stop failed');
+      startPolling(); refreshAll();
+    });
+  }
+  function doDelete() {
+    var name = state.confirmDel, rows = allRows(), i = rows.map(function (j) { return j.name; }).indexOf(name);
+    api('POST', '/api/jobs/' + enc(name) + '/delete', {}).then(function (r) {
+      if (!r.ok) { state.delErr = r.data.error || 'delete failed'; state.confirmDel = null; render(); return; }
+      var rest = rows.filter(function (j) { return j.name !== name; }), next = rest[i] || rest[i - 1] || null;
+      state.confirmDel = null; state.delErr = '';
+      state.selected = next ? next.name : null; state.job = null; state.files = null; state.view = null;
+      state.msg = 'removed ' + name + ' from history (files on disk stay)';
+      try { history.replaceState(null, '', next ? '#job=' + enc(next.name) : '#'); } catch (e) { }
+      refreshAll();
+    });
+  }
   function importExisting() {
     api('POST', '/api/import', {}).then(function (r) {
       state.msg = r.ok ? 'imported ' + r.data.imported.length + ' job(s)' : (r.data.error || 'import failed');
@@ -731,6 +799,10 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
         state.overwrite = null; state.form.newJob = true; state.focusNext = 'name';
         state.formNote = 'new job: pick a name different from the existing one, then press start'; break;
       case 'retry': doRetry(); return;
+      case 'stop': doStop(); return;
+      case 'delask': state.confirmDel = state.selected; state.delErr = ''; state.focusNext = 'delno'; break;
+      case 'delno': state.confirmDel = null; state.focusNext = 'delask'; break;
+      case 'delyes': doDelete(); return;
       case 'rename': state.renaming = arg; state.renameVal = arg; state.renameErr = ''; state.focusNext = 'rename'; break;
       case 'rcancel': state.renaming = null; break;
       case 'rsave': saveRename(); return;

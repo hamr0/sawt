@@ -55,6 +55,7 @@ RUN_READY = "ready for audio — paused"
 RUN_FAILED = "failed"
 RUN_RUNNING = "running"
 RUN_IMPORTED = "imported"
+RUN_STOPPED = "stopped"  # user asked to stop; resumes like a failed run
 
 JOB_DIR_SUFFIX = "_sawt"
 HOME_ENV = "SAWT_HOME"
@@ -269,10 +270,15 @@ def _say(run: Run, emit: Emit, line: str) -> None:
     emit(line)
 
 
-def _execute(data: dict, job: Job, run: Run, first_step: str, emit: Emit = _stdout) -> bool:
+def _execute(
+    data: dict, job: Job, run: Run, first_step: str, emit: Emit = _stdout,
+    should_stop: Callable[[], bool] | None = None,
+) -> bool:
     """Run steps from ``first_step`` on. Saves history after every step.
 
-    Returns True if the run reached the gate, False if a step failed.
+    ``should_stop`` is polled only between steps, never mid-step: when it returns True and a
+    step that would still run remains, the run ends ``stopped``. Returns True if the run
+    reached the gate, False if a step failed or the run was stopped.
     """
     out = Path(job["output"])
     for step in STEPS[STEPS.index(first_step):]:
@@ -303,6 +309,12 @@ def _execute(data: dict, job: Job, run: Run, first_step: str, emit: Emit = _stdo
         for d in details:
             _say(run, emit, f"  > {d}")
         save_jobs(data)
+        rest = STEPS[STEPS.index(step) + 1:]
+        if should_stop and should_stop() and any(not _skip_reason(r, run["settings"]) for r in rest):
+            run["status"] = RUN_STOPPED
+            _say(run, emit, f"■ stopped by user after {label}")
+            save_jobs(data)
+            return False
     run["status"] = RUN_READY
     _say(run, emit, GATE_LINE)
     save_jobs(data)
@@ -363,6 +375,7 @@ def run_book(
     assume_yes: bool = False,
     confirm: Callable[[str], bool] = _ask,
     emit: Emit = _stdout,
+    should_stop: Callable[[], bool] | None = None,
 ) -> Run | None:
     """Run steps 1-4 on one book. Returns the run, or None if the user declined the overwrite."""
     data = load_jobs()
@@ -388,18 +401,18 @@ def run_book(
         shutil.rmtree(out / d, ignore_errors=True)
     out.mkdir(parents=True, exist_ok=True)
     emit(f"job {job['name']}: {job['source']} → {out}")
-    _execute(data, job, run, STEPS[0], emit)
+    _execute(data, job, run, STEPS[0], emit, should_stop)
     return run
 
 
-def retry_job(name: str, emit: Emit = _stdout) -> Run:
-    """Resume the job's latest failed run from its failed step, using files on disk only."""
+def retry_job(name: str, emit: Emit = _stdout, should_stop: Callable[[], bool] | None = None) -> Run:
+    """Resume the job's latest failed or stopped run from its failed step, using files on disk only."""
     data = load_jobs()
     job = _find_job(data, name)
     if job is None:
         raise RunnerError(f"no job named {name!r}")
     run = job["runs"][-1] if job["runs"] else None
-    if run is None or run["status"] not in (RUN_FAILED, RUN_RUNNING):
+    if run is None or run["status"] not in (RUN_FAILED, RUN_RUNNING, RUN_STOPPED):
         raise RunnerError(f"job {name!r}: nothing to retry (latest run is not failed)")
     first = next(s for s in STEPS if run["steps"][s] not in (STEP_OK, STEP_SKIPPED))
     out = Path(job["output"])
@@ -416,7 +429,7 @@ def retry_job(name: str, emit: Emit = _stdout) -> Run:
     run["status"] = RUN_RUNNING
     emit(f"job {job['name']}: retrying from {STEP_LABELS[first]}")
     _say(run, emit, f"retry {_now()}: from {STEP_LABELS[first]}")
-    _execute(data, job, run, first, emit)
+    _execute(data, job, run, first, emit, should_stop)
     return run
 
 
@@ -430,6 +443,15 @@ def rename_job(old: str, new: str) -> None:
     if _find_job(data, new):
         raise RunnerError(f"job name {new!r} is already taken")
     job["name"] = new
+    save_jobs(data)
+
+
+def delete_job(name: str) -> None:
+    """Remove the job from history. Its files on disk are never touched."""
+    data = load_jobs()
+    if _find_job(data, name) is None:
+        raise RunnerError(f"no job named {name!r}")
+    data["jobs"] = [j for j in data["jobs"] if j["name"] != name]
     save_jobs(data)
 
 

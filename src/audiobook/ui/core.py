@@ -30,8 +30,8 @@ from pathlib import Path
 from urllib.parse import parse_qs, quote, unquote, urlsplit
 
 from ..runner import (
-    OVERWRITE_WARNING, RUN_FAILED, RUN_RUNNING, STEP_DIRS, RunnerError,
-    free_job_name, import_existing, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
+    OVERWRITE_WARNING, RUN_FAILED, RUN_RUNNING, RUN_STOPPED, STEP_DIRS, RunnerError,
+    delete_job, free_job_name, import_existing, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
 )
 from ..runner.core import _resolve_job
 from .page import FONT_FACE, PAGE
@@ -64,7 +64,7 @@ VIEW_TEXT_EXTS = (".txt", ".ssml", ".json", ".xml")
 VIEW_CSP = "default-src 'none'; style-src 'unsafe-inline'; font-src 'self'"
 DOWNLOAD_CHUNK_BYTES = 1024 * 1024
 
-_JOB_ROUTE = re.compile(r"^/api/jobs/([^/]+)(?:/(retry|rename|files|open))?$")
+_JOB_ROUTE = re.compile(r"^/api/jobs/([^/]+)(?:/(retry|rename|files|open|delete))?$")
 
 
 # ---------------------------------------------------------------------------
@@ -79,6 +79,7 @@ class _Worker:
         self.lock = threading.Lock()
         self._tasks: deque = deque()  # (job name, callable) not yet started
         self._current: str | None = None
+        self._stop = False  # cancel flag: the running book stops at its next step boundary
         self._error: dict | None = None  # last failure that could not be reported synchronously
         self._wake = threading.Condition(self.lock)
         threading.Thread(target=self._loop, daemon=True, name="sawt-ui-worker").start()
@@ -92,6 +93,7 @@ class _Worker:
                 "busy": self._busy(),
                 "current": self._current,
                 "queued": [name for name, _ in self._tasks],
+                "stopping": self._stop and self._current is not None,
                 "error": self._error,
             }
 
@@ -101,9 +103,25 @@ class _Worker:
             if self._busy():
                 return False
             self._error = None
+            self._stop = False
             self._tasks.extend(tasks)
             self._wake.notify()
             return True
+
+    def should_stop(self) -> bool:
+        return self._stop
+
+    def stop(self) -> list[str]:
+        """Drop every queued book and ask the running one to stop after its current step."""
+        with self.lock:
+            dropped = [name for name, _ in self._tasks]
+            self._tasks.clear()
+            if self._current is not None:
+                self._stop = True
+            return dropped
+
+    def holds(self, name: str) -> bool:  # caller holds the lock
+        return name == self._current or any(n == name for n, _ in self._tasks)
 
     def _loop(self) -> None:
         while True:
@@ -123,6 +141,8 @@ class _Worker:
             finally:
                 with self.lock:
                     self._current = None
+                    if not self._tasks:
+                        self._stop = False
 
     def _fail(self, name: str, message: str) -> None:
         with self.lock:
@@ -267,6 +287,12 @@ class _Handler(BaseHTTPRequestHandler):
             if m and m.group(2) == "retry":
                 self._body()
                 return self._post_retry(worker, unquote(m.group(1)))
+            if path == "/api/stop":
+                self._body()
+                return 200, {"dropped": worker.stop()}
+            if m and m.group(2) == "delete":
+                self._body()
+                return self._post_delete(worker, unquote(m.group(1)))
             if m and m.group(2) == "rename":
                 return self._post_rename(worker, unquote(m.group(1)), self._body())
             if m and m.group(2) == "open":
@@ -319,8 +345,8 @@ class _Handler(BaseHTTPRequestHandler):
             raise _HttpError(409, {"overwrite": True, "message": OVERWRITE_WARNING, "jobs": existing})
 
         def make(book: Path, job_name: str, new_job: bool):
-            return lambda: run_book(book, name=job_name, fiction=fiction, ssml=ssml,
-                                    new_job=new_job, assume_yes=True, emit=logger.info)
+            return lambda: run_book(book, name=job_name, fiction=fiction, ssml=ssml, new_job=new_job,
+                                    assume_yes=True, emit=logger.info, should_stop=worker.should_stop)
 
         if not worker.submit([(n, make(b, n, nj)) for b, n, _, nj in plan]):
             raise _HttpError(409, {"busy": True, "error": "a run is in progress — wait for it to end"})
@@ -373,11 +399,22 @@ class _Handler(BaseHTTPRequestHandler):
         if job is None:
             raise _HttpError(404, {"error": f"no job named {name!r}"})
         last = job["runs"][-1] if job["runs"] else None
-        if last is None or last["status"] not in (RUN_FAILED, RUN_RUNNING):
+        if last is None or last["status"] not in (RUN_FAILED, RUN_RUNNING, RUN_STOPPED):
             raise _bad(f"job {name!r}: nothing to retry (latest run is not failed)")
-        if not worker.submit([(name, lambda: retry_job(name, emit=logger.info))]):
+        if not worker.submit([(name, lambda: retry_job(name, emit=logger.info, should_stop=worker.should_stop))]):
             raise _HttpError(409, {"busy": True, "error": "a run is in progress — wait for it to end"})
         return 202, {"queued": [name]}
+
+    def _post_delete(self, worker: _Worker, name: str) -> tuple[int, dict]:
+        with worker.lock:  # jobs.json has one writer: a running book would overwrite the deletion
+            if worker.holds(name):
+                raise _bad(f"{name!r} is running or queued — stop it first")
+            self._refuse_if_busy(worker)
+            try:
+                delete_job(name)
+            except RunnerError as exc:
+                raise _HttpError(404, {"error": str(exc)}) from None
+        return 200, {"deleted": name}
 
     def _post_rename(self, worker: _Worker, old: str, body: dict) -> tuple[int, dict]:
         new = body.get("name")

@@ -193,6 +193,10 @@ After the last module: propose `/self-review`.
 - Folder pick list: when the path box holds a folder, the detected books (one level deep) appear as rows, updating as the path is typed. Each row has a tick (all ticked by default), the file name, an editable job name and a status ("new job" or "existing job → new run", the latter with the "new job" checkbox). `[ all ]` / `[ none ]` sit above; skipped files are listed greyed with their reason. Names are checked live against existing jobs and other ticked rows; `[ start N books ]` runs only the ticked rows, in list order, and is disabled with 0 ticked or any name error. A single file keeps the plain form. `GET /api/scan?path=` feeds the list; `POST /api/runs` takes `{"books": [{path, name, new_job}]}` and re-validates every path and name. The single-path form of `POST /api/runs` is kept (single files, CLI-style tests).
 - Artifacts layout: every step block starts collapsed (header row only; reset on tab open and job change). Headers show the folder name without underscores, the file count and the newest file's date; a missing step is a greyed `04 ssml · not produced` header. Subfolders get a muted `dir/ · N files` subheader, root files come first; files are a responsive grid of `name (size)` cells, up to 4 columns, with ellipsis and the full name in a tooltip.
 
+- Queue view: every queued book has a card at once (`[…] queued`, "2 of 5"), built from worker status, so books that never ran write nothing to history. Selecting one shows its Run tab with "queued — position N".
+- Job actions live in an action row at the top of the Run tab: `[ retry ]` (restart), `[ stop ]`, `[ delete ]`. `[ stop ]` clears the queue and lets the running book finish its current step (cancel flag checked between steps, never mid-step); the run ends `stopped` with a log line `■ stopped by user after <step>`, and Retry resumes from the next undone step like a failed run.
+- `[ delete ]` asks first ("Remove <name> from history? Files on disk stay: <path>"), removes the job from `jobs.json` only, and is refused while the job is running or queued (400) or while any run is active (409, jobs.json has one writer).
+
 ### Module 3 spec (signed off 2026-10-05)
 
 - **Tab:** one block per step folder present in the job's output, in order `01_ingestion` … `04_ssml`, plus `05_audio` if present. Header = folder name, file count, `[ open folder ]`. Files listed under it grouped by subfolder (`03_segments/ssml/`, `review/`), each with relative path and size. Every block starts collapsed (header row only); clicking the header expands it, and expansion resets whenever the tab is opened or the job changes. Missing step → "<folder> — not produced". Output folder gone → "folder missing" plus the path (LTR styling).
@@ -210,7 +214,7 @@ After the last module: propose `/self-review`.
 - Single-voice SSML for non-fiction.
 - Step 5: single-sentence content-block handling (Chirp3-HD fallback and/or flag in CSV).
 - Step 5: first full book (rest of *Tharthara Fawq al-Nil* vs *Awlad Haretna*).
-- No way to cancel a queued folder run once started.
+- No way to cancel a queued folder run once started. — resolved: [ stop ]
 - The UI font loads from the network (Google Fonts); offline it falls back. Decide whether to bundle it or drop it. — resolved: bundled locally
 
 ## 6. Non-requirements / out of scope
