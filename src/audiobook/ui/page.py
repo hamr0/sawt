@@ -136,6 +136,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v .stephead{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:4px 8px}
 .v .steptog{flex:1;min-width:0;text-align:left;background:none;border:0;padding:4px 0;cursor:pointer;overflow-wrap:anywhere}
 .v .steptog:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.v .stepmiss{padding:4px 0}
 .v .stepbody{padding:0 8px 8px}
 .v .gname{color:var(--textDim);font-size:12px;margin:10px 0 4px;padding-top:6px;border-top:1px solid var(--border)}
 .v .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(max(200px,calc((100% - 36px)/4)),1fr));gap:2px 12px}
@@ -423,7 +424,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
   }
   function stepHtml(job, s) {
-    if (!s.present) return '<div class="step"><div class="stephead dim">– ' + esc(disp(s.name)) + ' · not produced</div></div>';
+    if (!s.present) return '<div class="step"><div class="stephead"><span class="stepmiss">– <b>' + esc(disp(s.name)) + '</b> <span class="dim">· not produced</span></span></div></div>';
     var k = job + '|' + s.name, open = state.fexp[k] === true;  /* blocks start collapsed; reset on tab open and job change, kept on refresh */
     var h = '<div class="step"><div class="stephead"><button type="button" class="steptog" data-act="ftoggle" data-arg="' + esc(s.name) + '" aria-expanded="' + open + '">' + (open ? '▾' : '▸') + ' <b>' + esc(disp(s.name)) + '</b> <span class="dim">· ' + s.count + ' file' + (s.count === 1 ? '' : 's') + (s.mtime ? ' · ' + fmtTime(s.mtime) : '') + '</span></button>' +
       '<button type="button" class="btn mini" data-act="openfolder" data-arg="' + esc(s.name) + '">[ open folder ]</button></div>';

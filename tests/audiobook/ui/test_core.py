@@ -724,7 +724,7 @@ class TestStartButtonSync:
         assert collapsed.count("[ open folder ]") == 2 and collapsed.count('aria-expanded="false"') == 2
         assert 'aria-expanded="true"' not in collapsed and "/view?job=" not in collapsed and "fgrid" not in collapsed
         assert "· 3 files" in collapsed and "· 11 files" in collapsed
-        assert '<div class="stephead dim">\u2013 03 segments \u00b7 not produced</div>' in collapsed
+        assert ('<span class="stepmiss">\u2013 <b>03 segments</b> <span class="dim">\u00b7 not produced</span></span>') in collapsed
         assert "03_segments" not in collapsed.replace('data-arg="03_segments"', "") and "not produced" in collapsed
         # underscores are display-only: the toggle/open args keep the real folder name, headers show spaces
         assert "<b>01 ingestion</b>" in collapsed and 'data-arg="01_ingestion"' in collapsed and "<b>01_ingestion" not in collapsed
