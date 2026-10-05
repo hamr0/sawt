@@ -591,8 +591,8 @@ class TestStartButtonSync:
 
     def test_message_isolates_arabic_names_and_paths(self, tmp_path):
         html = self._run(tmp_path, "conflict")["afterStart"]
-        assert "&#39;<bdi dir=\"auto\">\u0635\u062f\u0649-\u0627\u0644\u0646\u0633\u064a\u0627\u0646</bdi>&#39;" in html
-        assert "(<bdi dir=\"auto\">\u0635\u062f\u0649" in html
+        assert "&#39;<bdi dir=\"auto\" class=\"nmi\">\u0635\u062f\u0649-\u0627\u0644\u0646\u0633\u064a\u0627\u0646</bdi>&#39;" in html
+        assert "(<bdi dir=\"auto\" class=\"nmi\">\u0635\u062f\u0649" in html
 
 
 class TestPathsAndWording:
@@ -640,6 +640,6 @@ def test_path_renders_one_isolate_per_segment(tmp_path):
     r = subprocess.run(["node", str(f)], capture_output=True, text=True, timeout=20)
     assert r.returncode == 0, r.stderr
     a, b = json.loads(r.stdout)
-    assert a.count('<bdi dir="auto" class="seg">') == 4 and a.count("/<wbr>") == 4
-    assert '<bdi dir="auto" class="seg">رحلة-ابن-فطومة.txt</bdi>' in a
-    assert 'dir="ltr"' in a and '<bdi dir="auto" class="seg">صدى</bdi>' in b
+    assert a.count('<bdi dir="ltr" class="seg">') == 4 and a.count("/<wbr>") == 4
+    assert '<bdi dir="ltr" class="seg">رحلة-ابن-فطومة.txt</bdi>' in a
+    assert 'dir="ltr"' in a and '<bdi dir="ltr" class="seg">صدى</bdi>' in b

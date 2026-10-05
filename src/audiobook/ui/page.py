@@ -50,6 +50,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v .dim{color:var(--textDim)}
 .v .pth{direction:ltr;unicode-bidi:isolate;text-align:left;line-height:1.8;padding-bottom:2px}
 .v .pth .seg{display:inline-block;max-width:100%;white-space:nowrap;overflow-wrap:anywhere;unicode-bidi:isolate;overflow:visible}
+.v .nmi{white-space:nowrap;overflow-wrap:anywhere}
 .v .nm{unicode-bidi:plaintext;text-align:start;overflow-wrap:anywhere}
 .v .btn{background:var(--panel2);border:1px solid var(--borderStrong);border-radius:0;padding:6px 10px;min-height:32px;cursor:pointer;color:var(--text);white-space:normal}
 .v .btn:hover{background:var(--panel)}
@@ -189,7 +190,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   function nm(s) { return '<span class="nm" dir="auto">' + esc(s) + '</span>'; }
   /* a path: LTR overall, each /-separated segment its own bidi isolate, line breaks only after "/" */
   function pthInner(escaped) {
-    return escaped.split('/').map(function (seg) { return seg ? '<bdi dir="auto" class="seg">' + seg + '</bdi>' : ''; }).join('/<wbr>');
+    return escaped.split('/').map(function (seg) { return seg ? '<bdi dir="ltr" class="seg">' + seg + '</bdi>' : ''; }).join('/<wbr>');
   }
   function pth(s) { return '<bdi class="pth" dir="ltr">' + pthInner(esc(s)) + '</bdi>'; }
   function isPath(t) { return /^(\/|~\/)/.test(t); }
@@ -197,7 +198,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   function msgHtml(s) {
     return esc(s).replace(/&#39;([^&]*?)&#39;|\(([^()]*)\)|(^|[\s])((?:\/|~\/)[^\s,;)]*)/g, function (m, q, par, sp, p) {
       if (p !== undefined) return sp + '<bdi class="pth" dir="ltr">' + pthInner(p) + '</bdi>';
-      var t = q !== undefined ? q : par, inner = isPath(t) ? '<bdi class="pth" dir="ltr">' + pthInner(t) + '</bdi>' : '<bdi dir="auto">' + t + '</bdi>';
+      var t = q !== undefined ? q : par, inner = isPath(t) ? '<bdi class="pth" dir="ltr">' + pthInner(t) + '</bdi>' : '<bdi dir="auto" class="nmi">' + t + '</bdi>';
       return q !== undefined ? '&#39;' + inner + '&#39;' : '(' + inner + ')';
     });
   }
