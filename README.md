@@ -99,9 +99,9 @@ cp .env.example .env
 |-----|------|
 | [Documentation Hub](docs/README.md) | Full documentation navigation |
 | [Plan](docs/02-features/azure-audiobooks/PLAN.md) | Execution plan, architecture decisions |
-| [POC-1 Results](docs/03-logs/POC1_RESULTS.md) | Book ingestion — production ready |
-| [POC-2 Results](docs/03-logs/POC2_RESULTS.md) | Chapter splitting — production ready |
-| [POC-3 Results](docs/03-logs/POC3_RESULTS.md) | Dialogue detection — production ready |
+| [POC-1 Results](docs/logs/03-logs/POC1_RESULTS.md) | Book ingestion — production ready |
+| [POC-2 Results](docs/logs/03-logs/POC2_RESULTS.md) | Chapter splitting — production ready |
+| [POC-3 Results](docs/logs/03-logs/POC3_RESULTS.md) | Dialogue detection — production ready |
 
 ## Cost
 

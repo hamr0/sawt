@@ -73,7 +73,7 @@ unsolved problem in the open-source ecosystem:
 2. PaddleOCR v5 (40%+ Arabic improvement, free, best OSS OCR for Arabic)
 3. Mistral OCR API (94.9% accuracy, paid, best-in-class)
 
-Full analysis: [research/ARABIC_PDF_EXTRACTION.md](research/ARABIC_PDF_EXTRACTION.md)
+Full analysis: [research/ARABIC_PDF_EXTRACTION.md](../logs/02-features/ARABIC_PDF_EXTRACTION.md)
 
 PDF test outputs preserved in `output/pdf/` for reference.
 
@@ -236,7 +236,7 @@ Nobody else has built a raw-book-to-audiobook pipeline for Arabic. Competitors a
 TTS engines (sell the voice, user handles everything) or audiobook platforms (distribute,
 don't produce). Our text processing pipeline bridges the gap.
 
-Full competitive analysis: [research/MARKET_RESEARCH.md](research/MARKET_RESEARCH.md)
+Full competitive analysis: [research/MARKET_RESEARCH.md](MARKET_RESEARCH.md)
 
 ---
 
@@ -365,7 +365,7 @@ Azure can use step 4 SSML or build it inline from step 3.
 
 ### POC-1: Book Ingestion (EPUB/DOCX to clean text)
 
-**Status:** COMPLETE (Feb 2026). Results: [docs/03-logs/POC1_RESULTS.md](../../03-logs/POC1_RESULTS.md)
+**Status:** COMPLETE (Feb 2026). Results: [docs/logs/03-logs/POC1_RESULTS.md](../../03-logs/POC1_RESULTS.md)
 
 **Problem:** Books arrive as EPUB or DOCX with inconsistent encoding, formatting, and structure.
 
@@ -412,7 +412,7 @@ Both modules polished with consistent patterns:
 
 ### POC-2: Chapter Detection & Splitting
 
-**Status:** COMPLETE (Feb 2026). Results: [docs/03-logs/POC2_RESULTS.md](../../03-logs/POC2_RESULTS.md)
+**Status:** COMPLETE (Feb 2026). Results: [docs/logs/03-logs/POC2_RESULTS.md](../../03-logs/POC2_RESULTS.md)
 
 **Problem:** Books use different structural delimiters (chapters, parts, sections, etc.) or none
 at all. Each structural unit becomes an audio file. Units that exceed Azure SSML limits need
@@ -710,7 +710,7 @@ and makes every boundary obvious.
 
 ### POC-4: SSML Generation + Voice Selection — DONE
 
-**Status:** Complete. SSML generation production-ready. POC-4a validated 4 TTS providers — Google Chirp3-HD and ElevenLabs are viable alternatives to Azure. See `docs/03-logs/POC4_RESULTS.md`.
+**Status:** Complete. SSML generation production-ready. POC-4a validated 4 TTS providers — Google Chirp3-HD and ElevenLabs are viable alternatives to Azure. See `docs/logs/03-logs/POC4_RESULTS.md`.
 
 **Code:** `src/audiobook/ssml/core.py` (stub exists)
 
@@ -864,7 +864,7 @@ PDFs kept in `data/books/pdf/` for reference. Output in `output/pdf/`. Not proce
 
 ## Go-to-Market Strategy
 
-Detailed analysis: [research/MARKET_RESEARCH.md](research/MARKET_RESEARCH.md)
+Detailed analysis: [research/MARKET_RESEARCH.md](MARKET_RESEARCH.md)
 
 ### Summary
 
@@ -897,7 +897,7 @@ $20-40/book. Market via Arabic social media. Success metric: 5+ paying customers
 - All paragraph boundaries verified by human review
 - Tested on 12 books across 3 formats (5 EPUB, 4 DOCX, 3 TXT)
 - 21 tests passing, PDF descoped and removed from pipeline
-- **Results:** `docs/03-logs/POC1_RESULTS.md`
+- **Results:** `docs/logs/03-logs/POC1_RESULTS.md`
 
 ### POC-2 (Chapter Splitting) ✓ PRODUCTION READY
 - Detect natural structural delimiters (parts, chapters, sections) across 3+ books
@@ -906,7 +906,7 @@ $20-40/book. Market via Arabic social media. Success metric: 5+ paying customers
 - No mid-sentence splits
 - Unit files concatenate back to original text
 - 91 tests passing, validated on all 12 books
-- **Results:** `docs/03-logs/POC2_RESULTS.md`
+- **Results:** `docs/logs/03-logs/POC2_RESULTS.md`
 
 ### POC-3 Phase A (Two-Voice) ✓ PRODUCTION READY
 - Dialogue detection on all 12 books, 103 tests passing
@@ -917,7 +917,7 @@ $20-40/book. Market via Arabic social media. Success metric: 5+ paying customers
 - Short story titles (مدد, قمر, علي لوز, etc.) left within 25K chapters — titles read aloud naturally as narrator pauses, listener navigation is time-based (30s rewind, bookmarks) not chapter-skip, TOC is complementary not mandatory
 - Dual output: machine CSV + human review text with sync workflow
 - Per-chapter + book-level summary CSV for quality validation
-- **Results:** `docs/03-logs/POC3_RESULTS.md`
+- **Results:** `docs/logs/03-logs/POC3_RESULTS.md`
 
 ### POC-3 Phase B (Multi-Voice) — CLOSED
 - **Skipped.** Azure Arabic has only 2 voices per dialect (no character distinction possible)
@@ -942,7 +942,7 @@ $20-40/book. Market via Arabic social media. Success metric: 5+ paying customers
   - Female narrator over male dialogue better than reverse
   - Same-gender pairings (MM, FF) produce most cohesive audio
   - Tested on Chapter 1 of Tharthara Fawq al-Nil
-- **Results:** `docs/03-logs/POC4_RESULTS.md`
+- **Results:** `docs/logs/03-logs/POC4_RESULTS.md`
 
 ### POC-5: Audio Generation (Multi-Provider) — NEXT
 - **Goal:** Full book/chapter audio generation from segments CSV (step 3 output)
@@ -980,7 +980,7 @@ Full voice inventory: `docs/02-features/research/final_voices.csv` (19 voices, p
 
 ## Audiobook Best Practices — How Sawt Meets Them
 
-Research: `docs/02-features/research/audiobook_best_practices.md`
+Research: `docs/wiki/audiobook_best_practices.md`
 
 | Best Practice | Industry Standard | Sawt Status |
 |---------------|-------------------|-------------|
@@ -1009,10 +1009,10 @@ Research: `docs/02-features/research/audiobook_best_practices.md`
 | Scalability analysis | `docs/02-features/azure-audiobooks/reference/prototypes/outputs/SCALABILITY_ANALYSIS.md` |
 | Bug fix history | `docs/02-features/azure-audiobooks/reference/prototypes/outputs/BUG_FIX_TEXT_LOSS_RESOLVED.md` |
 | Research findings | `docs/02-features/azure-audiobooks/reference/prototypes/outputs/QUOTATION_ATTRIBUTION_RESEARCH_FINDINGS.md` |
-| POC-1 results | `docs/03-logs/POC1_RESULTS.md` |
-| POC-2 results | `docs/03-logs/POC2_RESULTS.md` |
-| POC-3 results | `docs/03-logs/POC3_RESULTS.md` |
-| POC-4 results | `docs/03-logs/POC4_RESULTS.md` |
+| POC-1 results | `docs/logs/03-logs/POC1_RESULTS.md` |
+| POC-2 results | `docs/logs/03-logs/POC2_RESULTS.md` |
+| POC-3 results | `docs/logs/03-logs/POC3_RESULTS.md` |
+| POC-4 results | `docs/logs/03-logs/POC4_RESULTS.md` |
 | Azure voice capabilities | `docs/02-features/azure-audiobooks/reference/arabic_voices_capabilities.json` |
 | Hindawi CC corpus | [hindawi.org](https://www.hindawi.org/) — 3,271 books, CC BY 4.0 |
 | Swedish text corpus | [researchdata.se](https://researchdata.se/en/catalogue/dataset/2024-145) — 1,745 books, plain text |

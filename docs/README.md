@@ -8,9 +8,9 @@ Arabic Audiobook Production — documentation hub.
 |------|-------|
 | Execution plan (source of truth) | [PLAN.md](02-features/azure-audiobooks/PLAN.md) |
 | Repo structure & data flow | [REPO_STRUCTURE.md](02-features/azure-audiobooks/REPO_STRUCTURE.md) |
-| Product requirements | [PRD](01-product/prd.md) |
-| Development workflow | [Dev Workflow](04-process/dev-workflow.md) |
-| Definition of done | [DoD](04-process/definition-of-done.md) |
+| Product requirements | [PRD](product/prd.md) |
+| Development workflow | [Dev Workflow](wiki/dev-workflow.md) |
+| Definition of done | [DoD](wiki/definition-of-done.md) |
 
 ---
 
@@ -55,15 +55,15 @@ docs/
 
 | Document | Description |
 |----------|-------------|
-| [vision.md](00-context/vision.md) | What we're building and why |
-| [assumptions.md](00-context/assumptions.md) | Constraints, risks, known unknowns |
-| [system-state.md](00-context/system-state.md) | Current architecture, POC progress, dependencies |
+| [vision.md](product/vision.md) | What we're building and why |
+| [assumptions.md](product/assumptions.md) | Constraints, risks, known unknowns |
+| [system-state.md](archive/system-state.md) | Current architecture, POC progress, dependencies |
 
 ## 01-product/ — Requirements
 
 | Document | Description |
 |----------|-------------|
-| [prd.md](01-product/prd.md) | Product requirements for audiobook production |
+| [prd.md](product/prd.md) | Product requirements for audiobook production |
 
 ## 02-features/ — Azure Audiobooks
 
@@ -77,27 +77,27 @@ docs/
 
 | Document | Description |
 |----------|-------------|
-| [POC1_RESULTS.md](03-logs/POC1_RESULTS.md) | POC-1 results: book ingestion (PRODUCTION READY) |
-| [POC2_RESULTS.md](03-logs/POC2_RESULTS.md) | POC-2 results: chapter splitting (PRODUCTION READY) |
-| [POC3_RESULTS.md](03-logs/POC3_RESULTS.md) | POC-3 results: dialogue detection (PRODUCTION READY) |
-| [implementation-log.md](03-logs/implementation-log.md) | What was built, when |
-| [decisions-log.md](03-logs/decisions-log.md) | Architecture decisions with rationale |
-| [bug-log.md](03-logs/bug-log.md) | Bugs, root causes, fixes |
-| [validation-log.md](03-logs/validation-log.md) | CSV review results per POC |
-| [insights.md](03-logs/insights.md) | Learnings from prototypes and development |
+| [POC1_RESULTS.md](logs/03-logs/POC1_RESULTS.md) | POC-1 results: book ingestion (PRODUCTION READY) |
+| [POC2_RESULTS.md](logs/03-logs/POC2_RESULTS.md) | POC-2 results: chapter splitting (PRODUCTION READY) |
+| [POC3_RESULTS.md](logs/03-logs/POC3_RESULTS.md) | POC-3 results: dialogue detection (PRODUCTION READY) |
+| [implementation-log.md](logs/03-logs/implementation-log.md) | What was built, when |
+| [decisions-log.md](logs/03-logs/decisions-log.md) | Architecture decisions with rationale |
+| [bug-log.md](logs/03-logs/bug-log.md) | Bugs, root causes, fixes |
+| [validation-log.md](logs/03-logs/validation-log.md) | CSV review results per POC |
+| [insights.md](logs/03-logs/insights.md) | Learnings from prototypes and development |
 
 ## 04-process/ — Workflow
 
 | Document | Description |
 |----------|-------------|
-| [dev-workflow.md](04-process/dev-workflow.md) | POC development cycle, commands, review gates |
-| [definition-of-done.md](04-process/definition-of-done.md) | Completion criteria per POC |
+| [dev-workflow.md](wiki/dev-workflow.md) | POC development cycle, commands, review gates |
+| [definition-of-done.md](wiki/definition-of-done.md) | Completion criteria per POC |
 
 ---
 
 ## Audiobook Best Practices Compliance
 
-Based on research from professional narrators, ACX/Audible standards, and Storytel/Kitab Sawti production practices. Full research: [research/audiobook_best_practices.md](02-features/research/audiobook_best_practices.md)
+Based on research from professional narrators, ACX/Audible standards, and Storytel/Kitab Sawti production practices. Full research: [research/audiobook_best_practices.md](wiki/audiobook_best_practices.md)
 
 ### Met
 

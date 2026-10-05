@@ -18,7 +18,32 @@ restarting from zero. Two eras:
 
 ## [Unreleased]
 
+### Added
+
+- **POC-4c: Gemini TTS evaluated and chosen as the production provider.**
+  `scripts/generate_gemini_sample.py` renders tharthara-fawq-al-nil
+  chapter 1 with `gemini-3.8-flash-tts` in native two-speaker mode
+  (Sulafat narrator + Leda dialogue, the same voices as the Google
+  Chirp3-HD FF pair). It writes two variants: plain, and styled via
+  `speech_metadata.style` ("warm, calm, measured" narration; "soft, not
+  dramatic" dialogue). In listening tests the styled variant beat
+  ElevenLabs, with pronunciation judged ~90%+. Measured cost is ~3.6 output
+  tokens per character: ~$54 for the 5 Mahfouz novels at standard or 2027
+  batch pricing, against ~$167 for ElevenLabs. Gemini's content filter
+  deterministically blocks some violent literary passages in context
+  (each sentence passes alone), so the script halves on `content_blocked`
+  and retries. Findings, costs and the decision are in POC-4 results;
+  POC-5's open provider and voice questions are now closed.
+
 ### Changed
+
+- **Docs reorganized into product / wiki / logs / archive** via
+  docs-builder. 24 files moved and 59 inbound links repaired; the stale
+  `system-state.md` was archived. `docs/index.md` is now the generated map
+  of every doc. The 1,019-line `PLAN.md` was split into seven themed
+  pages: the core execution plan stays at `docs/product/PLAN.md`, the
+  themes are in `docs/wiki/`, and the original is archived byte-identical
+  at `docs/archive/PLAN.md`.
 
 - **`CLAUDE.md` rewritten against the built codebase.** The old file had
   drifted from reality: it claimed 126 tests (the suite has 259), pointed

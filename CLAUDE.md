@@ -174,18 +174,21 @@ Errors carry pipeline context (`IngestionError(ValueError)`). Return types are `
   → `ar-SY/JO/LB`. Dialect changes meaning, not just accent. Never mix within a book.
 - Azure Arabic has **zero** `mstts:express-as` support (no emotion styles, no HD voices). Only
   rate/pitch/volume. Emotion work is blocked on the platform, not on us.
-- Multi-provider: Google Chirp3-HD (~$1.16/book, primary), ElevenLabs (~$21.74/book, premium),
-  Azure (~$8–12/book, baseline). OpenAI has no Arabic voices. Mishkal diacritization makes
-  pronunciation *worse* — send plain text.
+- **Production provider: Gemini 3.8 Flash TTS** (`gemini-3.8-flash-tts`, decided 2026-10-05).
+  Sulafat narrator + Leda dialogue, with `speech_metadata.style` direction. It beat ElevenLabs
+  in listening tests at about Google cost (~$54 for 5 novels with batch pricing vs ElevenLabs
+  ~$167). Its content filter blocks some violent literary passages in context; split and retry,
+  and fall back to Google Chirp3-HD (same voice names). OpenAI has no Arabic voices. Mishkal
+  diacritization makes pronunciation *worse* — send plain text.
 
 ## Docs
 
 | Topic | Location |
 |-------|----------|
-| Execution plan (source of truth) | `docs/02-features/PLAN.md` |
-| Product requirements | `docs/01-product/prd.md` |
-| Documentation hub / knowledge base | `docs/README.md`, `docs/KNOWLEDGE_BASE.md` |
-| POC results (1–4) | `docs/03-logs/POC{1,2,3,4}_RESULTS.md` |
+| Execution plan (source of truth) | `docs/product/PLAN.md` |
+| Product requirements | `docs/product/prd.md` |
+| Documentation hub / knowledge base | `docs/README.md`, `docs/wiki/KNOWLEDGE_BASE.md` |
+| POC results (1–4) | `docs/logs/03-logs/POC{1,2,3,4}_RESULTS.md` |
 | Voice inventory (19 pairing-tested voices) | `docs/02-features/research/final_voices.csv` |
 
 Some docs still reference the old flat layout (`src/audiobook/ingest.py`,
@@ -200,5 +203,10 @@ Some docs still reference the old flat layout (`src/audiobook/ingest.py`,
 <!-- AGENT_RULES:START -->
 Consult when building something new or adding a feature — a standards guide, not hot
 context like MEMORY.md above:
-@.claude/remember/AGENT_RULES.md
+.claude/remember/AGENT_RULES.md
 <!-- AGENT_RULES:END -->
+
+<!-- DOCS_INDEX:START -->
+Docs map: `docs/index.md` — every doc in this project, with line counts.
+Search this corpus instead of reading it whole: `/docs-builder search <query words>`
+<!-- DOCS_INDEX:END -->

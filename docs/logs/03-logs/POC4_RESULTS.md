@@ -225,9 +225,48 @@ pass amr/openai_api     → OPENAI_API_KEY (not viable)
 
 ---
 
+## POC-4c: Gemini TTS — DONE (2026-10-05)
+
+**Winner. Best of all providers tested, including ElevenLabs.** Pronunciation judged ~90%+.
+
+### Test setup
+
+- **Model:** `gemini-3.8-flash-tts` (GA) via the Interactions API (`POST /v1beta/interactions`)
+- **Chapter:** tharthara-fawq-al-nil Ch1 (70 segments → 41 coalesced groups → 4 requests ≤1,500 chars)
+- **Voices:** Sulafat (narrator) + Leda (dialogue), the same names as the Google Chirp3-HD FF pair, so the only variable vs `google_FF.mp3` is the model
+- **Script:** `scripts/generate_gemini_sample.py`
+- **Output:** `output/epub/tharthara-fawq-al-nil-hindawi/05_audio/voice_pairings/gemini_FF{,_styled}.mp3`
+
+| Variant | Style direction | Duration | Output tokens | Verdict |
+|---------|-----------------|----------|---------------|---------|
+| `gemini_FF` | none | 9:03 | 17,298 | Good |
+| `gemini_FF_styled` | narrator: "warm, calm, measured audiobook narration; soft and unhurried" / dialogue: "natural, soft conversational delivery; gentle, not dramatic" | 10:17 | 19,668 | **Best overall: beats ElevenLabs** |
+
+### Key findings
+
+**1. Native two-speaker mode.** Narrator and dialogue go in one request (`speech_config.speakers`, max 2), like Azure SSML. No per-segment stitching, and Gemini paces the turns itself.
+
+**2. Style control works, and it's the differentiator.** `speech_metadata.style` per segment moved delivery toward the warm/soft profile (about 14% slower, audibly calmer). Azure Arabic has no equivalent (zero `express-as` styles).
+
+**3. Content filter blocks some literary passages. This is a production risk.** One 651-char narrator passage (Mamluks using passers-by for target practice, a bereaved mother screaming) is refused deterministically (3/3) with `content_blocked`, while every sentence in it passes alone. The filter is contextual. The script recovers by halving at group, then sentence, boundaries; this passage needed 5 splits and leaves 200ms seams. A single sentence that is blocked on its own has no Gemini workaround. Violent books (e.g. *Awlad Haretna*) will hit this more often.
+
+**4. Natural fallback exists.** Google Chirp3-HD exposes the same voice names (Sulafat, Leda), so falling back for a blocked sentence keeps the same voice identity.
+
+### Cost (~3.6 output tokens per character, measured)
+
+| Pricing | Per 1M chars | al-liss (121K) | 5 Mahfouz novels (1.69M) |
+|---------|-------------:|---------------:|-------------------------:|
+| Standard, through 2026-12-31 ($9/M audio tokens) | ~$32 | ~$3.90 | ~$54 |
+| Standard, from 2027-01-01 ($18/M) | ~$64 | ~$7.80 | ~$109 |
+| Batch, from 2027-01-01 ($9/M) | ~$32 | ~$3.90 | ~$54 |
+
+Input text tokens ($0.50–1.00/M) are negligible. It is not yet known whether blocked requests are billed. Batch pricing holds Gemini at Google Chirp3-HD cost ($51) and about a third of ElevenLabs ($167).
+
+---
+
 ## Open decisions for POC-5
 
-1. **Which provider for production?** Google Chirp3-HD ($3.63/book, good) vs ElevenLabs ($12/book API, best quality, ~3x cost)
-2. **Which ElevenLabs plan?** Pro ($99/mo, 500K chars) for steady production, Scale ($330/mo, 2M chars) for batch runs
-3. **Which voice pair?** F/F preferred — full chapter test with chosen pair before committing
-4. **Audio generation pipeline** — chapter-by-chapter, per-book output to `05_audio/`
+1. ~~**Which provider for production?**~~ **Decided 2026-10-05: Gemini 3.8 Flash TTS, styled.** Google Chirp3-HD (same voice names) as the content-block fallback.
+2. ~~**Which ElevenLabs plan?**~~ Moot: ElevenLabs is no longer the quality pick.
+3. ~~**Which voice pair?**~~ **Sulafat (narrator) + Leda (dialogue), FF**, with the style strings above.
+4. **Audio generation pipeline:** chapter-by-chapter, per-book output to `05_audio/`, with content-block splitting + Chirp3-HD fallback. Use batch pricing for full-book runs.
