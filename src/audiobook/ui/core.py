@@ -408,14 +408,13 @@ class _Handler(BaseHTTPRequestHandler):
         return 202, {"queued": [name]}
 
     def _post_delete(self, worker: _Worker, name: str) -> tuple[int, dict]:
-        with worker.lock:  # jobs.json has one writer: a running book would overwrite the deletion
+        with worker.lock:
             if worker.holds(name):
                 raise _bad(f"{name!r} is running or queued — stop it first")
-            self._refuse_if_busy(worker)
-            try:
-                delete_job(name)
-            except RunnerError as exc:
-                raise _HttpError(404, {"error": str(exc)}) from None
+        try:
+            delete_job(name)  # merge-on-save: another job's running book is unaffected
+        except RunnerError as exc:
+            raise _HttpError(404, {"error": str(exc)}) from None
         return 200, {"deleted": name}
 
     def _post_rename(self, worker: _Worker, old: str, body: dict) -> tuple[int, dict]:

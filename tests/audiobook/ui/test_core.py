@@ -1631,11 +1631,13 @@ class TestDelete:
         assert gate.entered.wait(10)
         status, data = client.post("/api/jobs/a/delete")  # running
         assert status == 400 and "running or queued" in data["error"]
-        status, data = client.post("/api/jobs/c/delete")  # other job: jobs.json has one writer, refused while busy
-        assert status == 409 and data["busy"] is True
+        status, data = client.post("/api/jobs/c/delete")  # another job: allowed while busy (merge-on-save)
+        assert status == 200
         gate.go.set()
         client.wait_idle()
-        assert {r["name"] for r in client.get("/api/jobs")[1]["jobs"]} == {"a", "c"}
+        assert {r["name"] for r in client.get("/api/jobs")[1]["jobs"]} == {"a"}  # a's saves did not resurrect c
+        client.post("/api/runs", {"path": str(books / "c.txt")})
+        client.wait_idle()
         # queued: a re-run of c waits behind a gated run of a
         gate.go.clear()
         gate.entered.clear()

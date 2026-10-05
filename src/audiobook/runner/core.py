@@ -6,7 +6,8 @@ one history file (``jobs.json``) with every run of every job.
 
 Stages stay isolated by data: the runner only calls each stage's entry point
 with explicit directories, and a retry reads nothing but the files already on
-disk. The runner is the single writer of ``jobs.json``.
+disk. Every write to ``jobs.json`` is a read-merge-write under a file lock (see
+``_mutate`` / ``_merge_job``), so several processes can share it safely.
 """
 
 import argparse
@@ -16,6 +17,8 @@ import os
 import shutil
 import sys
 import tempfile
+import uuid
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Callable, Iterable, TypedDict
@@ -24,6 +27,11 @@ from ..chapters import split_book
 from ..dialogue import segment_book
 from ..ingest import EXTRACTORS, ingest
 from ..ssml import generate_book_ssml
+
+try:
+    import fcntl
+except ImportError:  # e.g. Windows: no lock, one warning
+    fcntl = None
 
 logger = logging.getLogger(__name__)
 
@@ -101,6 +109,7 @@ class Run(TypedDict):
 
 
 class Job(TypedDict):
+    id: str  # stable identity: survives renames, so a run's saves find its own job
     name: str
     source: str
     output: str
@@ -137,6 +146,11 @@ def jobs_path() -> Path:
     return (Path(home) if home else DEFAULT_HOME) / JOBS_FILE
 
 
+def _legacy_id(job: dict) -> str:
+    """Id for an entry written before ids existed: derived from its (unique) output folder."""
+    return uuid.uuid5(uuid.NAMESPACE_URL, str(job.get("output", ""))).hex
+
+
 def load_jobs(path: Path | None = None) -> dict:
     path = path or jobs_path()
     if not path.exists():
@@ -147,7 +161,62 @@ def load_jobs(path: Path | None = None) -> dict:
             raise ValueError("missing 'jobs' list")
     except (ValueError, AttributeError) as exc:
         raise RunnerError(f"{path} is unreadable ({exc}); fix or remove it") from exc
+    for job in data["jobs"]:
+        job.setdefault("id", _legacy_id(job))  # old files: deterministic, persisted by the next save
     return data
+
+
+_lock_warned = False
+
+
+@contextmanager
+def _jobs_lock(path: Path):
+    """Exclusive lock on a sidecar ``jobs.json.lock``; without fcntl, no lock (warned once)."""
+    global _lock_warned
+    if fcntl is None:
+        if not _lock_warned:
+            _lock_warned = True
+            logger.warning("no file locking on this platform: concurrent writers to %s are not protected", path)
+        yield
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path.with_name(path.name + ".lock"), "a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+
+
+def _mutate(change: Callable[[dict], object], path: Path | None = None):
+    """Read-modify-write jobs.json under the lock; ``change`` raising means nothing is written."""
+    path = path or jobs_path()
+    with _jobs_lock(path):
+        data = load_jobs(path)
+        result = change(data)
+        save_jobs(data, path)
+        return result
+
+
+def _merge_job(path: Path, job: Job, create: bool = False) -> bool:
+    """Write only this job's runs into the current file, matched by id.
+
+    The file's name/source/output win (a rename made meanwhile survives, and ``job`` picks the
+    new name up). False if the job is gone, i.e. deleted by someone else: it is not resurrected.
+    """
+    def change(data: dict) -> bool:
+        cur = next((j for j in data["jobs"] if j["id"] == job["id"]), None)
+        if cur is None:
+            if not create:
+                return False
+            if find_job(data, job["name"]):
+                raise RunnerError(f"job name {job['name']!r} is already taken")
+            data["jobs"].append(job)
+            return True
+        cur["runs"] = job["runs"]
+        job["name"] = cur["name"]
+        return True
+    return _mutate(change, path)
 
 
 def save_jobs(data: dict, path: Path | None = None) -> None:
@@ -278,7 +347,7 @@ def _say(run: Run, emit: Emit, line: str) -> None:
 
 
 def _execute(
-    data: dict, job: Job, run: Run, first_step: str, emit: Emit = _stdout,
+    job: Job, run: Run, first_step: str, emit: Emit = _stdout,
     should_stop: Callable[[], bool] | None = None, jobs_file: Path | None = None,
 ) -> bool:
     """Run steps from ``first_step`` on. Saves history after every step.
@@ -288,17 +357,27 @@ def _execute(
     reached the gate, False if a step failed or the run was stopped.
     """
     out = Path(job["output"])
+    jobs_file = jobs_file or jobs_path()
+
+    def sync() -> bool:
+        if _merge_job(jobs_file, job):
+            return True
+        emit(f"job {job['name']} was deleted while running — stopping; nothing more is saved")
+        return False
+
     for step in STEPS[STEPS.index(first_step):]:
         label = STEP_LABELS[step]
         reason = _skip_reason(step, run["settings"])
         if reason:
             run["steps"][step] = STEP_SKIPPED
             _say(run, emit, f"{label} — {reason}")
-            save_jobs(data, jobs_file)
+            if not sync():
+                return False
             continue
         shutil.rmtree(out / STEP_DIRS[step], ignore_errors=True)  # this step's own partial output
         run["steps"][step] = STEP_RUNNING
-        save_jobs(data, jobs_file)
+        if not sync():
+            return False
         try:
             details = _STEP_FUNCS[step](job, run)
         except (Exception, KeyboardInterrupt) as exc:
@@ -307,7 +386,7 @@ def _execute(
             run["status"] = RUN_FAILED
             run["errors"].append({"step": step, "message": message})
             _say(run, emit, f"✗ {label} — {message}")
-            save_jobs(data, jobs_file)
+            sync()
             if isinstance(exc, KeyboardInterrupt):
                 raise
             return False
@@ -315,16 +394,19 @@ def _execute(
         _say(run, emit, f"✓ {label}")
         for d in details:
             _say(run, emit, f"  > {d}")
-        save_jobs(data, jobs_file)
+        if not sync():
+            return False
         rest = STEPS[STEPS.index(step) + 1:]
         if should_stop and should_stop() and any(not _skip_reason(r, run["settings"]) for r in rest):
             run["status"] = RUN_STOPPED
             _say(run, emit, f"■ stopped by user after {label}")
-            save_jobs(data, jobs_file)
+            if not sync():
+                return False
             return False
     run["status"] = RUN_READY
     _say(run, emit, GATE_LINE)
-    save_jobs(data, jobs_file)
+    if not sync():
+        return False
     return True
 
 
@@ -406,9 +488,10 @@ def run_book(
             if not assume_yes and not confirm("continue? [y/N] "):
                 emit("not confirmed — nothing changed")
                 return None
-        job = {"name": job_name, "source": str(book), "output": str(output), "runs": []}
-        data["jobs"].append(job)
+        job = {"id": uuid.uuid4().hex, "name": job_name, "source": str(book), "output": str(output), "runs": []}
+        is_new = True
     else:
+        is_new = False
         out = Path(job["output"])
         if has_step_output(out):
             emit(f"warning: {OVERWRITE_WARNING}")
@@ -422,8 +505,10 @@ def run_book(
     for d in STEP_DIRS.values():
         shutil.rmtree(out / d, ignore_errors=True)
     out.mkdir(parents=True, exist_ok=True)
+    if not _merge_job(jobs_file, job, create=is_new):
+        raise RunnerError(f"job {job['name']!r} was deleted — nothing to run")
     emit(f"job {job['name']}: {job['source']} → {out}")
-    _execute(data, job, run, STEPS[0], emit, should_stop, jobs_file)
+    _execute(job, run, STEPS[0], emit, should_stop, jobs_file)
     return run
 
 
@@ -452,30 +537,31 @@ def retry_job(name: str, emit: Emit = _stdout, should_stop: Callable[[], bool] |
     run["status"] = RUN_RUNNING
     emit(f"job {job['name']}: retrying from {STEP_LABELS[first]}")
     _say(run, emit, f"retry {_now()}: from {STEP_LABELS[first]}")
-    _execute(data, job, run, first, emit, should_stop, jobs_file)
+    _execute(job, run, first, emit, should_stop, jobs_file)
     return run
 
 
 def rename_job(old: str, new: str) -> None:
     """Change the job's label only; its output folder name stays fixed."""
     _check_name(new)
-    data = load_jobs()
-    job = find_job(data, old)
-    if job is None:
-        raise RunnerError(f"no job named {old!r}")
-    if find_job(data, new):
-        raise RunnerError(f"job name {new!r} is already taken")
-    job["name"] = new
-    save_jobs(data)
+
+    def change(data: dict) -> None:
+        job = find_job(data, old)
+        if job is None:
+            raise RunnerError(f"no job named {old!r}")
+        if find_job(data, new):
+            raise RunnerError(f"job name {new!r} is already taken")
+        job["name"] = new
+    _mutate(change)
 
 
 def delete_job(name: str) -> None:
     """Remove the job from history. Its files on disk are never touched."""
-    data = load_jobs()
-    if find_job(data, name) is None:
-        raise RunnerError(f"no job named {name!r}")
-    data["jobs"] = [j for j in data["jobs"] if j["name"] != name]
-    save_jobs(data)
+    def change(data: dict) -> None:
+        if find_job(data, name) is None:
+            raise RunnerError(f"no job named {name!r}")
+        data["jobs"] = [j for j in data["jobs"] if j["name"] != name]
+    _mutate(change)
 
 
 def list_jobs() -> list[dict]:
@@ -497,41 +583,51 @@ def list_jobs() -> list[dict]:
     return rows
 
 
+def imported_job(name: str, source: str, output: Path) -> Job | None:
+    """A history entry for an existing output folder (one run marked imported); None if it has no step folders."""
+    present = {s: (output / d).is_dir() for s, d in STEP_DIRS.items()}
+    if not any(present.values()):
+        return None
+    mtime = max((output / STEP_DIRS[s]).stat().st_mtime for s, ok in present.items() if ok)
+    return {
+        "id": uuid.uuid4().hex,
+        "name": name,
+        "source": source,
+        "output": str(output.resolve()),
+        "runs": [{
+            "date": datetime.fromtimestamp(mtime).isoformat(timespec="seconds"),
+            "settings": {"ssml": present["ssml"], "fiction": present["dialogue"]},
+            "status": RUN_IMPORTED,
+            "steps": {s: STEP_OK if ok else STEP_SKIPPED for s, ok in present.items()},
+            "log": ["imported from existing output (in place)"],
+            "errors": [],
+        }],
+    }
+
+
 def import_existing(
     output_root: Path = DEFAULT_OUTPUT_ROOT, books_root: Path = DEFAULT_BOOKS_ROOT
 ) -> dict:
     """Add the books already under ``output_root/{format}/{book}/`` to history, in place."""
-    data = load_jobs()
     imported, skipped = [], []
-    for fmt in IMPORT_FORMATS:
-        fmt_dir = Path(output_root) / fmt
-        if not fmt_dir.is_dir():
-            continue
-        for book_dir in sorted(p for p in fmt_dir.iterdir() if p.is_dir()):
-            present = {s: (book_dir / d).is_dir() for s, d in STEP_DIRS.items()}
-            if not any(present.values()):
+
+    def change(data: dict) -> None:
+        for fmt in IMPORT_FORMATS:
+            fmt_dir = Path(output_root) / fmt
+            if not fmt_dir.is_dir():
                 continue
-            name = book_dir.name
-            if find_job(data, name):
-                skipped.append((name, "already in history"))
-                continue
-            src = Path(books_root) / fmt / f"{name}.{fmt}"
-            mtime = max((book_dir / STEP_DIRS[s]).stat().st_mtime for s, ok in present.items() if ok)
-            data["jobs"].append({
-                "name": name,
-                "source": str(src.resolve()) if src.is_file() else "",
-                "output": str(book_dir.resolve()),
-                "runs": [{
-                    "date": datetime.fromtimestamp(mtime).isoformat(timespec="seconds"),
-                    "settings": {"ssml": present["ssml"], "fiction": present["dialogue"]},
-                    "status": RUN_IMPORTED,
-                    "steps": {s: STEP_OK if ok else STEP_SKIPPED for s, ok in present.items()},
-                    "log": ["imported from existing output (in place)"],
-                    "errors": [],
-                }],
-            })
-            imported.append(name)
-    save_jobs(data)
+            for book_dir in sorted(p for p in fmt_dir.iterdir() if p.is_dir()):
+                name = book_dir.name
+                src = Path(books_root) / fmt / f"{name}.{fmt}"
+                job = imported_job(name, str(src.resolve()) if src.is_file() else "", book_dir)
+                if job is None:
+                    continue
+                if find_job(data, name):
+                    skipped.append((name, "already in history"))
+                    continue
+                data["jobs"].append(job)
+                imported.append(name)
+    _mutate(change)
     return {"imported": imported, "skipped": skipped}
 
 

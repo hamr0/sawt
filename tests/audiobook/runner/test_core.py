@@ -230,7 +230,7 @@ class TestHistory:
         go(make_book(tmp_path), lines)
         data = json.loads(jobs_path().read_text(encoding="utf-8"))
         job = data["jobs"][0]
-        assert set(job) == {"name", "source", "output", "runs"}
+        assert set(job) == {"id", "name", "source", "output", "runs"} and len(job["id"]) == 32
         assert job["source"] == str((tmp_path / "novel.txt").resolve())
         run = job["runs"][0]
         assert set(run) == {"date", "settings", "status", "steps", "log", "errors"}
@@ -300,3 +300,72 @@ class TestImport:
         lines.clear()
         main(["--list"], emit=lines.append)
         assert len(lines) == 2 and "[imported]" in lines[0]
+
+
+class TestSharedHistory:
+    """jobs.json is shared: every write is a locked read-merge-write, matched by job id."""
+
+    def _mid_run(self, monkeypatch, action):
+        real = runner_core._STEP_FUNCS["chapters"]
+
+        fired = []
+
+        def step(job, run):
+            if not fired:  # only the outer run triggers the other writer
+                fired.append(1)
+                action()
+            return real(job, run)
+
+        monkeypatch.setitem(runner_core._STEP_FUNCS, "chapters", step)
+
+    def test_rename_mid_run_survives_the_runs_next_save(self, tmp_path, home, lines, monkeypatch):
+        self._mid_run(monkeypatch, lambda: runner_core.rename_job("novel", "renamed"))
+        go(make_book(tmp_path), lines)
+        jobs = json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"]
+        assert [j["name"] for j in jobs] == ["renamed"] and jobs[0]["runs"][-1]["status"] == runner_core.RUN_READY
+
+    def test_delete_mid_run_is_not_resurrected(self, tmp_path, home, lines, monkeypatch):
+        self._mid_run(monkeypatch, lambda: runner_core.delete_job("novel"))
+        go(make_book(tmp_path), lines)
+        assert json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"] == []
+        assert any("deleted while running" in m for m in lines)
+        assert not (tmp_path / "novel_sawt" / "03_segments").exists()  # stopped: no further steps ran
+
+    def test_two_writers_interleaving_lose_nothing(self, tmp_path, home, lines, monkeypatch):
+        other = make_book(tmp_path, "other")
+        self._mid_run(monkeypatch, lambda: go(other, []))  # a second run (new job) finishes inside the first
+        go(make_book(tmp_path), lines)
+        names = {j["name"] for j in json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"]}
+        assert names == {"novel", "other"}
+
+    def test_threads_hammering_the_file_keep_every_entry(self, tmp_path, home):
+        import threading
+        names = [f"j{i}" for i in range(12)]
+
+        def make(n):
+            runner_core._mutate(lambda d: d["jobs"].append({"id": n, "name": n, "source": "", "output": f"/o/{n}", "runs": []}))
+
+        threads = [threading.Thread(target=make, args=(n,)) for n in names]
+        [t.start() for t in threads]
+        [t.join() for t in threads]
+        assert sorted(j["name"] for j in json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"]) == sorted(names)
+
+    def test_legacy_file_without_ids_stays_readable_and_gets_stable_ids(self, tmp_path, home):
+        home.mkdir(parents=True)
+        old = {"jobs": [{"name": "a", "source": "", "output": "/o/a", "runs": []},
+                        {"name": "b", "source": "", "output": "/o/b", "runs": []}]}
+        jobs_path().write_text(json.dumps(old), encoding="utf-8")
+        first = runner_core.load_jobs()
+        assert [j["name"] for j in first["jobs"]] == ["a", "b"] and len({j["id"] for j in first["jobs"]}) == 2
+        assert runner_core.load_jobs()["jobs"][0]["id"] == first["jobs"][0]["id"]  # stable before any save
+        rename_job("a", "a2")  # persists the backfill
+        saved = json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"]
+        assert saved[0]["id"] == first["jobs"][0]["id"] and saved[0]["name"] == "a2" and saved[1]["id"] == first["jobs"][1]["id"]
+
+    def test_lock_sidecar_and_no_fcntl_fallback_warns_once(self, home, monkeypatch, caplog):
+        monkeypatch.setattr(runner_core, "fcntl", None)
+        monkeypatch.setattr(runner_core, "_lock_warned", False)
+        with caplog.at_level("WARNING"):
+            runner_core._mutate(lambda d: None)
+            runner_core._mutate(lambda d: None)
+        assert sum("no file locking" in r.message for r in caplog.records) == 1
