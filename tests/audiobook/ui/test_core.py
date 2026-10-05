@@ -480,6 +480,10 @@ class TestPage:
         for lab in ("labnote", "fixtures.js", "LiveCanvas", "overlay-vanilla", "data-lab"):
             assert lab not in PAGE
 
+    def test_file_grid_is_auto_fill_capped_at_four_columns(self):
+        rule = re.search(r"\.v \.fgrid\{[^}]*\}", PAGE).group(0)
+        assert "repeat(auto-fill,minmax(max(200px,calc((100% - 36px)/4)),1fr))" in rule
+
     def test_artifacts_tab_is_wired(self):
         assert "module 3, not built" not in PAGE
         assert "/files'" in PAGE and "/open'" in PAGE and "/view?job=" in PAGE
@@ -519,9 +523,10 @@ global.calls = [];
 if (arts) global.fetch = function (u, o) {
   global.calls.push([(o && o.method) || 'GET', u, o && o.body]);
   var files = { missing: false, output: '/x/out', steps: [
-    { name: '01_ingestion', present: true, count: 2, collapsed: false, groups: [{ dir: '', files: [
+    { name: '01_ingestion', present: true, count: 3, collapsed: false, groups: [{ dir: '', files: [
       { name: 'clean_text.txt', rel: 'clean_text.txt', path: '01_ingestion/clean_text.txt', size: 2048 },
-      { name: 'p<b>.csv', rel: 'p<b>.csv', path: '01_ingestion/p<b>.csv', size: 12 }] }] },
+      { name: 'p<b>.csv', rel: 'p<b>.csv', path: '01_ingestion/p<b>.csv', size: 12 }] },
+      { dir: 'ssml', files: [{ name: 'c1.csv', rel: 'ssml/c1.csv', path: '01_ingestion/ssml/c1.csv', size: 5 }] }] },
     { name: '02_chapters', present: true, count: 11, collapsed: true, groups: [{ dir: '', files: [] }] },
     { name: '03_segments', present: false }] };
   var d = u === '/api/status' ? { busy: false, current: null, queued: [] }
@@ -629,7 +634,10 @@ class TestStartButtonSync:
         assert "03_segments \u2014 not produced" in html
         assert 'href="/view?job=%D8%B1' in html and 'target="_blank" rel="noopener"' in html
         assert "01_ingestion%2Fp%3Cb%3E.csv" in html and "p&lt;b&gt;.csv" in html and "<b>.csv" not in html
-        assert "2.0 KB" in html
+        assert "(2.0 KB)</span>" in html and 'title="clean_text.txt"' in html and 'class="fgrid"' in html
+        # root files first with no subheader; subfolder gets "ssml/ · 1 file" label after them
+        assert html.index("clean_text.txt") < html.index('class="gname"') < html.index("c1.csv")
+        assert html.count('class="gname"') == 1 and "1 file</div>" in html
         # 11 files: starts collapsed (no file rows), the 2-file block is expanded
         assert 'aria-expanded="false"' in html and 'aria-expanded="true"' in html
         assert ["POST", "/api/jobs/%D8%B1%D9%88%D8%A7%D9%8A%D8%A9/open", '{"path":"02_chapters"}'] in out["calls"]

@@ -133,9 +133,11 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v .steptog{flex:1;min-width:0;text-align:left;background:none;border:0;padding:4px 0;cursor:pointer;overflow-wrap:anywhere}
 .v .steptog:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .v .stepbody{padding:0 8px 8px}
-.v .gname{color:var(--textDim);margin:6px 0 2px}
-.v .frow{display:flex;gap:12px;justify-content:space-between;align-items:baseline;padding:1px 0 1px 2ch}
-.v .frow .sz{color:var(--textDim);white-space:nowrap;direction:ltr}
+.v .gname{color:var(--textDim);font-size:12px;margin:10px 0 4px;padding-top:6px;border-top:1px solid var(--border)}
+.v .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(max(200px,calc((100% - 36px)/4)),1fr));gap:2px 12px}
+.v .fcell{display:flex;gap:4px;align-items:baseline;min-width:0;direction:ltr}
+.v .fcell a{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v .fcell .sz{flex:none;color:var(--textDim);font-size:12px;white-space:nowrap}
 .v .drawer{border:1px solid var(--accent);background:var(--panel);padding:10px;margin-bottom:10px}
 .v .drawer h3{margin:0 0 8px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
 .v .drawer .field{margin-bottom:8px}
@@ -400,7 +402,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   }
   function fmtSize(n) { return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(1) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
   function fileLink(job, f) {
-    return '<div class="frow"><a href="/view?job=' + enc(job) + '&amp;path=' + enc(f.path) + '" target="_blank" rel="noopener">' + pth(f.rel) + '</a><span class="sz">' + fmtSize(f.size) + '</span></div>';
+    return '<div class="fcell"><a href="/view?job=' + enc(job) + '&amp;path=' + enc(f.path) + '" target="_blank" rel="noopener" dir="auto" title="' + esc(f.name) + '">' + esc(f.name) + '</a><span class="sz">(' + fmtSize(f.size) + ')</span></div>';
   }
   function stepHtml(job, s) {
     if (!s.present) return '<div class="step"><div class="stephead dim">' + esc(s.name) + ' — not produced</div></div>';
@@ -409,7 +411,8 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       '<button type="button" class="btn mini" data-act="openfolder" data-arg="' + esc(s.name) + '">[ open folder ]</button></div>';
     if (open) {
       h += '<div class="stepbody">' + (s.count ? s.groups.map(function (g) {
-        return (g.dir ? '<div class="gname">' + pth(g.dir + '/') + ' <span class="dim">· ' + g.files.length + '</span></div>' : '') + g.files.map(function (f) { return fileLink(job, f); }).join('');
+        return (g.dir ? '<div class="gname">' + pth(g.dir + '/') + ' · ' + g.files.length + ' file' + (g.files.length === 1 ? '' : 's') + '</div>' : '') +
+          '<div class="fgrid">' + g.files.map(function (f) { return fileLink(job, f); }).join('') + '</div>';
       }).join('') : '<div class="dim">empty</div>') + '</div>';
     }
     return h + '</div>';
