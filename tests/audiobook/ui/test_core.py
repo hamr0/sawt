@@ -295,7 +295,7 @@ class TestStartRuns:
         marker.write_text("old", encoding="utf-8")
         status, data = client.post("/api/runs", {"path": str(book)})
         assert status == 409
-        assert data == {"overwrite": True, "message": OVERWRITE_WARNING, "jobs": ["novel"]}
+        assert data == {"overwrite": True, "message": OVERWRITE_WARNING, "jobs": ["novel"], "orphans": []}
         assert marker.exists() and len(client.job("novel")["runs"]) == 1  # nothing ran
         status, _ = client.post("/api/runs", {"path": str(book), "confirm": True})
         assert status == 202
@@ -575,7 +575,7 @@ global.fetch = function (u) { var d = u === '/api/status' ? { busy: busy, curren
 //DRIVER
 var conflict = process.argv[2] === 'conflict', overwrite = process.argv[2] === 'overwrite';
 var started = process.argv[2] === 'start', arts = process.argv[2] === 'arts';
-var scanning = process.argv[2] === 'scan', queueMode = process.argv[2] === 'queue', actsMode = process.argv[2] === 'acts', cardsMode = process.argv[2] === 'cards';
+var orphanMode = process.argv[2] === 'orphan', scanning = process.argv[2] === 'scan' || orphanMode, queueMode = process.argv[2] === 'queue', actsMode = process.argv[2] === 'acts', cardsMode = process.argv[2] === 'cards';
 function jr(name, status, steps, extra) {
   return Object.assign({ name: name, status: status, date: '2026-01-02T03:04:05', runs: 2, source: '/s/' + name + '.txt', output: '/o/' + name, steps: steps, missing: false }, extra || {});
 }
@@ -605,12 +605,16 @@ if (scanning) global.fetch = function (u, o) {
     : u === '/api/jobs' ? { jobs: [{ name: 'taken', status: 'imported', date: '', runs: 0 }] }
     : u.indexOf('/api/scan') === 0 ? { kind: 'folder', books: [
         { path: '/b/one.epub', file: 'one.epub', name: 'one', free_name: 'one', job: null },
-        { path: '/b/two.txt', file: 'two.txt', name: 'two', free_name: 'two', job: null },
+        { path: '/b/two.txt', file: 'two.txt', name: 'two', free_name: 'two', job: null, orphan: true },
         { path: '/b/old.txt', file: 'old.txt', name: 'taken', free_name: 'taken-2', job: 'taken' }],
       skipped: [{ file: 'scan.pdf', reason: 'unsupported format' }] }
+    : u === '/api/runs' && orphanMode ? { overwrite: true, message: 'folder holds output from a job no longer in history', jobs: ['two'], orphans: [{ name: 'two', path: '/b/two.txt' }] }
+    : u === '/api/runs' && orphanMode ? { overwrite: true, message: 'folder holds output from a job no longer in history', jobs: ['two'], orphans: [{ name: 'two', path: '/b/two.txt' }] }
     : u === '/api/runs' ? { queued: ['one'], skipped: [] }
+    : u === '/api/jobs/reattach' ? { name: 'two' }
     : { name: 'taken', output: '/x', source: '', runs: [], missing: false };
-  return Promise.resolve({ ok: true, status: u === '/api/runs' ? 202 : 200, json: function () { return Promise.resolve(d); } }); };
+  var st = u === '/api/runs' ? (orphanMode ? 409 : 202) : 200;
+  return Promise.resolve({ ok: st < 400, status: st, json: function () { return Promise.resolve(d); } }); };
 if (arts) global.fetch = function (u, o) {
   global.calls.push([(o && o.method) || 'GET', u, o && o.body]);
   var files = { missing: false, output: '/x/out', steps: [
@@ -683,6 +687,20 @@ setTimeout(function () {
     }
     setTimeout(function () { out.calls = global.calls; console.log(JSON.stringify(out)); process.exit(0); }, 250);
     }, 100);
+    return;
+  }
+  if (orphanMode) {
+    type('/b');
+    setTimeout(function () {
+      var click = function (act, arg) { fire('click', { closest: function () { return { dataset: { act: act, arg: arg }, disabled: false }; } }); };
+      out.rows = app.innerHTML;
+      click('start');
+      setTimeout(function () {
+        out.banner = app.innerHTML;
+        click('reattach', '0');
+        setTimeout(function () { out.after = app.innerHTML; out.calls = global.calls; console.log(JSON.stringify(out)); process.exit(0); }, 150);
+      }, 100);
+    }, 450);
     return;
   }
   if (scanning) {
@@ -819,6 +837,7 @@ class TestStartButtonSync:
         assert "job name (single file only)" not in html and 'id="f-name"' not in html
         assert "existing job \u2192 new run" in html and html.count('data-f="rownew"') == 1
         assert "scan.pdf" in html and "unsupported format" in html and "skiprow" in html
+        assert html.count("folder exists \u2014 not in history") == 1  # only the orphan row
         assert "[ start 2 books ]" in out["untick"] and "[ start 0 books ]" in out["none"]
         assert 'data-start disabled aria-disabled="true"' in out["none"] and "tick at least one book" in out["none"]
         assert "[ start 3 books ]" in out["all"] and 'data-start disabled' not in out["all"]
@@ -904,6 +923,18 @@ class TestStartButtonSync:
         # the selected job stays selected while filtered out of the list
         assert 'class="rhead"><span class="mk' in out["ar"] and '<span class="nm" dir="auto">a</span>' in out["ar"].split('class="rhead"')[1]
         assert "jobs (11)" in out["cleared"] and "[ \u00d7 ]" not in out["cleared"]
+
+
+    def test_orphan_banner_offers_reattach_and_updates_the_row(self, tmp_path):
+        out = self._run(tmp_path, "orphan")
+        assert "folder exists \u2014 not in history" in out["rows"]
+        banner = out["banner"]
+        assert "[ re-attach ]" in banner and "[ overwrite and run ]" in banner and "[ cancel ]" in banner
+        assert "no longer in history" in banner and "this path already has a job" not in banner
+        assert ["POST", "/api/jobs/reattach", '{"path":"/b/two.txt","name":"two"}'] in out["calls"]
+        after = out["after"]
+        assert "[ re-attach" not in after and "folder exists" not in after  # prompt gone, row now an existing job
+        assert "existing job \u2192 new run" in after
 
 
 class TestPathsAndWording:
@@ -1791,3 +1822,71 @@ class TestJobNames:
             runner_core.run_book(make_book(books, "n"), name="a\nb", assume_yes=True, emit=lambda m: None)
         run = runner_core.run_book(make_book(books, "n"), name=" spaced ", assume_yes=True, emit=lambda m: None)
         assert run is not None and load_jobs()["jobs"][0]["name"] == "spaced"
+
+
+class TestReattach:
+    def _orphan(self, client, books, stem="novel"):
+        book = make_book(books, stem)
+        client.post("/api/runs", {"path": str(book)})
+        client.wait_idle()
+        (books / f"{stem}_sawt" / "03_segments" / "review").mkdir(parents=True, exist_ok=True)
+        keep = books / f"{stem}_sawt" / "03_segments" / "review" / "chapter_1.txt"
+        keep.write_text("hand edited", encoding="utf-8")
+        client.post(f"/api/jobs/{stem}/delete")
+        return book, keep
+
+    def test_reattach_keeps_files_and_adds_an_imported_job(self, client, books):
+        book, keep = self._orphan(client, books)
+        before = {p.name: p.stat().st_mtime_ns for p in (books / "novel_sawt").rglob("*") if p.is_file()}
+        status, data = client.post("/api/jobs/reattach", {"path": str(book), "name": "novel"})
+        assert status == 200 and data == {"name": "novel"}
+        assert {p.name: p.stat().st_mtime_ns for p in (books / "novel_sawt").rglob("*") if p.is_file()} == before
+        assert keep.read_text(encoding="utf-8") == "hand edited"
+        job = client.job("novel")
+        assert job["source"] == str(book.resolve()) and job["output"] == str((books / "novel_sawt").resolve())
+        assert len(job["runs"]) == 1 and job["runs"][0]["status"] == "imported" and job["id"]
+        assert client.get("/api/jobs")[1]["jobs"][0]["status"] == "imported"
+
+    def test_refused_when_owned_missing_or_invalid(self, client, books):
+        book, _ = self._orphan(client, books)
+        assert client.post("/api/jobs/reattach", {"path": str(book), "name": "novel"})[0] == 200
+        status, data = client.post("/api/jobs/reattach", {"path": str(book), "name": "novel"})  # now owned
+        assert status == 400 and data["field"] == "name" and "already taken" in data["error"]
+        other = make_book(books, "other")
+        status, data = client.post("/api/jobs/reattach", {"path": str(other), "name": "other"})  # no folder
+        assert status == 400 and "nothing to re-attach" in data["error"]
+        status, data = client.post("/api/jobs/reattach", {"path": str(book), "name": "renamed"})  # wrong folder name
+        assert status == 400 and "nothing to re-attach" in data["error"]
+        assert client.post("/api/jobs/reattach", {"path": str(book), "name": "a/b"})[0] == 400
+        assert client.post("/api/jobs/reattach", {"path": str(book)})[0] == 400
+        assert client.post("/api/jobs/reattach", {"path": str(books / "ghost.txt"), "name": "x"})[0] == 400
+        assert client.post("/api/jobs/reattach", {"path": "rel.txt", "name": "x"})[0] == 400
+        (books / "scan.pdf").write_bytes(b"x")
+        assert client.post("/api/jobs/reattach", {"path": str(books / "scan.pdf"), "name": "scan"})[0] == 400
+        assert client.post("/api/jobs/reattach", {"path": str(book), "name": "novel"}, host="evil.example.com")[0] == 403
+
+    def test_folder_owned_by_another_job_refused(self, client, books):
+        book, _ = self._orphan(client, books)
+        data = load_jobs()
+        data["jobs"].append({"id": "x" * 32, "name": "squatter", "source": "", "output": str((books / "novel_sawt").resolve()), "runs": []})
+        save_jobs(data)
+        status, out = client.post("/api/jobs/reattach", {"path": str(book), "name": "novel"})
+        assert status == 400 and "already belongs to job 'squatter'" in out["error"]
+
+    def test_scan_marks_orphan_rows_and_409_lists_orphans(self, client, books):
+        book, keep = self._orphan(client, books)
+        row = client.get("/api/scan?path=" + quote(str(books)))[1]["books"][0]
+        assert row["job"] is None and row["orphan"] is True
+        status, data = client.post("/api/runs", {"books": [book_item(book, "novel")]})
+        assert status == 409 and data["orphans"] == [{"name": "novel", "path": str(book.resolve())}] and data["jobs"] == ["novel"]
+        assert keep.exists()
+        client.post("/api/jobs/reattach", {"path": str(book), "name": "novel"})
+        row = client.get("/api/scan?path=" + quote(str(books)))[1]["books"][0]
+        assert row["job"] == "novel" and row["orphan"] is False
+
+    def test_runner_reattach_helper_cli_side(self, home, books):
+        book = make_book(books, "novel")
+        runner_core.run_book(book, assume_yes=True, emit=lambda m: None)
+        runner_core.delete_job("novel")
+        job = runner_core.reattach_job(book, "novel")
+        assert job["runs"][0]["status"] == runner_core.RUN_IMPORTED and load_jobs()["jobs"][0]["name"] == "novel"

@@ -623,7 +623,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       var locked = r.job && !r.newJob;
       h += '<div class="brow' + (r.on ? '' : ' off') + '"><label class="opt"><input type="checkbox" data-f="rowon" data-i="' + i + '" data-fid="ron-' + i + '"' + (r.on ? ' checked' : '') + '> ' + nm(r.file) + '</label>' +
         '<div class="bline"><label class="sr" for="rn-f' + i + '">Job name for ' + esc(r.file) + '</label><input class="field" id="rn-f' + i + '" data-f="rowname" data-i="' + i + '" data-fid="rname-' + i + '" dir="auto" autocomplete="off" value="' + esc(locked ? r.job : r.nm) + '"' + (locked ? ' disabled' : '') + '>' +
-        '<span class="stat">' + (locked ? 'existing job → new run' : 'new job') + '</span>' +
+        '<span class="stat">' + (locked ? 'existing job → new run' : r.orphan ? 'folder exists — not in history' : 'new job') + '</span>' +
         (r.job ? '<label class="opt"><input type="checkbox" data-f="rownew" data-i="' + i + '" data-fid="rnew-' + i + '"' + (r.newJob ? ' checked' : '') + '> new job</label>' : '') + '</div>' +
         '<div class="ferr" data-rerr="' + i + '" role="alert">' + esc(rowErr(r, i)) + '</div></div>';
     });
@@ -664,8 +664,11 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     h += '<div class="go"><button type="button" class="btn pri" data-act="start" data-fid="start" data-start' + (startState().disabled ? ' disabled aria-disabled="true"' : '') + '>' + startLabel() + '</button><span class="dim busy" data-start-why>' + esc(why) + '</span></div>';
     if (state.generalErr) h += '<div class="banner b-red" role="alert">' + msgHtml(state.generalErr) + '</div>';
     if (state.overwrite) {
-      h += '<div class="banner b-amber" role="group" aria-label="Overwrite warning"><b>this path already has a job: ' + state.overwrite.jobs.map(nm).join(', ') + '</b><br>' + msgHtml(state.overwrite.message) +
-        '<div class="bacts"><button type="button" class="btn warn" data-act="overwrite" data-fid="overwrite">[ overwrite and run ]</button>' + (state.scan ? '' : '<button type="button" class="btn pri" data-act="newjob" data-fid="newjob">[ start as new job ]</button>') + '<button type="button" class="btn" data-act="cancel" data-fid="cancel">[ cancel ]</button></div></div>';
+      var orph = state.overwrite.orphans || [], orphNames = orph.map(function (o) { return o.name; });
+      var held = state.overwrite.jobs.filter(function (n) { return orphNames.indexOf(n) < 0; });
+      h += '<div class="banner b-amber" role="group" aria-label="Overwrite warning">' + (held.length ? '<b>this path already has a job: ' + held.map(nm).join(', ') + '</b><br>' : '') +
+        (orph.length ? '<b>folder exists — not in history: ' + orph.map(function (o) { return nm(o.name); }).join(', ') + '</b><br>' : '') + msgHtml(state.overwrite.message) +
+        '<div class="bacts">' + orph.map(function (o, i) { return '<button type="button" class="btn pri" data-act="reattach" data-arg="' + i + '" data-fid="reattach-' + i + '">[ re-attach' + (orph.length > 1 ? ' ' + esc(o.name) : '') + ' ]</button>'; }).join('') + '<button type="button" class="btn warn" data-act="overwrite" data-fid="overwrite">[ overwrite and run ]</button>' + (state.scan ? '' : '<button type="button" class="btn pri" data-act="newjob" data-fid="newjob">[ start as new job ]</button>') + '<button type="button" class="btn" data-act="cancel" data-fid="cancel">[ cancel ]</button></div></div>';
     }
     return h + '</div>';
   }
@@ -741,7 +744,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
         refreshAll().then(function () { if (state.jobs.some(function (j) { return j.name === d.queued[0]; })) selectJob(d.queued[0]); });
         return;
       }
-      if (r.status === 409 && d.overwrite) { state.overwrite = { message: d.message, jobs: d.jobs || [] }; state.offerNew = !state.scan; state.focusNext = state.scan ? 'overwrite' : 'newjob'; }
+      if (r.status === 409 && d.overwrite) { state.overwrite = { message: d.message, jobs: d.jobs || [], orphans: d.orphans || [] }; state.offerNew = !state.scan; state.focusNext = state.scan ? 'overwrite' : 'newjob'; }
       else if (r.status === 409 && d.busy) { state.busy = true; state.generalErr = d.error; startPolling(); }
       else if (d.field === 'path' || d.field === 'name') { state.formErr[d.field] = d.error; if (d.field === 'name' && /tick "new job"/.test(d.error)) state.offerNew = true; if (d.skipped) state.skipped = d.skipped; }
       else state.generalErr = d.error || 'request failed';
@@ -787,7 +790,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
         skipped: d.skipped || [],
         rows: d.books.map(function (b) {
           var o = old[b.path];
-          return o || { path: b.path, file: b.file, job: b.job, stem: b.file.replace(/\.[^.]*$/, ''), on: true, nm: b.name, free: b.free_name, newJob: false };
+          return o || { path: b.path, file: b.file, job: b.job, stem: b.file.replace(/\.[^.]*$/, ''), on: true, nm: b.name, free: b.free_name, orphan: !!b.orphan, newJob: false };
         })
       };
       state.overwrite = null; state.generalErr = '';
@@ -812,6 +815,19 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       refreshAll();
     });
   }
+  function doReattach(i) {
+    var o = state.overwrite.orphans[i];
+    api('POST', '/api/jobs/reattach', { path: o.path, name: o.name }).then(function (r) {
+      if (!r.ok) { state.generalErr = r.data.error || 're-attach failed'; state.overwrite = null; render(); return; }
+      state.msg = 're-attached ' + o.name + ' (files kept, no run)';
+      if (state.scan) {
+        state.scan.rows.forEach(function (row) { if (row.path === o.path) { row.job = o.name; row.nm = o.name; row.orphan = false; row.on = false; } });
+      }
+      state.overwrite = null;  /* re-run the start to see any remaining prompts */
+      state.selected = o.name; state.job = null; state.files = null;
+      refreshAll();
+    });
+  }
   function importExisting() {
     api('POST', '/api/import', {}).then(function (r) {
       state.msg = r.ok ? 'imported ' + r.data.imported.length + ' job(s)' : (r.data.error || 'import failed');
@@ -832,6 +848,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       case 'start': start(false); return;
       case 'cancel': state.overwrite = null; state.focusNext = 'path'; break;
       case 'overwrite': start(true); return;
+      case 'reattach': doReattach(+arg); return;
       case 'newjob':
         state.overwrite = null; state.form.newJob = true; state.focusNext = 'name';
         state.formNote = 'new job: pick a name different from the existing one, then press start'; break;

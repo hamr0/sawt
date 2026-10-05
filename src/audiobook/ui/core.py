@@ -31,7 +31,7 @@ from urllib.parse import parse_qs, quote, unquote, urlsplit
 
 from ..runner import (
     OVERWRITE_WARNING, ORPHAN_WARNING, RUN_FAILED, RUN_RUNNING, RUN_STOPPED, STEP_DIRS, RunnerError,
-    delete_job, find_job, free_job_name, has_step_output, new_job_output, import_existing, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
+    delete_job, find_job, free_job_name, has_step_output, new_job_output, import_existing, reattach_job, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
 )
 from ..runner.core import _resolve_job
 from .page import FONT_FACE, PAGE
@@ -287,6 +287,8 @@ class _Handler(BaseHTTPRequestHandler):
             if m and m.group(2) == "retry":
                 self._body()
                 return self._post_retry(worker, unquote(m.group(1)))
+            if path == "/api/jobs/reattach":
+                return self._post_reattach(self._body())
             if path == "/api/stop":
                 self._body()
                 return 200, {"dropped": worker.stop()}
@@ -344,7 +346,9 @@ class _Handler(BaseHTTPRequestHandler):
         orphans = [n for b, n, j, _ in plan if j is None and has_step_output(new_job_output(b, n))]
         if (existing or orphans) and not confirm:
             message = " ".join(m for m, names in ((OVERWRITE_WARNING, existing), (ORPHAN_WARNING, orphans)) if names)
-            raise _HttpError(409, {"overwrite": True, "message": message, "jobs": existing + orphans})
+            raise _HttpError(409, {"overwrite": True, "message": message, "jobs": existing + orphans,
+                                   "orphans": [{"name": n, "path": str(b)} for b, n, j, _ in plan
+                                               if j is None and n in orphans]})
 
         def make(book: Path, job_name: str, new_job: bool):
             return lambda: run_book(book, name=job_name, fiction=fiction, ssml=ssml, new_job=new_job,
@@ -406,6 +410,21 @@ class _Handler(BaseHTTPRequestHandler):
         if not worker.submit([(name, lambda: retry_job(name, emit=logger.info, should_stop=worker.should_stop))]):
             raise _HttpError(409, {"busy": True, "error": "a run is in progress — wait for it to end"})
         return 202, {"queued": [name]}
+
+    @staticmethod
+    def _post_reattach(body: dict) -> tuple[int, dict]:
+        raw = _absolute(body.get("path"), "path", "book path")
+        if not Path(raw).expanduser().is_file():
+            raise _bad(f"not a book file: {raw}", "path")
+        books, _ = _scan(raw, "path")
+        name = body.get("name")
+        if not isinstance(name, str):
+            raise _bad("name is required", "name")
+        try:
+            job = reattach_job(books[0], name)
+        except RunnerError as exc:
+            raise _bad(str(exc), "name") from None
+        return 200, {"name": job["name"]}
 
     def _post_delete(self, worker: _Worker, name: str) -> tuple[int, dict]:
         with worker.lock:
@@ -494,7 +513,9 @@ def _scan_result(raw: object) -> dict:
         free = free_job_name(data, b.stem, reserved)
         reserved.add(free)
         rows.append({"path": str(b), "file": b.name, "name": job["name"] if job else free,
-                     "job": job["name"] if job else None, "free_name": free})
+                     "job": job["name"] if job else None, "free_name": free,
+                     # a folder for the default name already holds output nobody owns
+                     "orphan": job is None and has_step_output(new_job_output(b, free))})
     return {"kind": "folder" if Path(raw_path).expanduser().is_dir() else "file",
             "books": rows, "skipped": skipped}
 

@@ -622,6 +622,29 @@ def imported_job(name: str, source: str, output: Path) -> Job | None:
     }
 
 
+def reattach_job(book: Path, name: str) -> Job:
+    """Re-add a job for ``<book dir>/<name>_sawt`` whose history entry was deleted; files are not touched.
+
+    Refused unless the folder holds step output and no job owns it or the name. The new entry has
+    one run marked imported, like ``import_existing``.
+    """
+    name = _check_name(name)
+    out = new_job_output(Path(book), name)
+    if not has_step_output(out):
+        raise RunnerError(f"nothing to re-attach: {out} has no step output")
+
+    def change(data: dict) -> Job:
+        if find_job(data, name):
+            raise RunnerError(f"job name {name!r} is already taken")
+        owner = next((j for j in data["jobs"] if j["output"] in (str(out), str(out.resolve()))), None)
+        if owner:
+            raise RunnerError(f"{out} already belongs to job {owner['name']!r}")
+        job = imported_job(name, str(book), out)
+        data["jobs"].append(job)
+        return job
+    return _mutate(change)
+
+
 def import_existing(
     output_root: Path = DEFAULT_OUTPUT_ROOT, books_root: Path = DEFAULT_BOOKS_ROOT
 ) -> dict:
