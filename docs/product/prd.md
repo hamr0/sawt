@@ -137,29 +137,59 @@ Five stages, each a package under `src/audiobook/` with logic in `core.py`; test
 
 ## 5. Next build: local UI + runner
 
-A localhost tool for the owner to run the whole flow without the command line.
+Status: Spec signed off 2026-10-05 — not built.
 
-**Requirements**
+### Problem & goal
 
-1. **Local and single user.** Binds to localhost; one user (the owner); no auth, hosting or multi-tenancy.
-2. **One entry gate.** Upload or drop an EPUB, DOCX or TXT (and choose fiction or non-fiction, dialect/voice config).
-3. **One runner** executes the stages in sequence by calling each stage's entry point, and records per-stage status (pending / running / done / failed / paused) so the UI can show progress.
-4. **Configurable review stops.** The user chooses which stages to pause after (for example after stage 3, to review the dialogue split before paying for audio), then resumes from that point.
-5. **Artifact viewing in the browser** per stage: clean text + `paragraphs.csv`; chapter list; segment CSVs + review text; SSML; per-chapter audio player.
-6. **Stage 5 is shown as "not built"** until the audio stage exists.
+Take a book file through the pipeline without the terminal. Steps 1–4 run straight through (mechanical, free); inspect each step's output by clicking.
 
-**Constraints**
+### Go / no-go
 
-- Python standard-library web server; no new dependencies.
-- Reads and writes the same files under `output/`; stays file-based, no database.
-- Stages remain isolated by data boundaries: the runner calls entry points, stages never import each other.
-- Review edits go through the existing review/`sync_review` flow.
+The runner chains steps 1–4, stops on an error, and resumes from the failed step using only files on disk, with every completed step's output untouched. Proven first from the command line (module 0). If it fails, no UI.
 
-**Open questions** (to be specced together with the LLM-call work)
+### Out of scope
 
-- A single sentence blocked by Gemini on its own: automatic Chirp3-HD fallback, a flag in a CSV for human decision, or both.
-- First full book to produce end to end: the rest of *Tharthara Fawq al-Nil* or *Awlad Haretna*.
-- Mixed Arabic/English text in a book — how stages and TTS handle embedded Latin script (unresolved; carried from the Feb 2026 assumptions).
+Hosting, other users, logins; a database; editing files in the browser; audio generation (step 5 gets its own spec); LLM calls; PDF and legacy `.doc`; voice/dialect pickers; accuracy-based auto-stops; styling beyond plain.
+
+### Behaviour
+
+| Area | Spec |
+|------|------|
+| Input | A local path box (not a browser upload — output must sit next to the source, and uploads don't reveal the source path). Accepts one file, or a folder that is scanned for `.epub`, `.docx`, `.txt`; anything else is skipped and listed. Legacy `.doc` is rejected with a reason. |
+| Job | One job = one book = one card. Re-running a book appends a new dated run to the same job; a separate job/card exists only when the user explicitly chooses "new job" for the same book. Later, regenerating with a different TTS engine or API key is another run on the same job (audio lands in `05_audio/{provider}/`). |
+| Name | Every job has a unique name, defaulting to the book's file name, editable. Duplicates rejected with a message. |
+| Output | `<book's folder>/<job name>_sawt/` containing `01_ingestion/ … 04_ssml/` (`05_audio/` later). Folder name fixed at job creation; renaming a job changes only its display label. |
+| Run | Steps 1–4 straight through. SSML is opt-in (off by default). Fiction/non-fiction toggle, default fiction; non-fiction skips dialogue detection. A folder's books run one after another; one run at a time. |
+| Stops | Only on an error, or at the fixed gate before the paid audio step. In v1 every successful run ends "ready for audio — paused". When audio exists, the gate gets a "Generate audio" button with estimated cost. |
+| Errors | ✗ + error message; Retry reruns from the failed step. |
+| Re-run | Overwrites steps 1–4 output in that job's folder. Before starting, a warning: overwriting the last run's files — start a new job instead to keep them. Old runs' logs stay in history; old files do not. |
+| Progress | A live log, one line per step with ✓/✗, plus `>` detail lines with numbers (e.g. "> 415 paragraphs, 81,025 chars", "> 4 chapters (size-based fallback)", "> 619 segments, 43% dialogue", "generating SSML — skipped (off)", "ready for audio — paused before paid step"). |
+| History | One file `~/.config/sawt/jobs.json`, one entry per job: name, source path, output path, list of runs; each run: date, settings, per-step status, `>` log lines, errors. Single writer (the runner), atomic writes. A job whose folder is gone shows as missing. The 12 books already in the repo's `output/` are imported into history in place (not moved); new runs follow the next-to-source rule. |
+| Layout | Left pane = one card per job (name, latest run status, date). Right pane tabs: `[1] Run` live/selected run log + details; `[2] History` all runs of this job, newest first, dated, expandable to log; `[3] Artifacts` one entry per step folder with an "open folder" button (opens in the file manager) and clickable files. |
+| Look | Monospace, light and plain, with a dark theme; style reference is the owner's bareloop UI (bracketed buttons, numbered tabs, `[✓]`/`[×]` status marks, pale blue-grey palette). Chosen from 5 `/live-canvas` variations. |
+| Stack | Python standard library HTTP server, no new dependencies. Binds 127.0.0.1 only; opens folders/serves files only inside known job `_sawt/` folders and the repo `output/`. |
+
+### Modules (in order; each proven before the next)
+
+| # | Module | Proof |
+|---|--------|-------|
+| 0 | Runner, CLI only, POC first: takes a path, runs steps 1–4, writes `jobs.json`, retries from the failed step. | Real runs on 2–3 test books plus tests; one run forced to fail, then retried. |
+| 1 | Look: 5 `/live-canvas` variations; owner picks one. | Owner picks one. |
+| 2 | UI shell: path input, start, live log, job cards, history. | — |
+| 3 | Artifacts tab: step folders, open-folder, file links. | — |
+
+After the last module: propose `/self-review`.
+
+**Done =** the owner points the UI at a book or folder, watches steps 1–4 tick through, opens every step folder from the page, and finds the job and its runs in history after a server restart.
+
+### Open questions (non-blocking)
+
+- Accuracy signals for auto-stop: ingest normalization stats, chapters-concatenate-to-source check, dialogue % far outside the 31–45% seen across the five novels.
+- Mixed Arabic/English text in a book — how stages and TTS handle embedded Latin script.
+- Current SSML voice config cannot produce an FF pairing (Azure only).
+- Single-voice SSML for non-fiction.
+- Step 5: single-sentence content-block handling (Chirp3-HD fallback and/or flag in CSV).
+- Step 5: first full book (rest of *Tharthara Fawq al-Nil* vs *Awlad Haretna*).
 
 ## 6. Non-requirements / out of scope
 
