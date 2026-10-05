@@ -1245,13 +1245,35 @@ class TestOpenFolder:
             def __init__(self, args, **kw):
                 seen["args"], seen["kw"] = args, kw
 
-            def wait(self, *a, **k):
-                raise AssertionError("must not wait")
+            def wait(self, *a, **k):  # called by the reaper thread, never by the request
+                seen["waited_in"] = threading.current_thread().name
 
         monkeypatch.setattr(ui_core.sys, "platform", platform)
         monkeypatch.setattr(ui_core.subprocess, "Popen", FakePopen)
         ui_core._open_folder(tmp_path)
         assert seen["args"] == [cmd, str(tmp_path)] and not seen["kw"].get("shell")
+        end = time.time() + 5
+        while "waited_in" not in seen and time.time() < end:
+            time.sleep(0.01)
+        assert seen["waited_in"] == "sawt-ui-reap"
+
+    def test_child_is_reaped_not_left_a_zombie(self, monkeypatch, tmp_path):
+        procs, real = [], subprocess.Popen
+
+        def true_instead(args, **kw):
+            p = real(["true"], **kw)  # a real, short-lived child
+            procs.append(p)
+            return p
+
+        monkeypatch.setattr(ui_core.sys, "platform", "linux")
+        monkeypatch.setattr(ui_core.subprocess, "Popen", true_instead)
+        ui_core._open_folder(tmp_path)
+        end = time.time() + 5
+        while procs[0].returncode is None and time.time() < end:  # wait() in the reaper thread sets it
+            time.sleep(0.01)
+        assert procs[0].returncode == 0
+        with pytest.raises(ChildProcessError):
+            os.waitpid(procs[0].pid, os.WNOHANG)  # already collected: nothing left to reap
 
     def test_windows_uses_startfile(self, monkeypatch, tmp_path):
         calls = []

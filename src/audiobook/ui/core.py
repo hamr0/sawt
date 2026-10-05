@@ -545,13 +545,14 @@ def _resolve_inside(output: Path, rel: object) -> Path:
 
 
 def _open_folder(path: Path) -> None:
-    """Show a folder in the system file manager; never waits on it, never uses a shell."""
+    """Show a folder in the system file manager; never blocks on it, never uses a shell."""
     if sys.platform.startswith("win"):
         os.startfile(path)  # noqa: S606 - Windows only
     else:
         cmd = "open" if sys.platform == "darwin" else "xdg-open"
-        subprocess.Popen([cmd, str(path)], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                         stderr=subprocess.DEVNULL, start_new_session=True)
+        proc = subprocess.Popen([cmd, str(path)], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL, start_new_session=True)
+        threading.Thread(target=proc.wait, daemon=True, name="sawt-ui-reap").start()  # reap without blocking the request
 
 
 def _step_files(output: Path, base: Path, step_dir: Path) -> list[dict]:
