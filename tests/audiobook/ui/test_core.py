@@ -108,7 +108,8 @@ class TestServer:
         body = r.read().decode()
         assert r.status == 200
         assert "Content-Security-Policy" in dict(r.getheaders())
-        assert "<title>Sawt Runner</title>" in body
+        assert "<title>sawt - every book has a voice</title>" in body
+        assert "<b>[sawt]</b>" in body and "- every book has a voice</span>" in body
 
     def test_foreign_host_rejected(self, client):
         for path in ("/", "/api/jobs", "/api/status"):

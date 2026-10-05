@@ -13,7 +13,7 @@ PAGE = r"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Sawt Runner</title>
+<title>sawt - every book has a voice</title>
 <style>
 __FONT_FACE__
 :root{
@@ -184,7 +184,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 </style>
 </head>
 <body>
-<div class="appbar"><span><b>sawt</b> <span style="color:var(--textDim)">local runner</span></span><button type="button" class="themebtn" id="themeBtn" aria-label="Toggle theme">[ &#9728; ]</button></div>
+<div class="appbar"><span><b>[sawt]</b> <span style="color:var(--textDim)">- every book has a voice</span></span><button type="button" class="themebtn" id="themeBtn" aria-label="Toggle theme">[ &#9728; ]</button></div>
 <div class="v" id="app"><div class="empty" style="margin:16px">loading...</div></div>
 
 <script>
