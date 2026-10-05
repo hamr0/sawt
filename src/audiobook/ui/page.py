@@ -418,9 +418,25 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     }).join('') + '</select>';
   }
 
+  /* single source of truth for the Start button; used by panelHtml() and syncStart() */
+  function startState() {
+    var why = !state.form.path.trim() ? 'enter a path to start' : state.busy ? 'a run is in progress; start unlocks when it ends' : '';
+    return { why: why, disabled: !!(why || state.starting) };
+  }
+  function namePh() { return stem(state.form.path.trim()) || 'defaults to the file name'; }
+  /* in-place update (no re-render: that would steal focus/caret from the field) */
+  function syncStart() {
+    var b = el.querySelector('[data-start]'), w = el.querySelector('[data-start-why]'), n = el.querySelector('#f-name');
+    var s = startState();
+    if (b) {
+      b.disabled = s.disabled;
+      if (s.disabled) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
+    }
+    if (w) w.textContent = s.why;
+    if (n) n.placeholder = namePh();
+  }
   function panelHtml() {
-    var f = state.form, e = state.formErr, ph = stem(f.path.trim()) || 'defaults to the file name';
-    var why = !f.path.trim() ? 'enter a path to start' : state.busy ? 'a run is in progress; start unlocks when it ends' : '';
+    var f = state.form, e = state.formErr, ph = namePh(), why = startState().why;
     var h = '<div class="drawer" role="region" aria-label="New job"><h3><span>new job</span><button type="button" class="btn mini" data-act="drawer" data-fid="drawer-x">[ × close ]</button></h3>';
     h += '<label class="lbl" for="f-path">path to a book file or folder</label><input class="field" id="f-path" data-f="path" data-fid="path" dir="ltr" autocomplete="off" spellcheck="false" placeholder="absolute path to a book file or folder" value="' + esc(f.path) + '"' +
       (e.path ? ' aria-invalid="true" aria-describedby="e-path"' : '') + '>';
@@ -432,7 +448,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     h += '<fieldset><legend class="sr">Book type</legend><label class="opt"><input type="radio" name="mode" data-f="mode" data-fid="mode-fic" value="fic"' + (f.fiction ? ' checked' : '') + '> fiction</label><label class="opt"><input type="radio" name="mode" data-f="mode" data-fid="mode-non" value="non"' + (!f.fiction ? ' checked' : '') + '> non-fiction</label></fieldset>';
     h += '<fieldset><label class="opt"><input type="checkbox" data-f="ssml" data-fid="ssml"' + (f.ssml ? ' checked' : '') + '> SSML (Azure only)</label>' +
       (f.newJob ? '<label class="opt"><input type="checkbox" data-f="newJob" data-fid="newJob" checked> new job (keep the old files)</label>' : '') + '</fieldset>';
-    h += '<div class="go"><button type="button" class="btn pri" data-act="start" data-fid="start"' + (why || state.starting ? ' disabled aria-disabled="true"' : '') + '>[ start ]</button>' + (why ? '<span class="dim busy">' + esc(why) + '</span>' : '') + '</div>';
+    h += '<div class="go"><button type="button" class="btn pri" data-act="start" data-fid="start" data-start' + (startState().disabled ? ' disabled aria-disabled="true"' : '') + '>[ start ]</button><span class="dim busy" data-start-why>' + esc(why) + '</span></div>';
     if (state.generalErr) h += '<div class="banner b-red" role="alert">' + esc(state.generalErr) + '</div>';
     if (state.overwrite) {
       h += '<div class="banner b-amber" role="group" aria-label="Overwrite warning"><b>this path already has a job: ' + state.overwrite.jobs.map(nm).join(', ') + '</b><br>' + esc(state.overwrite.message) +
@@ -573,6 +589,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     if (f === 'path') {
       state.form.path = e.target.value;
       if (state.overwrite || state.formErr.path || state.generalErr) { state.overwrite = null; state.formErr = {}; state.generalErr = ''; render(); }
+      else syncStart();
     } else if (f === 'name') state.form.name = e.target.value;
     else if (f === 'rename') state.renameVal = e.target.value;
   });

@@ -490,3 +490,58 @@ class TestPage:
         f.write_text(js, encoding="utf-8")
         r = subprocess.run(["node", "--check", str(f)], capture_output=True, text=True)
         assert r.returncode == 0, r.stderr
+
+
+# Fake-DOM harness: runs the real page JS under node, drives the new-job panel.
+_HARNESS = r"""
+var listeners = {}, busy = process.argv[2] === 'busy';
+function node(extra) { return Object.assign({ disabled: false, attrs: {}, textContent: '', placeholder: '',
+  setAttribute: function (k, v) { this.attrs[k] = v; }, removeAttribute: function (k) { delete this.attrs[k]; } }, extra); }
+var btn = node(), why = node(), nm = node();
+var app = { innerHTML: '', addEventListener: function (t, f) { listeners[t] = f; }, contains: function () { return true; },
+  querySelector: function (s) { return s === '[data-start]' ? btn : s === '[data-start-why]' ? why : s === '#f-name' ? nm : null; },
+  querySelectorAll: function () { return []; } };
+var tbtn = node({ addEventListener: function () {} });
+global.document = { activeElement: null, documentElement: node({ getAttribute: function () { return 'light'; } }),
+  getElementById: function (i) { return i === 'app' ? app : tbtn; }, addEventListener: function () {} };
+global.window = { addEventListener: function () {} }; global.location = { hash: '' };
+global.matchMedia = function () { return { matches: false }; }; global.localStorage = { getItem: function () { return null; } };
+global.history = { replaceState: function () {} };
+global.fetch = function (u) { var d = u === '/api/status' ? { busy: busy, current: null, queued: [] } : u === '/api/jobs' ? { jobs: [] } : {};
+  return Promise.resolve({ ok: true, status: 200, json: function () { return Promise.resolve(d); } }); };
+//DRIVER
+function fire(t, target) { listeners[t]({ target: target }); }
+function type(v) { fire('input', { value: v, dataset: { f: 'path' } }); }
+fire('click', { closest: function () { return { dataset: { act: 'drawer' }, disabled: false }; } });
+setTimeout(function () {
+  var out = { html: app.innerHTML };
+  type(''); out.empty = [btn.disabled, why.textContent];
+  type('/books/my-novel.epub'); out.typed = [btn.disabled, btn.attrs['aria-disabled'], why.textContent, nm.placeholder];
+  type('   '); out.blank = [btn.disabled, why.textContent];
+  console.log(JSON.stringify(out)); process.exit(0);
+}, 50);
+"""
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
+class TestStartButtonSync:
+    def _run(self, tmp_path, mode):
+        js = re.search(r"<script>(.*)</script>", PAGE, re.S).group(1)
+        f = tmp_path / "run.js"
+        setup, driver = _HARNESS.split("//DRIVER")
+        f.write_text(setup + "\n" + js + "\n" + driver, encoding="utf-8")
+        r = subprocess.run(["node", str(f), mode], capture_output=True, text=True, timeout=20)
+        assert r.returncode == 0, r.stderr
+        return json.loads(r.stdout.strip().splitlines()[-1])
+
+    def test_typing_a_path_enables_start_in_place(self, tmp_path):
+        out = self._run(tmp_path, "idle")
+        assert out["empty"] == [True, "enter a path to start"]
+        assert out["typed"] == [False, None, "", "my-novel"]
+        assert out["blank"] == [True, "enter a path to start"]
+
+    def test_busy_keeps_start_disabled_with_reason(self, tmp_path):
+        out = self._run(tmp_path, "busy")
+        # status poll flipped busy while the panel was open: the re-render reflects it
+        assert 'data-start disabled aria-disabled="true"' in out["html"]
+        assert out["typed"][0] is True and "run is in progress" in out["typed"][2]
