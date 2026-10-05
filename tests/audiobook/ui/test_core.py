@@ -869,7 +869,7 @@ class TestViewer:
         status, headers, body = view(client, "01_ingestion/paragraphs.csv")
         page = body.decode("utf-8")
         assert status == 200 and headers["content-type"] == "text/html; charset=utf-8"
-        assert "<table>" in page and "<thead><tr><th dir=\"auto\">n</th>" in page
+        assert "<table dir=\"ltr\">" in page and "<thead><tr><th dir=\"auto\" class=\"n\">n</th>" in page
         assert f'<td dir="auto">{NARRATION}</td>' in page
         assert "<script>" not in page and "&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;q&quot;" in page
         assert "position:sticky" in page and "<title>paragraphs.csv</title>" in page
@@ -878,21 +878,41 @@ class TestViewer:
     def test_csv_with_bom_and_embedded_newline(self, client, job):
         (job / "01_ingestion" / "p.csv").write_bytes("\ufeffn,text\n1,\"a\nb\"\n".encode("utf-8"))
         page = view(client, "01_ingestion/p.csv")[2].decode("utf-8")
-        assert "<th dir=\"auto\">n</th>" in page and "a\nb" in page
+        assert '<th dir="auto" class="n">n</th>' in page and "a\nb" in page
+
+    def test_csv_narrow_columns_nowrap_text_column_wraps(self, client, job):
+        (job / "01_ingestion" / "s.csv").write_text(
+            "segment_number,type,char_count,text\n1,narrator,5," + NARRATION + "\n", encoding="utf-8")
+        page = view(client, "01_ingestion/s.csv")[2].decode("utf-8")
+        assert '<th dir="auto" class="n">segment_number</th>' in page and '<td dir="auto" class="n">narrator</td>' in page
+        assert '<th dir="auto">text</th>' in page and f'<td dir="auto">{NARRATION}</td>' in page
+        assert ".n{white-space:nowrap;width:1%}" in page
+        # no "text" header: the last column is the wide one
+        (job / "01_ingestion" / "t.csv").write_text("a,b\nx,y\n", encoding="utf-8")
+        page = view(client, "01_ingestion/t.csv")[2].decode("utf-8")
+        assert '<td dir="auto" class="n">x</td><td dir="auto">y</td>' in page
+
+    def test_neutral_lines_default_rtl_latin_stays_auto(self, client, job):
+        (job / "01_ingestion" / "n.txt").write_text("\u0661\nHello\n12:30\n" + NARRATION, encoding="utf-8")
+        page = view(client, "01_ingestion/n.txt")[2].decode("utf-8")
+        assert '<div dir="rtl">\u0661</div><div dir="auto">Hello</div><div dir="rtl">12:30</div>' in page
+        (job / "01_ingestion" / "n.csv").write_text("n,text\n\u0661,Hello\n", encoding="utf-8")
+        page = view(client, "01_ingestion/n.csv")[2].decode("utf-8")
+        assert '<td dir="rtl" class="n">\u0661</td><td dir="auto">Hello</td>' in page
 
     def test_txt_lines_each_dir_auto_and_escaped(self, client, job):
         (job / "01_ingestion" / "clean_text.txt").write_text(f"{NARRATION}\n\n<b>x</b>\n{DIALOGUE}", encoding="utf-8")
         status, _, body = view(client, "01_ingestion/clean_text.txt")
         page = body.decode("utf-8")
-        assert status == 200 and '<pre dir="auto">' in page
-        assert f'<div dir="auto">{NARRATION}</div><div dir="auto"></div><div dir="auto">&lt;b&gt;x&lt;/b&gt;</div>' in page
+        assert status == 200 and '<pre dir="rtl">' in page
+        assert f'<div dir="auto">{NARRATION}</div><div dir="rtl"></div><div dir="auto">&lt;b&gt;x&lt;/b&gt;</div>' in page
         assert "<b>x</b>" not in page
 
     @pytest.mark.parametrize("ext", [".ssml", ".json", ".xml"])
     def test_other_text_types_use_pre(self, client, job, ext):
         (job / "01_ingestion" / f"f{ext}").write_text("<speak>x</speak>", encoding="utf-8")
         page = view(client, f"01_ingestion/f{ext}")[2].decode("utf-8")
-        assert '<pre dir="auto"><div dir="auto">&lt;speak&gt;x&lt;/speak&gt;</div></pre>' in page
+        assert '<pre dir="rtl"><div dir="auto">&lt;speak&gt;x&lt;/speak&gt;</div></pre>' in page
 
     def test_unknown_extension_is_a_download(self, client, job):
         (job / "01_ingestion" / "ملف.mp3").write_bytes(b"ID3\x00audio")

@@ -22,6 +22,7 @@ import shutil
 import subprocess
 import sys
 import threading
+import unicodedata
 import webbrowser
 from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -501,9 +502,19 @@ pre div{min-height:1.5em}
 table{border-collapse:collapse;width:100%}
 th,td{border:1px solid var(--border);padding:4px 8px;vertical-align:top;text-align:start;overflow-wrap:anywhere;white-space:pre-wrap}
 th{position:sticky;top:0;background:var(--panel)}
+.n{white-space:nowrap;width:1%}
 td{background:var(--field)}
 .note{border:1px dashed var(--dim);padding:14px;color:var(--dim)}
 """
+
+
+_STRONG_BIDI = ("L", "R", "AL")
+
+
+def _dir_attr(text: str) -> str:
+    """dir="auto" resolves a line with no strong-direction character (e.g. only ١) to LTR;
+    the viewer is for Arabic books, so such lines get dir="rtl" and the rest stay auto."""
+    return "auto" if any(unicodedata.bidirectional(c) in _STRONG_BIDI for c in text) else "rtl"
 
 
 def _view_body(target: Path, ext: str, size: int) -> str:
@@ -518,12 +529,18 @@ def _view_body(target: Path, ext: str, size: int) -> str:
             return f'<div class="note">could not parse this CSV: {html.escape(str(exc))}</div>'
         if not rows:
             return '<div class="note">empty file</div>'
-        cell = lambda tag, row: "".join(f'<{tag} dir="auto">{html.escape(c)}</{tag}>' for c in row)  # noqa: E731
+        # The "text" column (else the last) takes the remaining width and wraps; the rest are no-wrap, content-sized.
+        wide = rows[0].index("text") if "text" in rows[0] else len(rows[0]) - 1
+
+        def cell(tag: str, row: list[str]) -> str:
+            return "".join(f'<{tag} dir="{_dir_attr(c)}"' + ("" if i == wide else ' class="n"') + f">{html.escape(c)}</{tag}>"
+                           for i, c in enumerate(row))
+
         head = f"<thead><tr>{cell('th', rows[0])}</tr></thead>"
         body = "".join(f"<tr>{cell('td', r)}</tr>" for r in rows[1:])
-        return f"<table>{head}<tbody>{body}</tbody></table>"
-    lines = "".join(f'<div dir="auto">{html.escape(line)}</div>' for line in text.splitlines())
-    return f'<pre dir="auto">{lines}</pre>'
+        return f'<table dir="ltr">{head}<tbody>{body}</tbody></table>'
+    lines = "".join(f'<div dir="{_dir_attr(line)}">{html.escape(line)}</div>' for line in text.splitlines())
+    return f'<pre dir="rtl">{lines}</pre>'
 
 
 def _view_page(job: str, rel: str, target: Path, ext: str, size: int) -> str:
