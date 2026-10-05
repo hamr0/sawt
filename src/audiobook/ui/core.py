@@ -34,7 +34,7 @@ from ..runner import (
     free_job_name, import_existing, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
 )
 from ..runner.core import _resolve_job
-from .page import PAGE
+from .page import FONT_FACE, PAGE
 
 __all__ = ["make_server", "serve", "main"]
 
@@ -45,19 +45,23 @@ DEFAULT_PORT = 8765
 MAX_BODY_BYTES = 64 * 1024
 LOCAL_HOSTNAMES = ("127.0.0.1", "localhost")
 
-# The page is one inline document; fonts come from Google Fonts, everything else is local.
+# The page is one inline document; everything, fonts included, is served locally.
 PAGE_CSP = (
     "default-src 'none'; script-src 'unsafe-inline'; "
-    "style-src 'unsafe-inline' https://fonts.googleapis.com; "
-    "font-src https://fonts.gstatic.com; connect-src 'self'"
+    "style-src 'unsafe-inline'; font-src 'self'; connect-src 'self'"
 )
+
+# GET /static/<name>: exact names only, never a path built from the request.
+STATIC_DIR = Path(__file__).parent / "static"
+STATIC_FILES = {"CourierPrime-Regular.woff2": "font/woff2", "CourierPrime-Bold.woff2": "font/woff2"}
+STATIC_CACHE = "public, max-age=31536000, immutable"
 
 # Artifacts tab: step folders in pipeline order (05_audio only when it exists).
 ARTIFACT_STEP_DIRS = (*STEP_DIRS.values(), "05_audio")
 AUDIO_DIR = "05_audio"
 VIEW_MAX_BYTES = 5 * 1024 * 1024
 VIEW_TEXT_EXTS = (".txt", ".ssml", ".json", ".xml")
-VIEW_CSP = "default-src 'none'; style-src 'unsafe-inline'"
+VIEW_CSP = "default-src 'none'; style-src 'unsafe-inline'; font-src 'self'"
 DOWNLOAD_CHUNK_BYTES = 1024 * 1024
 
 _JOB_ROUTE = re.compile(r"^/api/jobs/([^/]+)(?:/(retry|rename|files|open))?$")
@@ -170,7 +174,8 @@ class _Handler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
+        if "Cache-Control" not in (extra or {}):
+            self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
         for k, v in (extra or {}).items():
@@ -212,6 +217,8 @@ class _Handler(BaseHTTPRequestHandler):
             if method == "GET" and path == "/":
                 return self._send(200, PAGE.encode("utf-8"), "text/html; charset=utf-8",
                                   {"Content-Security-Policy": PAGE_CSP})
+            if method == "GET" and path.startswith("/static/"):
+                return self._static(unquote(path[len("/static/"):]))
             if method == "GET" and path == "/view":
                 return self._view(parse_qs(urlsplit(self.path).query))
             status, payload = self._route(method, path)
@@ -343,6 +350,12 @@ class _Handler(BaseHTTPRequestHandler):
         body = _view_page(name, rel, target, ext, size)
         self._send(200, body.encode("utf-8"), "text/html; charset=utf-8",
                    {"Content-Security-Policy": VIEW_CSP})
+
+    def _static(self, name: str) -> None:
+        ctype = STATIC_FILES.get(name)  # allow-list lookup; the name never reaches the filesystem otherwise
+        if ctype is None:
+            raise _HttpError(404, {"error": "not found"})
+        self._send(200, (STATIC_DIR / name).read_bytes(), ctype, {"Cache-Control": STATIC_CACHE})
 
     def _download(self, target: Path, size: int) -> None:
         self.send_response(200)
@@ -605,7 +618,7 @@ def _view_page(job: str, rel: str, target: Path, ext: str, size: int) -> str:
         '<!doctype html>\n<html lang="en"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width, initial-scale=1">'
         '<meta name="color-scheme" content="light dark">'
-        f"<title>{html.escape(target.name)}</title><style>{_VIEW_STYLE}</style></head><body>"
+        f"<title>{html.escape(target.name)}</title><style>{FONT_FACE}{_VIEW_STYLE}</style></head><body>"
         f'<header><h1 dir="auto">{html.escape(target.name)}</h1>'
         f'<div class="meta">job <bdi dir="auto">{html.escape(job)}</bdi> · '
         f'<bdi dir="ltr">{html.escape(rel)}</bdi></div></header>'

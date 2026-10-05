@@ -211,7 +211,7 @@ After the last module: propose `/self-review`.
 - Step 5: single-sentence content-block handling (Chirp3-HD fallback and/or flag in CSV).
 - Step 5: first full book (rest of *Tharthara Fawq al-Nil* vs *Awlad Haretna*).
 - No way to cancel a queued folder run once started.
-- The UI font loads from the network (Google Fonts); offline it falls back. Decide whether to bundle it or drop it.
+- The UI font loads from the network (Google Fonts); offline it falls back. Decide whether to bundle it or drop it. — resolved: bundled locally
 
 ## 6. Non-requirements / out of scope
 

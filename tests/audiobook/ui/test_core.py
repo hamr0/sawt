@@ -473,6 +473,48 @@ class TestPersistence:
         assert client.job("novel")["missing"] is True
 
 
+class TestStaticFonts:
+    def test_page_has_no_external_hosts_and_csp_is_self_only(self, client):
+        assert "googleapis" not in PAGE and "gstatic" not in PAGE and "<link" not in PAGE
+        assert "@font-face" in PAGE and "/static/CourierPrime-Regular.woff2" in PAGE
+        assert "font-src 'self'" in ui_core.PAGE_CSP and "google" not in ui_core.PAGE_CSP
+        conn = http.client.HTTPConnection("127.0.0.1", client.port)
+        conn.request("GET", "/", headers={"Host": f"127.0.0.1:{client.port}"})
+        csp = conn.getresponse().getheader("Content-Security-Policy")
+        assert csp == ui_core.PAGE_CSP
+
+    @pytest.mark.parametrize("name", ["CourierPrime-Regular.woff2", "CourierPrime-Bold.woff2"])
+    def test_font_served_with_type_and_cache(self, client, name):
+        status, headers, body = raw_get(client, "/static/" + name)
+        assert status == 200 and headers["content-type"] == "font/woff2"
+        assert body[:4] == b"wOF2" and "max-age=31536000" in headers["cache-control"]
+        assert headers["cache-control"].count("no-store") == 0 and headers["x-content-type-options"] == "nosniff"
+
+    @pytest.mark.parametrize("name", ["OFL.txt", "../core.py", "..%2Fcore.py", "%2e%2e/core.py", "nope.woff2",
+                                      "CourierPrime-Regular.woff2/", "", "CourierPrime-Regular.woff2%00"])
+    def test_only_allow_listed_names(self, client, name):
+        assert raw_get(client, "/static/" + name)[0] == 404
+
+    def test_foreign_host_rejected(self, client):
+        conn = http.client.HTTPConnection("127.0.0.1", client.port)
+        conn.request("GET", "/static/CourierPrime-Regular.woff2", headers={"Host": "evil.example.com"})
+        assert conn.getresponse().status == 403
+
+    def test_files_and_license_ship_in_repo(self):
+        for n in (*ui_core.STATIC_FILES, "OFL.txt"):
+            assert (ui_core.STATIC_DIR / n).is_file()
+        assert "SIL Open Font License" in (ui_core.STATIC_DIR / "OFL.txt").read_text(encoding="utf-8")
+
+    def test_viewer_uses_bundled_font_too(self, client, job):
+        _, headers, body = view(client, "01_ingestion/clean_text.txt")
+        assert "font-src 'self'" in headers["content-security-policy"] and b"/static/CourierPrime-Bold.woff2" in body
+
+    def test_job_pane_is_360px_with_narrow_fallback(self):
+        assert "grid-template-columns:360px minmax(0,1fr)" in PAGE
+        narrow = PAGE.split("@media (max-width:720px)")[1]
+        assert "grid-template-columns:minmax(0,1fr)" in narrow
+
+
 class TestPage:
     def test_theme_and_scroll_contract(self):
         assert "prefers-color-scheme: dark" in PAGE

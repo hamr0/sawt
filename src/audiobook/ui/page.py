@@ -3,6 +3,10 @@
 Look follows DESIGN_PLAN.md / DESIGN_MEMORY.md (owner-approved variant D).
 """
 
+# Courier Prime (SIL OFL, see static/OFL.txt), latin subset, served from /static/ by the UI server.
+FONT_FACE = """@font-face{font-family:'Courier Prime';font-style:normal;font-weight:400;font-display:swap;src:url(/static/CourierPrime-Regular.woff2) format('woff2')}
+@font-face{font-family:'Courier Prime';font-style:normal;font-weight:700;font-display:swap;src:url(/static/CourierPrime-Bold.woff2) format('woff2')}"""
+
 PAGE = r"""<!doctype html>
 <html lang="en">
 <head>
@@ -10,8 +14,8 @@ PAGE = r"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>Sawt Runner</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap">
 <style>
+__FONT_FACE__
 :root{
   --bg:#e1e2e7;--panel:#d0d5e3;--panel2:#e9e9ed;--text:#3257ad;--textDim:#4c598a;--textFaint:#6b74a6;
   --border:#c4c8da;--borderStrong:#7b84ad;--accent:#215aa8;--fieldBg:#ffffff;
@@ -74,7 +78,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v .opt input{margin:0;width:16px;height:16px;accent-color:var(--accent)}
 .v .mk{font-weight:700;white-space:nowrap}
 .v .st-ready{color:var(--green)}.v .st-running{color:var(--cyan)}.v .st-failed{color:var(--red)}.v .st-missing{color:var(--amber)}.v .st-imported,.v .st-none{color:var(--textDim)}
-.v .main{display:grid;grid-template-columns:300px minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:100%}
+.v .main{display:grid;grid-template-columns:360px minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:100%}
 .v .left{padding:10px;border-right:1px solid var(--border);min-width:0;overflow-y:auto}
 .v .right{padding:10px 16px;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
 .v .right>*{flex:none}
@@ -805,3 +809,4 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 </body>
 </html>
 """
+PAGE = PAGE.replace("__FONT_FACE__", FONT_FACE)
