@@ -30,8 +30,8 @@ from pathlib import Path
 from urllib.parse import parse_qs, quote, unquote, urlsplit
 
 from ..runner import (
-    OVERWRITE_WARNING, RUN_FAILED, RUN_RUNNING, RUN_STOPPED, STEP_DIRS, RunnerError,
-    delete_job, free_job_name, import_existing, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
+    OVERWRITE_WARNING, ORPHAN_WARNING, RUN_FAILED, RUN_RUNNING, RUN_STOPPED, STEP_DIRS, RunnerError,
+    delete_job, free_job_name, has_step_output, new_job_output, import_existing, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
 )
 from ..runner.core import _resolve_job
 from .page import FONT_FACE, PAGE
@@ -340,9 +340,11 @@ class _Handler(BaseHTTPRequestHandler):
         # Check busy before asking for any confirmation: there is no point confirming a run that can't start.
         if worker.status()["busy"]:
             raise _HttpError(409, {"busy": True, "error": "a run is in progress — wait for it to end"})
-        existing = [n for _, n, j, _ in plan if j and any((Path(j["output"]) / d).exists() for d in STEP_DIRS.values())]
-        if existing and not confirm:
-            raise _HttpError(409, {"overwrite": True, "message": OVERWRITE_WARNING, "jobs": existing})
+        existing = [n for _, n, j, _ in plan if j and has_step_output(Path(j["output"]))]
+        orphans = [n for b, n, j, _ in plan if j is None and has_step_output(new_job_output(b, n))]
+        if (existing or orphans) and not confirm:
+            message = " ".join(m for m, names in ((OVERWRITE_WARNING, existing), (ORPHAN_WARNING, orphans)) if names)
+            raise _HttpError(409, {"overwrite": True, "message": message, "jobs": existing + orphans})
 
         def make(book: Path, job_name: str, new_job: bool):
             return lambda: run_book(book, name=job_name, fiction=fiction, ssml=ssml, new_job=new_job,

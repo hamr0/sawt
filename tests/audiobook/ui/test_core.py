@@ -1649,3 +1649,67 @@ class TestJobsFilePinned:
         runner_core.run_book(make_book(books, "a"), assume_yes=True, emit=lambda m: None)
         assert not (other / "jobs.json").exists()
         assert json.loads(started.read_text(encoding="utf-8"))["jobs"][0]["runs"][-1]["status"] == runner_core.RUN_READY
+
+
+class TestOrphanedFolder:
+    """A deleted job's files stay on disk; re-running the same book/name must not silently wipe them."""
+
+    def _orphan(self, client, books):
+        book = make_book(books, "novel")
+        client.post("/api/runs", {"path": str(book)})
+        client.wait_idle()
+        review = books / "novel_sawt" / "03_segments" / "review"
+        review.mkdir(parents=True, exist_ok=True)
+        (review / "chapter_1.txt").write_text("hand edited", encoding="utf-8")
+        assert client.post("/api/jobs/novel/delete")[0] == 200
+        return book, review / "chapter_1.txt"
+
+    def test_single_file_form_needs_confirmation(self, client, books):
+        book, edited = self._orphan(client, books)
+        status, data = client.post("/api/runs", {"path": str(book)})
+        assert status == 409 and data["overwrite"] is True and data["jobs"] == ["novel"]
+        assert runner_core.ORPHAN_WARNING in data["message"] and "no longer in history" in data["message"]
+        assert edited.read_text(encoding="utf-8") == "hand edited" and client.get("/api/status")[1]["busy"] is False
+        assert client.post("/api/runs", {"path": str(book), "confirm": True})[0] == 202
+        client.wait_idle()
+        assert not edited.exists() and client.job("novel")["runs"][-1]["status"] == runner_core.RUN_READY
+
+    def test_books_list_form_needs_confirmation(self, client, books):
+        book, edited = self._orphan(client, books)
+        items = {"books": [book_item(book, "novel")]}
+        status, data = client.post("/api/runs", items)
+        assert status == 409 and data["overwrite"] is True and data["jobs"] == ["novel"]
+        assert edited.read_text(encoding="utf-8") == "hand edited"
+        assert client.post("/api/runs", {**items, "confirm": True})[0] == 202
+        client.wait_idle()
+        assert not edited.exists()
+
+    def test_message_names_both_kinds_when_mixed(self, client, books):
+        book, _ = self._orphan(client, books)
+        other = make_book(books, "other")
+        client.post("/api/runs", {"path": str(other)})
+        client.wait_idle()
+        status, data = client.post("/api/runs", {"books": [book_item(book, "novel"), book_item(other, "other")]})
+        assert status == 409 and data["jobs"] == ["other", "novel"]
+        assert OVERWRITE_WARNING in data["message"] and runner_core.ORPHAN_WARNING in data["message"]
+
+    def test_cli_declined_confirmation_keeps_files(self, home, books):
+        book = make_book(books, "novel")
+        runner_core.run_book(book, emit=lambda m: None)
+        edited = books / "novel_sawt" / "03_segments" / "review" / "chapter_1.txt"
+        edited.parent.mkdir(parents=True, exist_ok=True)
+        edited.write_text("hand edited", encoding="utf-8")
+        runner_core.delete_job("novel")
+        lines = []
+        assert runner_core.run_book(book, emit=lines.append, confirm=lambda _: False) is None
+        assert any(runner_core.ORPHAN_WARNING in m for m in lines) and edited.read_text(encoding="utf-8") == "hand edited"
+        assert load_jobs()["jobs"] == []  # nothing was added to history either
+        assert runner_core.run_book(book, emit=lines.append, confirm=lambda _: True) is not None
+        assert not edited.exists()
+
+    def test_cli_assume_yes_skips_prompt(self, home, books):
+        book = make_book(books, "novel")
+        runner_core.run_book(book, emit=lambda m: None)
+        runner_core.delete_job("novel")
+        run = runner_core.run_book(book, assume_yes=True, confirm=lambda _: pytest.fail("must not prompt"), emit=lambda m: None)
+        assert run["status"] == runner_core.RUN_READY

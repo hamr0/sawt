@@ -70,6 +70,10 @@ IMPORT_FORMATS = ("epub", "docx", "txt")  # pdf is out of scope
 OVERWRITE_WARNING = (
     "overwriting the last run's files — start a new job instead to keep them"
 )
+ORPHAN_WARNING = (
+    "this folder already holds output from a job no longer in history — "
+    "running will overwrite its files (including any edited review files)"
+)
 GATE_LINE = "ready for audio — paused before paid step"
 
 
@@ -357,6 +361,15 @@ def _resolve_job(data: dict, book: Path, name: str | None, new_job: bool) -> tup
     return None, chosen
 
 
+def new_job_output(book: Path, job_name: str) -> Path:
+    """Where a new job for ``book`` keeps its output (next to the book)."""
+    return book.parent / f"{job_name}{JOB_DIR_SUFFIX}"
+
+
+def has_step_output(out: Path) -> bool:
+    return any((out / d).exists() for d in STEP_DIRS.values())
+
+
 def _new_run(settings: Settings) -> Run:
     return {
         "date": _now(),
@@ -385,14 +398,19 @@ def run_book(
     data = load_jobs(jobs_file)
     job, job_name = _resolve_job(data, book, name, new_job)
     if job is None:
-        output = book.parent / f"{job_name}{JOB_DIR_SUFFIX}"
+        output = new_job_output(book, job_name)
         if any(j["output"] == str(output) for j in data["jobs"]):
             raise RunnerError(f"output folder {output} already belongs to another job")
+        if has_step_output(output):  # e.g. the job was deleted from history but its files stayed
+            emit(f"warning: {ORPHAN_WARNING}")
+            if not assume_yes and not confirm("continue? [y/N] "):
+                emit("not confirmed — nothing changed")
+                return None
         job = {"name": job_name, "source": str(book), "output": str(output), "runs": []}
         data["jobs"].append(job)
     else:
         out = Path(job["output"])
-        if any((out / d).exists() for d in STEP_DIRS.values()):
+        if has_step_output(out):
             emit(f"warning: {OVERWRITE_WARNING}")
             if not assume_yes and not confirm("continue? [y/N] "):
                 emit("not confirmed — nothing changed")
