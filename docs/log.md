@@ -5,3 +5,5 @@
 ## [2026-10-05] validate | PASS — 0 gate failure(s)
 ## [2026-10-05] archive | docs/product/PLAN.md -> docs/archive/PLAN.md, 179 link(s) rewritten
 ## [2026-10-05] index-flat | 31 row(s) (18 product, 11 logs, 2 archive)
+## [2026-10-05] index-flat | 33 row(s) (9 product, 11 logs, 13 archive)
+## [2026-10-05] index-flat | 33 row(s) (9 product, 11 logs, 13 archive)

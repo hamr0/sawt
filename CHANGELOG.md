@@ -37,6 +37,11 @@ restarting from zero. Two eras:
 
 ### Changed
 
+- **Docs consolidated into one PRD and one learnings doc.**
+  `docs/product/prd.md` (now including the local UI + runner spec) and
+  `docs/product/learnings.md` replace the old PLAN, PRD, vision,
+  assumptions, knowledge base and six split wiki pages, which are
+  archived; logs flattened into `docs/logs/`.
 - **Docs reorganized into product / wiki / logs / archive** via
   docs-builder. 24 files moved and 59 inbound links repaired; the stale
   `system-state.md` was archived. `docs/index.md` is now the generated map

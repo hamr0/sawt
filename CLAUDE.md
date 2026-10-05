@@ -185,11 +185,11 @@ Errors carry pipeline context (`IngestionError(ValueError)`). Return types are `
 
 | Topic | Location |
 |-------|----------|
-| Execution plan (source of truth) | `docs/product/PLAN.md` |
-| Product requirements | `docs/product/prd.md` |
-| Documentation hub / knowledge base | `docs/README.md`, `docs/wiki/KNOWLEDGE_BASE.md` |
-| POC results (1–4) | `docs/logs/03-logs/POC{1,2,3,4}_RESULTS.md` |
-| Voice inventory (19 pairing-tested voices) | `docs/02-features/research/final_voices.csv` |
+| Product requirements (single source of truth) | `docs/product/prd.md` |
+| Learnings from POCs and research | `docs/product/learnings.md` |
+| Documentation hub | `docs/README.md` |
+| POC results (1–4) | `docs/logs/POC{1,2,3,4}_RESULTS.md` |
+| Voice inventory (19 pairing-tested voices) | `docs/logs/final_voices.csv` |
 
 Some docs still reference the old flat layout (`src/audiobook/ingest.py`,
 `docs/02-features/azure-audiobooks/…`). The tree above is authoritative.

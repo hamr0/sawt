@@ -49,7 +49,7 @@ Our pipeline ingests books for audio conversion. Format choice determines what c
 | **EPUB** | First-class (content source) | Best extraction quality. Hindawi has 3,271 CC books. Born-digital = clean text. |
 | **DOCX** | First-class (author input) | Authors write in Word/Google Docs. python-docx handles Arabic cleanly. |
 | **TXT** | Internal-use (bulk corpus) | Swedish dataset has 1,745 Hindawi books as plain text. Not user-facing. |
-| **PDF** | Out of scope | Fused words, no OSS solution. See [PDF findings](../logs/02-features/ARABIC_PDF_EXTRACTION.md). |
+| **PDF** | Out of scope | Fused words, no OSS solution. See [PDF findings](../logs/ARABIC_PDF_EXTRACTION.md). |
 
 ### Key Finding: PDF Is Intractable for Arabic
 - No open-source tool correctly extracts word-spaced Arabic text from PDFs
@@ -58,7 +58,7 @@ Our pipeline ingests books for audio conversion. Format choice determines what c
 - Most Arabic PDFs in the wild are scanned images (require OCR, not text extraction)
 - Even Amazon refuses Arabic PDF uploads for Kindle — requires EPUB/DOCX
 - The largest Arabic digital library (Shamela) uses human transcription, not OCR
-- Full analysis: [ARABIC_PDF_EXTRACTION.md](../logs/02-features/ARABIC_PDF_EXTRACTION.md)
+- Full analysis: [ARABIC_PDF_EXTRACTION.md](../logs/ARABIC_PDF_EXTRACTION.md)
 
 ---
 
