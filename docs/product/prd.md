@@ -137,7 +137,7 @@ Five stages, each a package under `src/audiobook/` with logic in `core.py`; test
 
 ## 5. Next build: local UI + runner
 
-Status: Spec signed off 2026-10-05 — not built. Module 0 built (feat/runner). Module 2 built (feat/ui).
+Status: Spec signed off 2026-10-05. Modules 0, 1 and 2 built (feat/runner, feat/ui); module 3 (Artifacts tab) not built.
 
 ### Problem & goal
 
@@ -174,13 +174,22 @@ Hosting, other users, logins; a database; editing files in the browser; audio ge
 | # | Module | Proof |
 |---|--------|-------|
 | 0 | Runner, CLI only, POC first: takes a path, runs steps 1–4, writes `jobs.json`, retries from the failed step. | Real runs on 2–3 test books plus tests; one run forced to fail, then retried. |
-| 1 | Look: 5 `/live-canvas` variations; owner picks one. | Owner picks one. |
-| 2 | UI shell: path input, start, live log, job cards, history. | — |
+| 1 | Look: 5 `/live-canvas` variations; owner picks one. | Owner picked variant D (light + dark themes, independently scrolling job list). |
+| 2 | UI shell: path input, start, live log, job cards, history. | Tests (337 passing, including a Node fake-DOM page test) plus a real-browser check of themes, live run, new-job flow and Arabic paths/names. |
 | 3 | Artifacts tab: step folders, open-folder, file links. | — |
 
 After the last module: propose `/self-review`.
 
 **Done =** the owner points the UI at a book or folder, watches steps 1–4 tick through, opens every step folder from the page, and finds the job and its runs in history after a server restart.
+
+### Decided during build
+
+- On first launch with no history, an `[ import existing output/ ]` button imports the repo's existing output folders.
+- When the typed book already has a job, a "new job" checkbox appears. Unchecked = a new run on the existing job.
+- One run at a time: while a run is going, other start/retry actions are refused with a message.
+- A job left "running" after a crash or server stop shows as interrupted, with Retry available.
+- In a folder run, a book whose job name is already taken is skipped and listed; the rest of the folder still runs.
+- Arabic display: paths render left-to-right with segments that break only at `/`; names and paths embedded in messages are bidi-isolated and don't wrap.
 
 ### Open questions (non-blocking)
 
@@ -190,6 +199,8 @@ After the last module: propose `/self-review`.
 - Single-voice SSML for non-fiction.
 - Step 5: single-sentence content-block handling (Chirp3-HD fallback and/or flag in CSV).
 - Step 5: first full book (rest of *Tharthara Fawq al-Nil* vs *Awlad Haretna*).
+- No way to cancel a queued folder run once started.
+- The UI font loads from the network (Google Fonts); offline it falls back. Decide whether to bundle it or drop it.
 
 ## 6. Non-requirements / out of scope
 

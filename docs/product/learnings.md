@@ -30,7 +30,8 @@ Citations of the form `(PLAN:N-M)` refer to the original big plan (formerly `doc
 14. [Tried and abandoned](#14-tried-and-abandoned)
 15. [Success criteria as met](#15-success-criteria-as-met)
 16. [Superseded views](#16-superseded-views)
-17. [Reference index](#17-reference-index)
+17. [Runner + UI build (2026-10-05)](#17-runner--ui-build-2026-10-05)
+18. [Reference index](#18-reference-index)
 
 ---
 
@@ -453,7 +454,7 @@ Hand-off rules: the stage-3 segments CSV is the universal hand-off; Gemini/Googl
 
 ### Process lessons
 - When a design is broken, say so and redesign; do not patch over it. Validate with tests/regression/smoke after a correction before reporting. Edits to canonical docs must be additive (no silent omission). Follow the literal scoped ask and do not create unrequested files. Pushing to main is acceptable; do not open a PR per change. Dev workflow and definition of done live in [dev-workflow](../wiki/dev-workflow.md) and [definition-of-done](../wiki/definition-of-done.md).
-- Reference index: see [section 17](#17-reference-index).
+- Reference index: see [section 18](#18-reference-index).
 
 ---
 
@@ -588,7 +589,28 @@ One-liners so the history is not lost:
 
 ---
 
-## 17. Reference index
+## 17. Runner + UI build (2026-10-05)
+
+### Process: spec before build
+- Spec first through the AGENT_RULES Operating Flow (interview rounds, explicit owner sign-off), then build. A UI built without approval was deleted. Opus orchestrates and reviews; Sonnet agents write the code.
+
+### Testing
+- Server/API tests passed while the page itself was broken. A real-browser check found defects across four fix rounds after the first build. That is why a page-level test now exists: a Node fake-DOM harness in `tests/audiobook/ui/test_core.py` that runs the real page JS (e.g. `TestStartButtonSync`).
+
+### Arabic display
+- Arabic paths need LTR direction with segments that break only at `/`.
+- Arabic names embedded in LTR messages need bidi isolation (`<bdi>` / `unicode-bidi: isolate`), or the sentence reorders around them.
+
+### Runner design
+- The go/no-go passed: a forced step-3 failure, then retry, left steps 1-2 output byte-identical (the retry resumes from disk).
+- `ingest()` hard-coded its output location (`output/{format}/{book}/`). It got an optional `ingestion_dir` argument so the runner can write to `<book dir>/<name>_sawt/01_ingestion`; this was the one stage change.
+
+### Look
+- Taken from bareloop's real CSS, not a description of it. Its light-theme colours failed the WCAG contrast check until darkened (contrast-tuned tokens in `DESIGN_PLAN.md`).
+
+---
+
+## 18. Reference index
 
 Internal (paths as in the original plan; some now relocated):
 - Market research [wiki/MARKET_RESEARCH.md](../wiki/MARKET_RESEARCH.md); PDF research [logs/ARABIC_PDF_EXTRACTION.md](../logs/ARABIC_PDF_EXTRACTION.md); production detector prototype `reference/prototypes/06_simplified_detector.py`; `reference/character_voice_assignment.py`; `reference/azure_integration.py`; prototype outputs `SIMPLIFIED_DETECTION_FINAL_STATUS.md`, `SCALABILITY_ANALYSIS.md`, `BUG_FIX_TEXT_LOSS_RESOLVED.md`, `QUOTATION_ATTRIBUTION_RESEARCH_FINDINGS.md`; `arabic_voices_capabilities.json`.
