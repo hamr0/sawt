@@ -456,7 +456,7 @@ def delete_job(name: str) -> None:
 
 
 def list_jobs() -> list[dict]:
-    """One row per job: name, status of the latest run, date, run count, output, missing flag."""
+    """One row per job: name, status and step states of the latest run, date, run count, source, output, missing flag."""
     rows = []
     for job in load_jobs()["jobs"]:
         last = job["runs"][-1] if job["runs"] else None
@@ -467,6 +467,8 @@ def list_jobs() -> list[dict]:
             "date": last["date"] if last else "",
             "runs": len(job["runs"]),
             "output": job["output"],
+            "source": job["source"],
+            "steps": last["steps"] if last else {},
             "missing": missing,
         })
     return rows

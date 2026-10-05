@@ -568,12 +568,25 @@ global.fetch = function (u) { var d = u === '/api/status' ? { busy: busy, curren
 //DRIVER
 var conflict = process.argv[2] === 'conflict', overwrite = process.argv[2] === 'overwrite';
 var started = process.argv[2] === 'start', arts = process.argv[2] === 'arts';
-var scanning = process.argv[2] === 'scan', queueMode = process.argv[2] === 'queue', actsMode = process.argv[2] === 'acts';
-if (queueMode || actsMode) global.fetch = function (u, o) {
+var scanning = process.argv[2] === 'scan', queueMode = process.argv[2] === 'queue', actsMode = process.argv[2] === 'acts', cardsMode = process.argv[2] === 'cards';
+function jr(name, status, steps, extra) {
+  return Object.assign({ name: name, status: status, date: '2026-01-02T03:04:05', runs: 2, source: '/s/' + name + '.txt', output: '/o/' + name, steps: steps, missing: false }, extra || {});
+}
+var ALLOK = { ingest: 'ok', chapters: 'ok', dialogue: 'ok', ssml: 'skipped' };
+var CARDS = [jr('a', 'ready for audio \u2014 paused', ALLOK), jr('b', 'ready for audio \u2014 paused', Object.assign({ audio: 'ok' }, ALLOK)),
+  jr('c', 'failed', { ingest: 'ok', chapters: 'failed', dialogue: 'pending', ssml: 'pending' }),
+  jr('d', 'running', { ingest: 'ok', chapters: 'ok', dialogue: 'running', ssml: 'pending' }),
+  jr('e', 'stopped', { ingest: 'ok', chapters: 'ok', dialogue: 'pending', ssml: 'pending' }),
+  jr('f', 'running', { ingest: 'running', chapters: 'pending', dialogue: 'pending', ssml: 'pending' }),
+  jr('g', 'imported', ALLOK), jr('h', 'missing', ALLOK, { missing: true }), jr('i', 'ready for audio \u2014 paused', ALLOK),
+  jr('\u0631\u0648\u0627\u064a\u0629', 'ready for audio \u2014 paused', ALLOK, { source: '/s/\u0643\u062a\u0627\u0628.epub' }), jr('mybook-job', 'failed', ALLOK, { source: '/s/MyBook.EPUB' })];
+if (queueMode || actsMode || cardsMode) global.fetch = function (u, o) {
   global.calls.push([(o && o.method) || 'GET', u, o && o.body]);
   var run = { date: '2026-01-01T00:00:00', status: actsMode ? 'stopped' : 'running', settings: { ssml: false, fiction: true },
     steps: { ingest: 'ok', chapters: 'pending', dialogue: 'pending', ssml: 'pending' }, log: ['\u2713 ingesting', '\u25a0 stopped by user after ingesting'], errors: [] };
-  var d = u === '/api/status' ? (queueMode ? { busy: true, current: 'a', queued: ['b', 'c'], stopping: false } : { busy: false, current: null, queued: [] })
+  var d = u === '/api/status' && cardsMode ? { busy: true, current: 'd', queued: ['i'], stopping: false }
+    : u === '/api/status' ? (queueMode ? { busy: true, current: 'a', queued: ['b', 'c'], stopping: false } : { busy: false, current: null, queued: [] })
+    : u === '/api/jobs' && cardsMode ? { jobs: CARDS }
     : u === '/api/jobs' ? { jobs: [{ name: actsMode ? 'x' : 'a', status: actsMode ? 'stopped' : 'running', date: '2026-01-01T00:00:00', runs: 1 }] }
     : u === '/api/stop' ? { dropped: ['b', 'c'] }
     : { name: actsMode ? 'x' : 'a', output: '/out/x_sawt', source: '/s/x.txt', runs: [run], missing: false };
@@ -630,6 +643,19 @@ setTimeout(function () {
       if (overwrite) fire('click', { closest: function () { return { dataset: { act: 'newjob' }, disabled: false }; } });
       out.afterAct = app.innerHTML;
       console.log(JSON.stringify(out)); process.exit(0); }, 100);
+    return;
+  }
+  if (cardsMode) {
+    var cl = function (act) { fire('click', { closest: function () { return { dataset: { act: act }, disabled: false }; } }); };
+    var srch = function (v) { fire('input', { value: v, dataset: { f: 'search' } }); };
+    cl('reload');
+    setTimeout(function () {
+      out.cards = app.innerHTML;
+      var snap = function (v) { srch(v); return app.innerHTML; };
+      out.latin = snap('MYBOOK-JOB'); out.src = snap('myBOOK.epub'); out.ar = snap('\u0631\u0648\u0627\u064a\u0629'); out.arsrc = snap('\u0643\u062a\u0627\u0628'); out.none = snap('zzz');
+      cl('searchclear'); out.cleared = app.innerHTML;
+      console.log(JSON.stringify(out)); process.exit(0);
+    }, 100);
     return;
   }
   if (queueMode || actsMode) {
@@ -798,7 +824,7 @@ class TestStartButtonSync:
     def test_queue_view_placeholders_and_stop(self, tmp_path):
         out = self._run(tmp_path, "queue")
         first = out["first"]
-        assert first.count('<div class="card') == 3 and "queued \u00b7 2 of 3" in first and "queued \u00b7 3 of 3" in first
+        assert first.count('<div class="card') == 3 and 'st-queued">queued</span> \u00b7 2 of 3' in first and 'st-queued">queued</span> \u00b7 3 of 3' in first
         assert "[\u2026]" in first  # queued status mark
         ph = out["placeholder"]  # selecting a placeholder card: its Run tab, no job entry needed
         assert "queued \u2014 position 2 of 3" in ph and "[ stop ]" in ph and "[ delete ]" not in ph and "[ rename ]" not in ph.split('class="rhead"')[1]
@@ -816,6 +842,45 @@ class TestStartButtonSync:
         assert "Remove " in ask and "from history? Files on disk stay: " in ask and '<bdi class="pth" dir="ltr">' in ask and 'class="seg">x_sawt</bdi>' in ask
         assert "[ remove ]" not in out["cancelled"] and "from history?" not in out["cancelled"]
         assert ["POST", "/api/jobs/x/delete", "{}"] in out["calls"]
+
+
+    def test_card_status_mapping_and_search(self, tmp_path):
+        out = self._run(tmp_path, "cards")
+
+        def card(html, name):
+            m = re.search(r'<div class="card[^"]*"><button[^>]*data-arg="%s".*?</span></button>' % re.escape(name), html)
+            assert m, name
+            return re.sub(r"<[^>]+>", "", m.group(0)).strip()
+
+        h = out["cards"]
+        assert "jobs (11)" in h
+        expect = {
+            "a": ("[\u00b7]", "partial \u00b7 artifacts ready, audio pending"),
+            "b": ("[\u2713]", "complete \u00b7 artifacts + audio"),
+            "c": ("[\u00d7]", "failed \u00b7 chapters error"),
+            "d": ("[>]", "running \u00b7 detecting dialogue"),
+            "e": ("[\u25a0]", "stopped \u00b7 after chapters, retry to continue"),
+            "f": ("[!]", "interrupted \u00b7 retry to continue"),
+            "g": ("[\u00b7]", "imported \u00b7 artifacts only, no run log"),
+            "h": ("[?]", "missing \u00b7 output folder deleted"),
+            "i": ("[\u2026]", "queued \u00b7 2 of 2"),  # queued wins over its old run status
+        }
+        for name, (mark, line2) in expect.items():
+            text = card(h, name)
+            assert text.startswith(mark + " " + name) and text.endswith(line2), (name, text)
+            assert "2026-01-02 \u00b7 2 runs" in text
+        # status word carries its status colour class; line 2 is the muted row
+        assert 'class="row2"><span class="st-failed">failed</span> \u00b7 chapters error' in h
+        assert "ready for audio" not in re.sub(r"<[^>]+>", "", h.split('class="rpanel"')[0].split("jobsel")[1].split("</select>")[1])
+        # search: case-insensitive on name or source file name, Latin and Arabic, live count, clear
+        assert "jobs (1 of 11)" in out["latin"] and "jobs (1 of 11)" in out["src"] and "jobs (1 of 11)" in out["ar"] and "jobs (1 of 11)" in out["arsrc"]
+        assert 'data-arg="mybook-job"' in out["src"] and 'data-arg="a"' not in out["src"].split('class="list"')[1].split("</aside>")[0]
+        assert 'data-arg="\u0631\u0648\u0627\u064a\u0629"' in out["arsrc"].split('class="list"')[1]
+        assert 'dir="auto" autocomplete="off" placeholder="search jobs"' in h and "[ \u00d7 ]" in out["ar"] and "[ \u00d7 ]" not in h
+        assert "no jobs match" in out["none"] and "jobs (0 of 11)" in out["none"]
+        # the selected job stays selected while filtered out of the list
+        assert 'class="rhead"><span class="mk' in out["ar"] and '<span class="nm" dir="auto">a</span>' in out["ar"].split('class="rhead"')[1]
+        assert "jobs (11)" in out["cleared"] and "[ \u00d7 ]" not in out["cleared"]
 
 
 class TestPathsAndWording:

@@ -77,7 +77,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v .opt{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .v .opt input{margin:0;width:16px;height:16px;accent-color:var(--accent)}
 .v .mk{font-weight:700;white-space:nowrap}
-.v .st-ready{color:var(--green)}.v .st-running{color:var(--cyan)}.v .st-failed{color:var(--red)}.v .st-missing{color:var(--amber)}.v .st-imported,.v .st-none{color:var(--textDim)}.v .st-queued{color:var(--cyan)}.v .st-stopped{color:var(--amber)}
+.v .st-ready{color:var(--green)}.v .st-running{color:var(--cyan)}.v .st-failed{color:var(--red)}.v .st-missing{color:var(--amber)}.v .st-imported,.v .st-none{color:var(--textDim)}.v .st-queued{color:var(--cyan)}.v .st-partial,.v .st-complete{color:var(--green)}.v .st-interrupted{color:var(--amber)}.v .st-stopped{color:var(--amber)}
 .v .main{display:grid;grid-template-columns:360px minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:100%}
 .v .left{padding:10px;border-right:1px solid var(--border);min-width:0;overflow-y:auto}
 .v .right{padding:10px 16px;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
@@ -143,6 +143,8 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v .fcell{display:flex;gap:4px;align-items:baseline;min-width:0;direction:ltr}
 .v .fcell a{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .v .fcell .sz{flex:none;color:var(--textDim);font-size:12px;white-space:nowrap}
+.v .srch{display:flex;gap:6px;align-items:center;margin:0 0 8px}
+.v .srch .field{flex:1}
 .v .rowsbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 6px}
 .v .brow{border:1px solid var(--border);background:var(--panel2);padding:4px 8px;margin-bottom:4px}
 .v .brow .bline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px;padding-left:22px}
@@ -190,8 +192,8 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 <script>
 (function () {
   'use strict';
-  var MK = { ready: '[✓]', running: '[▶]', failed: '[×]', missing: '[?]', imported: '[·]', none: '[ ]', queued: '[…]', stopped: '[■]' };
-  var STX = { ready: 'ready for audio — paused', running: 'running', failed: 'failed', missing: 'missing', imported: 'imported', none: 'no runs', queued: 'queued', stopped: 'stopped' };
+  var MK = { ready: '[✓]', running: '[>]', failed: '[×]', missing: '[?]', imported: '[·]', none: '[ ]', queued: '[…]', stopped: '[■]', partial: '[·]', complete: '[✓]', interrupted: '[!]' };
+  var STX = { ready: 'ready for audio — paused', running: 'running', failed: 'failed', missing: 'missing', imported: 'imported', none: 'no runs', queued: 'queued', stopped: 'stopped', partial: 'partial', complete: 'complete', interrupted: 'interrupted' };
   var LABEL = { ingest: 'ingesting', chapters: 'splitting chapters', dialogue: 'detecting dialogue', ssml: 'generating SSML' };
   var STEPS = ['ingest', 'chapters', 'dialogue', 'ssml'];
   var GATE = 'ready for audio — paused before paid step';
@@ -206,7 +208,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     panel: false, form: { path: '', name: '', fiction: true, ssml: false, newJob: false },
     offerNew: false, formErr: {}, formNote: '', generalErr: '', overwrite: null, starting: false,
     skipped: [], queuedNames: [], msg: '', retryErr: '',
-    renaming: null, renameVal: '', renameErr: '', focusNext: null, stopping: false, confirmDel: null, delErr: '',
+    renaming: null, renameVal: '', renameErr: '', focusNext: null, stopping: false, confirmDel: null, delErr: '', search: '',
     files: null, filesErr: '', fexp: {},
     freeName: '', freeFor: '', scan: null  /* folder pick list: { rows: [{path,file,job,stem,on,nm,newJob}], skipped: [] }; null = single file or no path */
   };
@@ -255,7 +257,32 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       return { name: n, status: 'queued', date: '', runs: 0, placeholder: true };
     }));
   }
+  /* the one place that maps a job (latest run + worker status) to its card status; "missing" wins over everything */
+  function cardStatus(r) {
+    var steps = r.steps || {}, q = qinfo(r.name), s = r.status, ok = STEPS.filter(function (x) { return steps[x] === 'ok'; });
+    if (r.missing || s === 'missing') return { k: 'missing', word: 'missing', why: 'output folder deleted' };
+    if (q) return { k: 'queued', word: 'queued', why: qtext(q) };
+    if (s === 'running') {
+      if (state.statusKnown && state.current !== r.name) return { k: 'interrupted', word: 'interrupted', why: 'retry to continue' };
+      var cur = STEPS.filter(function (x) { return steps[x] === 'running'; })[0];
+      return { k: 'running', word: 'running', why: cur ? LABEL[cur] : 'starting' };
+    }
+    if (s === 'failed') return { k: 'failed', word: 'failed', why: (STEPS.filter(function (x) { return steps[x] === 'failed'; })[0] || 'a step') + ' error' };
+    if (s === 'stopped') return { k: 'stopped', word: 'stopped', why: 'after ' + (ok.length ? ok[ok.length - 1] : 'start') + ', retry to continue' };
+    if (s === 'imported') return { k: 'imported', word: 'imported', why: 'artifacts only, no run log' };
+    if (s && s.indexOf('ready') === 0) {
+      return steps.audio === 'ok' ? { k: 'complete', word: 'complete', why: 'artifacts + audio' } : { k: 'partial', word: 'partial', why: 'artifacts ready, audio pending' };
+    }
+    return { k: 'none', word: 'no runs', why: 'not started yet' };
+  }
   function rowKey(r) { return qinfo(r.name) ? 'queued' : key(r.status); }
+  function matches(r) {
+    var q = state.search.trim().toLowerCase();
+    if (!q) return true;
+    var src = (r.source || '').split('/').pop();
+    return r.name.toLowerCase().indexOf(q) >= 0 || src.toLowerCase().indexOf(q) >= 0;
+  }
+  function visibleRows() { return allRows().filter(matches); }
   function qtext(q) { return q.n + ' of ' + q.total; }
   function stem(p) {
     var b = p.replace(/\/+$/, '').split('/').pop() || '';
@@ -540,16 +567,17 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   }
 
   function cardHtml(j) {
-    var sel = j.name === state.selected, name = esc(j.name), k = rowKey(j), cq = qinfo(j.name);
+    var sel = j.name === state.selected, name = esc(j.name), c = cardStatus(j);
     if (state.renaming === j.name) return '<div class="card sel ren-card">' + renameForm('ren-card-f') + '</div>';
-    return '<div class="card' + (sel ? ' sel' : '') + '"><button type="button" class="cardmain" data-act="sel" data-arg="' + name + '" aria-current="' + sel + '"><span>' + mk(k) + ' ' + nm(j.name) +
-      '</span><span class="row2">' + (cq ? 'queued · ' + esc(qtext(cq)) : esc(dayOf(j.date)) + ' · ' + esc(STX[k]) + (j.runs ? ' · ' + j.runs + ' run' + (j.runs === 1 ? '' : 's') : '')) + '</span></button>' +
+    var line1 = mk(c.k) + ' ' + nm(j.name) + (j.placeholder ? '' : ' <span class="dim">' + esc(dayOf(j.date)) + ' · ' + j.runs + ' run' + (j.runs === 1 ? '' : 's') + '</span>');
+    return '<div class="card' + (sel ? ' sel' : '') + '"><button type="button" class="cardmain" data-act="sel" data-arg="' + name + '" aria-current="' + sel + '"><span>' + line1 +
+      '</span><span class="row2"><span class="st-' + c.k + '">' + esc(c.word) + '</span> · ' + esc(c.why) + '</span></button>' +
       (sel && !j.placeholder ? '<button type="button" class="btn mini cardren" data-act="rename" data-arg="' + name + '" aria-label="Rename ' + name + '">[ rename ]</button>' : '') + '</div>';
   }
   function jobSelect() {
-    return '<select class="field jobsel" data-f="sel" data-fid="sel" aria-label="Select job">' + allRows().map(function (j) {
+    return '<select class="field jobsel" data-f="sel" data-fid="sel" aria-label="Select job">' + allRows().filter(function (j) { return matches(j) || j.name === state.selected; }).map(function (j) {
       var oq = qinfo(j.name);
-      return '<option value="' + esc(j.name) + '"' + (j.name === state.selected ? ' selected' : '') + '>' + MK[rowKey(j)] + ' ' + esc(j.name) + ' — ' + (oq ? 'queued ' + qtext(oq) : esc(dayOf(j.date))) + '</option>';
+      return '<option value="' + esc(j.name) + '"' + (j.name === state.selected ? ' selected' : '') + '>' + MK[cardStatus(j).k] + ' ' + esc(j.name) + ' — ' + (oq ? 'queued ' + qtext(oq) : esc(dayOf(j.date))) + '</option>';
     }).join('') + '</select>';
   }
 
@@ -638,10 +666,14 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   }
 
   function layout() {
-    var left = '<div class="lh"><span>jobs (' + allRows().length + ')</span>' + (state.panel ? '' : '<button type="button" class="btn pri" data-act="drawer" data-fid="drawer">[ + new job ]</button>') + '</div>';
+    var left = '<div class="lh"><span>jobs (' + (state.search.trim() ? visibleRows().length + ' of ' : '') + allRows().length + ')</span>' + (state.panel ? '' : '<button type="button" class="btn pri" data-act="drawer" data-fid="drawer">[ + new job ]</button>') + '</div>';
     if (state.panel) left += panelHtml();
+    if (allRows().length) {
+      left += '<div class="srch"><label class="sr" for="job-search">Search jobs</label><input class="field" id="job-search" type="text" data-f="search" data-fid="search" dir="auto" autocomplete="off" placeholder="search jobs" value="' + esc(state.search) + '">' +
+        (state.search ? '<button type="button" class="btn mini" data-act="searchclear" data-fid="searchclear" aria-label="Clear search">[ × ]</button>' : '') + '</div>';
+    }
     if (state.loading) left += '<div class="dim">loading...</div>';
-    else if (allRows().length) left += jobSelect() + '<div class="list">' + allRows().map(cardHtml).join('') + '</div>';
+    else if (allRows().length) left += jobSelect() + '<div class="list">' + (visibleRows().length ? visibleRows().map(cardHtml).join('') : '<div class="dim">no jobs match</div>') + '</div>';
     else left += '<div class="empty">no jobs yet</div>';
     return '<div class="main"><aside class="left" data-left>' + left + '</aside><section class="right">' + rightHtml() + '</section></div>';
   }
@@ -800,6 +832,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
         state.formNote = 'new job: pick a name different from the existing one, then press start'; break;
       case 'retry': doRetry(); return;
       case 'stop': doStop(); return;
+      case 'searchclear': state.search = ''; state.focusNext = 'search'; break;
       case 'delask': state.confirmDel = state.selected; state.delErr = ''; state.focusNext = 'delno'; break;
       case 'delno': state.confirmDel = null; state.focusNext = 'delask'; break;
       case 'delyes': doDelete(); return;
@@ -829,6 +862,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     } else if (f === 'rowname') { state.scan.rows[+e.target.dataset.i].nm = e.target.value; syncStart(); }
     else if (f === 'name') state.form.name = e.target.value;
     else if (f === 'rename') state.renameVal = e.target.value;
+    else if (f === 'search') { state.search = e.target.value; render(); }
   });
   el.addEventListener('change', function (e) {
     var f = e.target.dataset.f;
