@@ -138,6 +138,14 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v .fcell{display:flex;gap:4px;align-items:baseline;min-width:0;direction:ltr}
 .v .fcell a{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .v .fcell .sz{flex:none;color:var(--textDim);font-size:12px;white-space:nowrap}
+.v .rowsbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 6px}
+.v .brow{border:1px solid var(--border);background:var(--panel2);padding:4px 8px;margin-bottom:4px}
+.v .brow .bline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:2px;padding-left:22px}
+.v .brow .bline .field{flex:1 1 140px;width:auto}
+.v .brow .stat{font-size:12px;color:var(--textDim)}
+.v .brow .ferr{margin:2px 0 0 22px}
+.v .brow.off{opacity:.6}
+.v .skiprow{color:var(--textFaint);font-size:12px;padding:1px 0;overflow-wrap:anywhere}
 .v .drawer{border:1px solid var(--accent);background:var(--panel);padding:10px;margin-bottom:10px}
 .v .drawer h3{margin:0 0 8px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
 .v .drawer .field{margin-bottom:8px}
@@ -194,9 +202,10 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     offerNew: false, formErr: {}, formNote: '', generalErr: '', overwrite: null, starting: false,
     skipped: [], queuedNames: [], msg: '', retryErr: '',
     renaming: null, renameVal: '', renameErr: '', focusNext: null,
-    files: null, filesErr: '', fexp: {}
+    files: null, filesErr: '', fexp: {},
+    scan: null  /* folder pick list: { rows: [{path,file,job,stem,on,nm,newJob}], skipped: [] }; null = single file or no path */
   };
-  var polling = false;
+  var polling = false, scanTimer = null, SCAN_DELAY_MS = 250;
 
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function nm(s) { return '<span class="nm" dir="auto">' + esc(s) + '</span>'; }
@@ -484,17 +493,61 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     }).join('') + '</select>';
   }
 
+  /* ---------- folder pick list ---------- */
+  function rowName(r) { return r.job && !r.newJob ? r.job : r.nm.trim(); }
+  function rowErr(r, i) {
+    if (!r.on || (r.job && !r.newJob)) return '';
+    var n = r.nm.trim();
+    if (!n) return 'name required';
+    if (state.jobs.some(function (j) { return j.name === n; })) return 'name already taken by another job';
+    var rows = state.scan.rows;
+    for (var k = 0; k < rows.length; k++) if (k !== i && rows[k].on && rowName(rows[k]) === n) return 'same name as another ticked book';
+    return '';
+  }
+  function ticked() { return state.scan ? state.scan.rows.filter(function (r) { return r.on; }).length : 0; }
+  function startLabel() {
+    if (!state.scan) return '[ start ]';
+    var n = ticked();
+    return '[ start ' + n + ' book' + (n === 1 ? '' : 's') + ' ]';
+  }
   /* single source of truth for the Start button; used by panelHtml() and syncStart() */
   function startState() {
-    var why = !state.form.path.trim() ? 'enter a path to start' : state.busy ? 'a run is in progress; start unlocks when it ends' : '';
+    var why;
+    if (state.scan) {
+      var rows = state.scan.rows;
+      why = !rows.length ? 'no runnable books in this folder' : !ticked() ? 'tick at least one book' :
+        rows.some(function (r, i) { return rowErr(r, i); }) ? 'fix the name errors first' : '';
+      if (!why && state.busy) why = 'a run is in progress; start unlocks when it ends';
+    } else why = !state.form.path.trim() ? 'enter a path to start' : state.busy ? 'a run is in progress; start unlocks when it ends' : '';
     return { why: why, disabled: !!(why || state.starting) };
+  }
+  function rowsHtml() {
+    var sc = state.scan, h = '<div class="rows" role="group" aria-label="Books found">';
+    if (sc.rows.length) {
+      h += '<div class="rowsbar"><button type="button" class="btn mini" data-act="rowsall" data-fid="rall">[ all ]</button><button type="button" class="btn mini" data-act="rowsnone" data-fid="rnone">[ none ]</button><span class="dim">' + ticked() + ' of ' + sc.rows.length + ' ticked</span></div>';
+    }
+    sc.rows.forEach(function (r, i) {
+      var locked = r.job && !r.newJob;
+      h += '<div class="brow' + (r.on ? '' : ' off') + '"><label class="opt"><input type="checkbox" data-f="rowon" data-i="' + i + '" data-fid="ron-' + i + '"' + (r.on ? ' checked' : '') + '> ' + nm(r.file) + '</label>' +
+        '<div class="bline"><label class="sr" for="rn-f' + i + '">Job name for ' + esc(r.file) + '</label><input class="field" id="rn-f' + i + '" data-f="rowname" data-i="' + i + '" data-fid="rname-' + i + '" dir="auto" autocomplete="off" value="' + esc(locked ? r.job : r.nm) + '"' + (locked ? ' disabled' : '') + '>' +
+        '<span class="stat">' + (locked ? 'existing job → new run' : 'new job') + '</span>' +
+        (r.job ? '<label class="opt"><input type="checkbox" data-f="rownew" data-i="' + i + '" data-fid="rnew-' + i + '"' + (r.newJob ? ' checked' : '') + '> new job</label>' : '') + '</div>' +
+        '<div class="ferr" data-rerr="' + i + '" role="alert">' + esc(rowErr(r, i)) + '</div></div>';
+    });
+    if (sc.skipped.length) h += '<div class="lbl">skipped</div>' + sc.skipped.map(function (k) { return '<div class="skiprow">' + nm(k.file) + ' — ' + msgHtml(k.reason) + '</div>'; }).join('');
+    return h + '</div>';
   }
   function namePh() { return stem(state.form.path.trim()) || 'defaults to the file name'; }
   /* in-place update (no re-render: that would steal focus/caret from the field) */
   function syncStart() {
     var b = el.querySelector('[data-start]'), w = el.querySelector('[data-start-why]'), n = el.querySelector('#f-name');
     var s = startState();
+    if (state.scan) {
+      var errs = el.querySelectorAll('[data-rerr]');
+      for (var i = 0; i < errs.length; i++) errs[i].textContent = rowErr(state.scan.rows[+errs[i].dataset.rerr], +errs[i].dataset.rerr);
+    }
     if (b) {
+      b.textContent = startLabel();
       b.disabled = s.disabled;
       if (s.disabled) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled');
     }
@@ -507,18 +560,19 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     h += '<label class="lbl" for="f-path">path to a book file or folder</label><input class="field" id="f-path" data-f="path" data-fid="path" dir="ltr" autocomplete="off" spellcheck="false" placeholder="absolute path to a book file or folder" value="' + esc(f.path) + '"' +
       (e.path ? ' aria-invalid="true" aria-describedby="e-path"' : '') + '>';
     if (e.path) h += '<div class="ferr" id="e-path" role="alert">' + msgHtml(e.path) + '</div>';
-    h += '<label class="lbl" for="f-name">job name (single file only)</label><input class="field" id="f-name" data-f="name" data-fid="name" dir="auto" autocomplete="off" placeholder="' + esc(ph) + '" value="' + esc(f.name) + '"' +
+    if (state.scan) h += rowsHtml();
+    else h += '<label class="lbl" for="f-name">job name (single file only)</label><input class="field" id="f-name" data-f="name" data-fid="name" dir="auto" autocomplete="off" placeholder="' + esc(ph) + '" value="' + esc(f.name) + '"' +
       (e.name ? ' aria-invalid="true" aria-describedby="e-name"' : state.formNote ? ' aria-describedby="e-name"' : '') + '>';
-    if (e.name) h += '<div class="ferr" id="e-name" role="alert">' + msgHtml(e.name) + '</div>';
-    else if (state.formNote) h += '<div class="fhint" id="e-name">' + esc(state.formNote) + '</div>';
+    if (!state.scan && e.name) h += '<div class="ferr" id="e-name" role="alert">' + msgHtml(e.name) + '</div>';
+    else if (!state.scan && state.formNote) h += '<div class="fhint" id="e-name">' + esc(state.formNote) + '</div>';
     h += '<fieldset><legend class="sr">Book type</legend><label class="opt"><input type="radio" name="mode" data-f="mode" data-fid="mode-fic" value="fic"' + (f.fiction ? ' checked' : '') + '> fiction</label><label class="opt"><input type="radio" name="mode" data-f="mode" data-fid="mode-non" value="non"' + (!f.fiction ? ' checked' : '') + '> non-fiction</label></fieldset>';
     h += '<fieldset><label class="opt"><input type="checkbox" data-f="ssml" data-fid="ssml"' + (f.ssml ? ' checked' : '') + '> SSML (Azure only)</label>' +
-      (f.newJob || state.offerNew ? '<label class="opt"><input type="checkbox" data-f="newJob" data-fid="newJob"' + (f.newJob ? ' checked' : '') + '> new job (keep the old files)</label>' : '') + '</fieldset>';
-    h += '<div class="go"><button type="button" class="btn pri" data-act="start" data-fid="start" data-start' + (startState().disabled ? ' disabled aria-disabled="true"' : '') + '>[ start ]</button><span class="dim busy" data-start-why>' + esc(why) + '</span></div>';
+      (!state.scan && (f.newJob || state.offerNew) ? '<label class="opt"><input type="checkbox" data-f="newJob" data-fid="newJob"' + (f.newJob ? ' checked' : '') + '> new job (keep the old files)</label>' : '') + '</fieldset>';
+    h += '<div class="go"><button type="button" class="btn pri" data-act="start" data-fid="start" data-start' + (startState().disabled ? ' disabled aria-disabled="true"' : '') + '>' + startLabel() + '</button><span class="dim busy" data-start-why>' + esc(why) + '</span></div>';
     if (state.generalErr) h += '<div class="banner b-red" role="alert">' + msgHtml(state.generalErr) + '</div>';
     if (state.overwrite) {
       h += '<div class="banner b-amber" role="group" aria-label="Overwrite warning"><b>this path already has a job: ' + state.overwrite.jobs.map(nm).join(', ') + '</b><br>' + msgHtml(state.overwrite.message) +
-        '<div class="bacts"><button type="button" class="btn warn" data-act="overwrite" data-fid="overwrite">[ overwrite and run ]</button><button type="button" class="btn pri" data-act="newjob" data-fid="newjob">[ start as new job ]</button><button type="button" class="btn" data-act="cancel" data-fid="cancel">[ cancel ]</button></div></div>';
+        '<div class="bacts"><button type="button" class="btn warn" data-act="overwrite" data-fid="overwrite">[ overwrite and run ]</button>' + (state.scan ? '' : '<button type="button" class="btn pri" data-act="newjob" data-fid="newjob">[ start as new job ]</button>') + '<button type="button" class="btn" data-act="cancel" data-fid="cancel">[ cancel ]</button></div></div>';
     }
     return h + '</div>';
   }
@@ -571,13 +625,16 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     state.formErr = {}; state.formNote = ''; state.generalErr = ''; state.overwrite = null; state.offerNew = false;
     if (!p) { state.formErr.path = 'path is required: absolute path to a book file or folder'; render(); return; }
     var body = { path: p, fiction: f.fiction, ssml: f.ssml, newJob: f.newJob, confirm: !!confirm };
-    if (f.name.trim()) body.name = f.name.trim();
+    if (state.scan) {  /* folder: only the ticked rows, in list order */
+      if (startState().disabled) { render(); return; }
+      body = { books: state.scan.rows.filter(function (r) { return r.on; }).map(function (r) { return { path: r.path, name: rowName(r), new_job: !!r.newJob }; }), fiction: f.fiction, ssml: f.ssml, confirm: !!confirm };
+    } else if (f.name.trim()) body.name = f.name.trim();
     state.starting = true; render();
     api('POST', '/api/runs', body).then(function (r) {
       state.starting = false;
       var d = r.data;
       if (r.status === 202) {
-        state.form = { path: '', name: '', fiction: true, ssml: false, newJob: false }; state.offerNew = false;
+        state.form = { path: '', name: '', fiction: true, ssml: false, newJob: false }; state.offerNew = false; state.scan = null;
         state.skipped = d.skipped || []; state.queuedNames = d.queued || [];
         state.panel = false; state.tab = 1; state.view = null; state.focusNext = 'drawer';
         state.msg = 'started ' + d.queued.join(', ');
@@ -587,7 +644,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
         refreshAll().then(function () { if (state.jobs.some(function (j) { return j.name === d.queued[0]; })) selectJob(d.queued[0]); });
         return;
       }
-      if (r.status === 409 && d.overwrite) { state.overwrite = { message: d.message, jobs: d.jobs || [] }; state.offerNew = true; state.focusNext = 'newjob'; }
+      if (r.status === 409 && d.overwrite) { state.overwrite = { message: d.message, jobs: d.jobs || [] }; state.offerNew = !state.scan; state.focusNext = state.scan ? 'overwrite' : 'newjob'; }
       else if (r.status === 409 && d.busy) { state.busy = true; state.generalErr = d.error; startPolling(); }
       else if (d.field === 'path' || d.field === 'name') { state.formErr[d.field] = d.error; if (d.field === 'name' && /tick "new job"/.test(d.error)) state.offerNew = true; if (d.skipped) state.skipped = d.skipped; }
       else state.generalErr = d.error || 'request failed';
@@ -619,6 +676,26 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       render();
     });
   }
+  function doScan() {
+    var p = state.form.path.trim();
+    if (!/^(\/|~)/.test(p)) { if (state.scan) { state.scan = null; render(); } return; }
+    api('GET', '/api/scan?path=' + enc(p)).then(function (r) {
+      if (state.form.path.trim() !== p) return;  /* typed on since: a newer scan is coming */
+      var d = r.data;
+      if (!r.ok || !d.books || d.kind !== 'folder') { if (state.scan) { state.scan = null; render(); } return; }
+      var old = {};
+      if (state.scan) state.scan.rows.forEach(function (x) { old[x.path] = x; });
+      state.scan = {
+        skipped: d.skipped || [],
+        rows: d.books.map(function (b) {
+          var o = old[b.path];
+          return o || { path: b.path, file: b.file, job: b.job, stem: b.file.replace(/\.[^.]*$/, ''), on: true, nm: b.name, newJob: false };
+        })
+      };
+      state.overwrite = null; state.generalErr = '';
+      render();
+    });
+  }
   function importExisting() {
     api('POST', '/api/import', {}).then(function (r) {
       state.msg = r.ok ? 'imported ' + r.data.imported.length + ' job(s)' : (r.data.error || 'import failed');
@@ -635,6 +712,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       case 'viewrun': state.view = +arg; state.tab = 1; break;
       case 'latest': state.view = null; break;
       case 'drawer': if (state.panel) closePanel(); else openPanel(); break;
+      case 'rowsall': case 'rowsnone': state.scan.rows.forEach(function (r) { r.on = a === 'rowsall'; }); state.overwrite = null; break;
       case 'start': start(false); return;
       case 'cancel': state.overwrite = null; state.focusNext = 'path'; break;
       case 'overwrite': start(true); return;
@@ -664,7 +742,9 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       state.form.path = e.target.value;
       if (state.overwrite || state.formErr.path || state.generalErr) { state.overwrite = null; state.formErr = {}; state.generalErr = ''; render(); }
       else syncStart();
-    } else if (f === 'name') state.form.name = e.target.value;
+      clearTimeout(scanTimer); scanTimer = setTimeout(doScan, SCAN_DELAY_MS);
+    } else if (f === 'rowname') { state.scan.rows[+e.target.dataset.i].nm = e.target.value; syncStart(); }
+    else if (f === 'name') state.form.name = e.target.value;
     else if (f === 'rename') state.renameVal = e.target.value;
   });
   el.addEventListener('change', function (e) {
@@ -672,13 +752,18 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     if (f === 'mode') state.form.fiction = e.target.value === 'fic';
     else if (f === 'ssml') state.form.ssml = e.target.checked;
     else if (f === 'newJob') { state.form.newJob = e.target.checked; render(); }
+    else if (f === 'rowon') { state.scan.rows[+e.target.dataset.i].on = e.target.checked; state.overwrite = null; render(); }
+    else if (f === 'rownew') {
+      var r = state.scan.rows[+e.target.dataset.i];
+      r.newJob = e.target.checked; r.nm = r.newJob ? r.stem : r.job; state.overwrite = null; render();
+    }
     else if (f === 'sel') selectJob(e.target.value);
   });
   el.addEventListener('keydown', function (e) {
     var f = e.target.dataset && e.target.dataset.f;
     if ((f === 'path' || f === 'name') && e.key === 'Enter') {
       e.preventDefault();
-      if (state.form.path.trim() && !state.busy && !state.starting) start(false);
+      if (state.form.path.trim() && !startState().disabled) start(false);
     } else if (f === 'rename' && e.key === 'Enter') { e.preventDefault(); saveRename(); }
     else if (f === 'rename' && e.key === 'Escape') { state.renaming = null; render(); }
     else if (e.target.getAttribute && e.target.getAttribute('role') === 'tab' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {

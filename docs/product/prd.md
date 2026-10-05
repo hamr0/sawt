@@ -190,6 +190,8 @@ After the last module: propose `/self-review`.
 - A job left "running" after a crash or server stop shows as interrupted, with Retry available.
 - In a folder run, a book whose job name is already taken is skipped and listed; the rest of the folder still runs.
 - Arabic display: paths render left-to-right with segments that break only at `/`; names and paths embedded in messages are bidi-isolated and don't wrap.
+- Folder pick list: when the path box holds a folder, the detected books (one level deep) appear as rows, updating as the path is typed. Each row has a tick (all ticked by default), the file name, an editable job name and a status ("new job" or "existing job → new run", the latter with the "new job" checkbox). `[ all ]` / `[ none ]` sit above; skipped files are listed greyed with their reason. Names are checked live against existing jobs and other ticked rows; `[ start N books ]` runs only the ticked rows, in list order, and is disabled with 0 ticked or any name error. A single file keeps the plain form. `GET /api/scan?path=` feeds the list; `POST /api/runs` takes `{"books": [{path, name, new_job}]}` and re-validates every path and name. The single-path form of `POST /api/runs` is kept (single files, CLI-style tests).
+- Artifacts layout: every step block starts collapsed (header row only; expanded blocks are remembered in memory for the page session). Subfolders get a muted `dir/ · N files` subheader, root files come first; files are a responsive grid of `name (size)` cells, up to 4 columns, with ellipsis and the full name in a tooltip.
 
 ### Module 3 spec (signed off 2026-10-05)
 

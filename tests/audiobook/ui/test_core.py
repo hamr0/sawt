@@ -519,7 +519,20 @@ global.fetch = function (u) { var d = u === '/api/status' ? { busy: busy, curren
 //DRIVER
 var conflict = process.argv[2] === 'conflict', overwrite = process.argv[2] === 'overwrite';
 var started = process.argv[2] === 'start', arts = process.argv[2] === 'arts';
+var scanning = process.argv[2] === 'scan';
 global.calls = [];
+if (scanning) global.fetch = function (u, o) {
+  global.calls.push([(o && o.method) || 'GET', u, o && o.body]);
+  var d = u === '/api/status' ? { busy: false, current: null, queued: [] }
+    : u === '/api/jobs' ? { jobs: [{ name: 'taken', status: 'imported', date: '', runs: 0 }] }
+    : u.indexOf('/api/scan') === 0 ? { kind: 'folder', books: [
+        { path: '/b/one.epub', file: 'one.epub', name: 'one', job: null },
+        { path: '/b/two.txt', file: 'two.txt', name: 'two', job: null },
+        { path: '/b/old.txt', file: 'old.txt', name: 'taken', job: 'taken' }],
+      skipped: [{ file: 'scan.pdf', reason: 'unsupported format' }] }
+    : u === '/api/runs' ? { queued: ['one'], skipped: [] }
+    : { name: 'taken', output: '/x', source: '', runs: [], missing: false };
+  return Promise.resolve({ ok: true, status: u === '/api/runs' ? 202 : 200, json: function () { return Promise.resolve(d); } }); };
 if (arts) global.fetch = function (u, o) {
   global.calls.push([(o && o.method) || 'GET', u, o && o.body]);
   var files = { missing: false, output: '/x/out', steps: [
@@ -559,6 +572,28 @@ setTimeout(function () {
       if (overwrite) fire('click', { closest: function () { return { dataset: { act: 'newjob' }, disabled: false }; } });
       out.afterAct = app.innerHTML;
       console.log(JSON.stringify(out)); process.exit(0); }, 100);
+    return;
+  }
+  if (scanning) {
+    type('/b');
+    setTimeout(function () {
+      var click = function (act) { fire('click', { closest: function () { return { dataset: { act: act }, disabled: false }; } }); };
+      var change = function (f, i, checked) { fire('change', { dataset: { f: f, i: String(i) }, checked: checked }); };
+      out.scan = app.innerHTML;
+      change('rowon', 0, false); out.untick = app.innerHTML;
+      click('rowsnone'); out.none = app.innerHTML;
+      click('rowsall'); out.all = app.innerHTML;
+      fire('input', { value: 'two', dataset: { f: 'rowname', i: '0' } });      // duplicate of ticked row 1
+      out.dup = [btn.disabled, why.textContent, btn.textContent];
+      fire('input', { value: 'taken', dataset: { f: 'rowname', i: '0' } });    // duplicate of an existing job
+      out.dupJob = [btn.disabled, why.textContent];
+      fire('input', { value: 'fresh', dataset: { f: 'rowname', i: '0' } });
+      out.fixed = [btn.disabled, why.textContent, btn.textContent];
+      change('rownew', 2, true); out.newjob = app.innerHTML;
+      change('rownew', 2, false); change('rowon', 0, false);
+      click('start');
+      setTimeout(function () { out.calls = global.calls; console.log(JSON.stringify(out)); process.exit(0); }, 100);
+    }, 450);
     return;
   }
   if (arts) {
@@ -654,6 +689,28 @@ class TestStartButtonSync:
         assert out["afterRetab"].count('aria-expanded="true"') == 1 and "c1.csv" in out["afterRetab"]
         assert ["POST", "/api/jobs/%D8%B1%D9%88%D8%A7%D9%8A%D8%A9/open", '{"path":"02_chapters"}'] in out["calls"]
         assert "opened 02_chapters" in out["afterOpen"]
+
+
+    def test_folder_pick_list_rows_all_none_label_and_disabled(self, tmp_path):
+        out = self._run(tmp_path, "scan")
+        html = out["scan"]
+        assert html.count('data-f="rowon"') == 3 and html.count('data-f="rowon"') == html.count(" checked>") - html.count('data-f="rownew"')
+        assert "[ start 3 books ]" in html and "[ all ]" in html and "[ none ]" in html
+        assert "job name (single file only)" not in html and 'id="f-name"' not in html
+        assert "existing job \u2192 new run" in html and html.count('data-f="rownew"') == 1
+        assert "scan.pdf" in html and "unsupported format" in html and "skiprow" in html
+        assert "[ start 2 books ]" in out["untick"] and "[ start 0 books ]" in out["none"]
+        assert 'data-start disabled aria-disabled="true"' in out["none"] and "tick at least one book" in out["none"]
+        assert "[ start 3 books ]" in out["all"] and 'data-start disabled' not in out["all"]
+        # live name validation: errors on a duplicate of a ticked row or of an existing job
+        assert out["dup"] == [True, "fix the name errors first", "[ start 3 books ]"]
+        assert out["dupJob"] == [True, "fix the name errors first"]
+        assert out["fixed"] == [False, "", "[ start 3 books ]"]
+        assert 'data-f="rownew" data-i="2" data-fid="rnew-2" checked' in out["newjob"]
+        # start sends only ticked rows, in list order
+        body = json.loads(next(c[2] for c in out["calls"] if c[1] == "/api/runs"))
+        assert body["books"] == [{"path": "/b/two.txt", "name": "two", "new_job": False},
+                                 {"path": "/b/old.txt", "name": "taken", "new_job": False}]
 
 
 class TestPathsAndWording:
@@ -1011,3 +1068,156 @@ class TestOpenFolder:
         monkeypatch.setattr(os, "startfile", calls.append, raising=False)
         ui_core._open_folder(tmp_path)
         assert calls == [tmp_path]
+
+
+# ---------------------------------------------------------------------------
+# Folder pick list: scan endpoint and the books-list form of POST /api/runs
+# ---------------------------------------------------------------------------
+
+
+class TestScan:
+    def test_folder_lists_books_and_skipped(self, client, books):
+        make_book(books, "one")
+        make_book(books, "two")
+        (books / "scan.pdf").write_bytes(b"x")
+        (books / "old.doc").write_bytes(b"x")
+        (books / ".hidden.txt").write_text("x", encoding="utf-8")
+        (books / "sub").mkdir()
+        make_book(books / "sub", "deep")  # one level only
+        status, data = client.get("/api/scan?path=" + quote(str(books)))
+        assert status == 200 and data["kind"] == "folder"
+        assert [(b["file"], b["name"], b["job"]) for b in data["books"]] == [("one.txt", "one", None), ("two.txt", "two", None)]
+        assert data["books"][0]["path"] == str((books / "one.txt").resolve())
+        skipped = {s["file"]: s["reason"] for s in data["skipped"]}
+        assert set(skipped) == {"old.doc", "scan.pdf"} and "save it as .docx" in skipped["old.doc"]
+
+    def test_existing_job_reported(self, client, books):
+        book = make_book(books, "one")
+        client.post("/api/runs", {"path": str(book)})
+        client.wait_idle()
+        client.post("/api/jobs/one/rename", {"name": "renamed"})
+        data = client.get("/api/scan?path=" + quote(str(books)))[1]
+        assert data["books"][0]["job"] == "renamed" and data["books"][0]["name"] == "renamed"
+
+    def test_single_file(self, client, books):
+        book = make_book(books, "solo")
+        data = client.get("/api/scan?path=" + quote(str(book)))[1]
+        assert data["kind"] == "file" and [b["file"] for b in data["books"]] == ["solo.txt"]
+
+    def test_errors_in_bad_style(self, client, books):
+        (books / "scan.pdf").write_bytes(b"x")
+        for raw, text in (("/definitely/not/here", "path not found"), ("relative/dir", "absolute path"),
+                          ("", "path is required"), (str(books / "scan.pdf"), "unsupported format")):
+            status, data = client.get("/api/scan?path=" + quote(raw))
+            assert status == 400 and data["field"] == "path" and text in data["error"], raw
+        assert client.get("/api/scan")[0] == 400
+
+    def test_foreign_host_rejected(self, client, books):
+        assert client.get("/api/scan?path=" + quote(str(books)), host="evil.example.com")[0] == 403
+
+    def test_empty_folder_is_not_an_error(self, client, books):
+        assert client.get("/api/scan?path=" + quote(str(books)))[1]["books"] == []
+
+
+def book_item(book, name=None, new_job=False):
+    item = {"path": str(book), "new_job": new_job}
+    if name is not None:
+        item["name"] = name
+    return item
+
+
+class TestBooksListRun:
+    def test_subset_runs_in_list_order(self, client, books):
+        a, b, c = (make_book(books, s) for s in ("a", "b", "c"))
+        status, data = client.post("/api/runs", {"books": [book_item(c, "c"), book_item(a, "a")]})
+        assert status == 202 and data == {"queued": ["c", "a"], "skipped": []}
+        client.wait_idle()
+        assert {r["name"] for r in client.get("/api/jobs")[1]["jobs"]} == {"a", "c"}
+        assert not (books / "b_sawt").exists()
+
+    def test_rename_per_row(self, client, books):
+        a = make_book(books, "a")
+        status, data = client.post("/api/runs", {"books": [book_item(a, "الرواية")], "ssml": True, "fiction": False})
+        assert status == 202 and data["queued"] == ["الرواية"]
+        client.wait_idle()
+        assert (books / "الرواية_sawt").is_dir()
+        assert client.job("الرواية")["runs"][-1]["settings"] == {"ssml": True, "fiction": False}
+
+    def test_duplicate_name_skipped_not_fatal(self, client, books):
+        a, b, c = (make_book(books, s) for s in ("a", "b", "c"))
+        status, data = client.post("/api/runs", {"books": [book_item(a, "same"), book_item(b, "same"), book_item(c, "c")]})
+        assert status == 202 and data["queued"] == ["same", "c"]
+        assert data["skipped"][0]["file"] == "b.txt" and "already used" in data["skipped"][0]["reason"]
+        client.wait_idle()
+
+    def test_name_taken_by_existing_job_skipped_among_many_rejected_alone(self, client, books):
+        other = books / "elsewhere"
+        other.mkdir()
+        client.post("/api/runs", {"path": str(make_book(other, "dup"))})
+        client.wait_idle()
+        a, b = make_book(books, "a"), make_book(books, "b")
+        status, data = client.post("/api/runs", {"books": [book_item(a, "dup"), book_item(b, "b")]})
+        assert status == 202 and data["queued"] == ["b"] and "already taken" in data["skipped"][0]["reason"]
+        client.wait_idle()
+        status, data = client.post("/api/runs", {"books": [book_item(a, "dup")]})
+        assert status == 400 and data["field"] == "books" and "already taken" in data["error"]
+
+    def test_existing_job_new_run_vs_new_job(self, client, books):
+        book = make_book(books, "novel")
+        client.post("/api/runs", {"path": str(book)})
+        client.wait_idle()
+        (books / "novel_sawt" / "01_ingestion" / "marker.txt").write_text("old", encoding="utf-8")
+        # unticked "new job": a new run on the existing job, behind the overwrite warning
+        status, data = client.post("/api/runs", {"books": [book_item(book, "novel")]})
+        assert status == 409 and data["overwrite"] is True and data["jobs"] == ["novel"]
+        assert client.post("/api/runs", {"books": [book_item(book, "novel")], "confirm": True})[0] == 202
+        client.wait_idle()
+        assert len(client.job("novel")["runs"]) == 2
+        # ticked "new job": a separate job with its own folder, no warning
+        status, data = client.post("/api/runs", {"books": [book_item(book, "novel-2", True)]})
+        assert status == 202 and data["queued"] == ["novel-2"]
+        client.wait_idle()
+        assert (books / "novel-2_sawt").is_dir()
+        # a different name without new_job is refused for that book
+        assert client.post("/api/runs", {"books": [book_item(book, "other")]})[0] == 400
+
+    @pytest.mark.parametrize("make_items", [
+        lambda books: [{"path": str(books)}],                      # a folder
+        lambda books: [{"path": str(books / "ghost.txt")}],        # missing
+        lambda books: [{"path": "relative.txt"}],
+        lambda books: [{"path": str(books / "scan.pdf")}],         # unsupported
+        lambda books: [{"path": str(books / "old.doc")}],
+        lambda books: ["not-an-object"],
+        lambda books: [{"path": 5}],
+        lambda books: [],
+        lambda books: "nope",
+    ])
+    def test_revalidates_every_path(self, client, books, make_items):
+        for n in ("scan.pdf", "old.doc"):
+            (books / n).write_bytes(b"x")
+        good = make_book(books, "good")
+        status, data = client.post("/api/runs", {"books": [book_item(good), *make_items(books)]}
+                                   if make_items(books) else {"books": make_items(books)})
+        assert status == 400 and data["field"] == "books" and data["error"]
+        assert client.get("/api/status")[1]["busy"] is False and client.get("/api/jobs")[1]["jobs"] == []
+
+    def test_non_text_name_rejected(self, client, books):
+        a = make_book(books, "a")
+        assert client.post("/api/runs", {"books": [{"path": str(a), "name": 3}]})[0] == 400
+
+    def test_busy_refused(self, client, books, monkeypatch):
+        a, b = make_book(books, "a"), make_book(books, "b")
+        gate, entered = threading.Event(), threading.Event()
+        real = runner_core._STEP_FUNCS["ingest"]
+
+        def slow(job, run):
+            entered.set()
+            gate.wait(10)
+            return real(job, run)
+
+        monkeypatch.setitem(runner_core._STEP_FUNCS, "ingest", slow)
+        assert client.post("/api/runs", {"books": [book_item(a, "a")]})[0] == 202
+        assert entered.wait(10)
+        assert client.post("/api/runs", {"books": [book_item(b, "b")]})[0] == 409
+        gate.set()
+        client.wait_idle()

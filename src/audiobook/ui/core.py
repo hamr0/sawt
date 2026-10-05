@@ -239,6 +239,8 @@ class _Handler(BaseHTTPRequestHandler):
                 return 200, {"jobs": _sorted_rows(list_jobs())}
             if path == "/api/status":
                 return 200, worker.status()
+            if path == "/api/scan":
+                return 200, _scan_result(parse_qs(urlsplit(self.path).query).get("path", [""])[0])
             m = _JOB_ROUTE.match(path)
             if m and not m.group(2):
                 return 200, _job_detail(unquote(m.group(1)))
@@ -270,63 +272,50 @@ class _Handler(BaseHTTPRequestHandler):
             raise _HttpError(409, {"busy": True, "error": "a run is in progress — wait for it to end"})
 
     def _post_runs(self, worker: _Worker, body: dict) -> tuple[int, dict]:
-        raw_path = body.get("path")
-        if not isinstance(raw_path, str) or not raw_path.strip():
-            raise _bad("path is required: absolute path to a book file or folder", "path")
-        raw_path = raw_path.strip()
-        if not Path(raw_path).expanduser().is_absolute():
-            raise _bad("use an absolute path (starts with / or ~)", "path")
-        name = body.get("name")
-        if name is not None and not isinstance(name, str):
-            raise _bad("name must be text", "name")
-        name = (name or "").strip() or None
+        name_field = "books" if "books" in body else "path"
         fiction, ssml = body.get("fiction", True) is not False, body.get("ssml", False) is True
-        new_job, confirm = body.get("newJob", False) is True, body.get("confirm", False) is True
-
-        try:
-            books, skipped = scan_path(raw_path)
-        except RunnerError as exc:
-            raise _bad(str(exc), "path") from None
-        skipped_out = [{"file": f.name, "reason": why} for f, why in skipped]
-        if not books:
-            raise _bad("no runnable books found", "path", skipped=skipped_out)
-        if name and Path(raw_path).expanduser().is_dir():
-            raise _bad("name applies to a single book, not a folder", "name", skipped=skipped_out)
+        confirm = body.get("confirm", False) is True
+        if "books" in body:
+            candidates, skipped_out = _books_candidates(body["books"]), []
+            error_field = "books"
+        else:
+            candidates, skipped_out, name, new_job = _path_candidates(body)
+            error_field = "name" if (name or new_job) else "path"
 
         data = load_jobs()
-        plan, taken = [], set()  # (book, resolved name, existing job)
-        for book in books:
+        plan, taken = [], set()  # (book, resolved name, existing job, new_job)
+        for book, cname, cnew in candidates:
             try:
-                job, job_name = _resolve_job(data, book, name, new_job)
+                job, job_name = _resolve_job(data, book, cname, cnew)
             except RunnerError as exc:
-                if len(books) > 1:  # one bad book must not block the rest of the folder
+                if len(candidates) > 1:  # one bad book must not block the rest of the folder
                     skipped_out.append({"file": book.name, "reason": _ui_text(str(exc))})
                     continue
-                raise _bad(str(exc), "name" if (name or new_job) else "path", skipped=skipped_out) from None
+                raise _bad(str(exc), error_field, skipped=skipped_out) from None
             if job is None and job_name in taken:
                 skipped_out.append({"file": book.name,
                                     "reason": f"job name {job_name!r} is already used by another book in this folder"})
                 continue
             taken.add(job_name)
-            plan.append((book, job_name, job))
+            plan.append((book, job_name, job, cnew))
 
         if not plan:
-            raise _bad("no runnable books found", "path", skipped=skipped_out)
+            raise _bad("no runnable books found", name_field, skipped=skipped_out)
 
         # Check busy before asking for any confirmation: there is no point confirming a run that can't start.
         if worker.status()["busy"]:
             raise _HttpError(409, {"busy": True, "error": "a run is in progress — wait for it to end"})
-        existing = [n for _, n, j in plan if j and any((Path(j["output"]) / d).exists() for d in STEP_DIRS.values())]
+        existing = [n for _, n, j, _ in plan if j and any((Path(j["output"]) / d).exists() for d in STEP_DIRS.values())]
         if existing and not confirm:
             raise _HttpError(409, {"overwrite": True, "message": OVERWRITE_WARNING, "jobs": existing})
 
-        def make(book: Path, job_name: str):
+        def make(book: Path, job_name: str, new_job: bool):
             return lambda: run_book(book, name=job_name, fiction=fiction, ssml=ssml,
                                     new_job=new_job, assume_yes=True, emit=logger.info)
 
-        if not worker.submit([(n, make(b, n)) for b, n, _ in plan]):
+        if not worker.submit([(n, make(b, n, nj)) for b, n, _, nj in plan]):
             raise _HttpError(409, {"busy": True, "error": "a run is in progress — wait for it to end"})
-        return 202, {"queued": [n for _, n, _ in plan], "skipped": skipped_out}
+        return 202, {"queued": [n for _, n, _, _ in plan], "skipped": skipped_out}
 
     @staticmethod
     def _post_open(name: str, body: dict) -> tuple[int, dict]:
@@ -388,6 +377,71 @@ class _Handler(BaseHTTPRequestHandler):
                     raise _HttpError(404, {"error": str(exc)}) from None
                 raise _bad(str(exc), "name") from None
         return 200, {"name": new.strip()}
+
+
+def _absolute(raw: object, field: str, what: str = "path") -> str:
+    if not isinstance(raw, str) or not raw.strip():
+        raise _bad(f"{what} is required: absolute path to a book file or folder", field)
+    raw = raw.strip()
+    if not Path(raw).expanduser().is_absolute():
+        raise _bad("use an absolute path (starts with / or ~)", field)
+    return raw
+
+
+def _scan(raw_path: str, field: str) -> tuple[list[Path], list[dict]]:
+    try:
+        books, skipped = scan_path(raw_path)
+    except RunnerError as exc:
+        raise _bad(str(exc), field) from None
+    return books, [{"file": f.name, "reason": why} for f, why in skipped]
+
+
+def _path_candidates(body: dict) -> tuple[list[tuple[Path, str | None, bool]], list[dict], str | None, bool]:
+    """The single-path form of POST /api/runs: one file, or every book in a folder."""
+    raw_path = _absolute(body.get("path"), "path")
+    name = body.get("name")
+    if name is not None and not isinstance(name, str):
+        raise _bad("name must be text", "name")
+    name = (name or "").strip() or None
+    new_job = body.get("newJob", False) is True
+    books, skipped_out = _scan(raw_path, "path")
+    if not books:
+        raise _bad("no runnable books found", "path", skipped=skipped_out)
+    if name and Path(raw_path).expanduser().is_dir():
+        raise _bad("name applies to a single book, not a folder", "name", skipped=skipped_out)
+    return [(b, name, new_job) for b in books], skipped_out, name, new_job
+
+
+def _books_candidates(items: object) -> list[tuple[Path, str | None, bool]]:
+    """The pick-list form: every path is re-checked as a runnable book file."""
+    if not isinstance(items, list) or not items:
+        raise _bad("books must be a non-empty list", "books")
+    out = []
+    for item in items:
+        if not isinstance(item, dict):
+            raise _bad("each book must be an object with a path", "books")
+        raw = _absolute(item.get("path"), "books", "book path")
+        if not Path(raw).expanduser().is_file():
+            raise _bad(f"not a book file: {raw}", "books")
+        books, _ = _scan(raw, "books")  # raises the runner's reason for an unsupported file
+        name = item.get("name")
+        if name is not None and not isinstance(name, str):
+            raise _bad("name must be text", "books")
+        out.append((books[0], (name or "").strip() or None, item.get("new_job", False) is True))
+    return out
+
+
+def _scan_result(raw: object) -> dict:
+    raw_path = _absolute(raw, "path")
+    books, skipped = _scan(raw_path, "path")
+    jobs = load_jobs()["jobs"]
+    rows = []
+    for b in books:
+        job = next((j for j in jobs if j["source"] == str(b)), None)
+        rows.append({"path": str(b), "file": b.name, "name": job["name"] if job else b.stem,
+                     "job": job["name"] if job else None})
+    return {"kind": "folder" if Path(raw_path).expanduser().is_dir() else "file",
+            "books": rows, "skipped": skipped}
 
 
 def _sorted_rows(rows: list[dict]) -> list[dict]:
