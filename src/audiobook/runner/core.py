@@ -133,8 +133,8 @@ def jobs_path() -> Path:
     return (Path(home) if home else DEFAULT_HOME) / JOBS_FILE
 
 
-def load_jobs() -> dict:
-    path = jobs_path()
+def load_jobs(path: Path | None = None) -> dict:
+    path = path or jobs_path()
     if not path.exists():
         return {"jobs": []}
     try:
@@ -146,9 +146,12 @@ def load_jobs() -> dict:
     return data
 
 
-def save_jobs(data: dict) -> None:
-    """Write jobs.json atomically: temp file in the same folder, then rename."""
-    path = jobs_path()
+def save_jobs(data: dict, path: Path | None = None) -> None:
+    """Write jobs.json atomically: temp file in the same folder, then rename.
+
+    ``path`` pins the file; a run passes the one it resolved at start so it never switches files mid-run.
+    """
+    path = path or jobs_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=".jobs-", suffix=".tmp")
     try:
@@ -272,7 +275,7 @@ def _say(run: Run, emit: Emit, line: str) -> None:
 
 def _execute(
     data: dict, job: Job, run: Run, first_step: str, emit: Emit = _stdout,
-    should_stop: Callable[[], bool] | None = None,
+    should_stop: Callable[[], bool] | None = None, jobs_file: Path | None = None,
 ) -> bool:
     """Run steps from ``first_step`` on. Saves history after every step.
 
@@ -287,11 +290,11 @@ def _execute(
         if reason:
             run["steps"][step] = STEP_SKIPPED
             _say(run, emit, f"{label} — {reason}")
-            save_jobs(data)
+            save_jobs(data, jobs_file)
             continue
         shutil.rmtree(out / STEP_DIRS[step], ignore_errors=True)  # this step's own partial output
         run["steps"][step] = STEP_RUNNING
-        save_jobs(data)
+        save_jobs(data, jobs_file)
         try:
             details = _STEP_FUNCS[step](job, run)
         except (Exception, KeyboardInterrupt) as exc:
@@ -300,7 +303,7 @@ def _execute(
             run["status"] = RUN_FAILED
             run["errors"].append({"step": step, "message": message})
             _say(run, emit, f"✗ {label} — {message}")
-            save_jobs(data)
+            save_jobs(data, jobs_file)
             if isinstance(exc, KeyboardInterrupt):
                 raise
             return False
@@ -308,16 +311,16 @@ def _execute(
         _say(run, emit, f"✓ {label}")
         for d in details:
             _say(run, emit, f"  > {d}")
-        save_jobs(data)
+        save_jobs(data, jobs_file)
         rest = STEPS[STEPS.index(step) + 1:]
         if should_stop and should_stop() and any(not _skip_reason(r, run["settings"]) for r in rest):
             run["status"] = RUN_STOPPED
             _say(run, emit, f"■ stopped by user after {label}")
-            save_jobs(data)
+            save_jobs(data, jobs_file)
             return False
     run["status"] = RUN_READY
     _say(run, emit, GATE_LINE)
-    save_jobs(data)
+    save_jobs(data, jobs_file)
     return True
 
 
@@ -378,7 +381,8 @@ def run_book(
     should_stop: Callable[[], bool] | None = None,
 ) -> Run | None:
     """Run steps 1-4 on one book. Returns the run, or None if the user declined the overwrite."""
-    data = load_jobs()
+    jobs_file = jobs_path()  # resolved once: every save in this run goes to the same file
+    data = load_jobs(jobs_file)
     job, job_name = _resolve_job(data, book, name, new_job)
     if job is None:
         output = book.parent / f"{job_name}{JOB_DIR_SUFFIX}"
@@ -401,13 +405,14 @@ def run_book(
         shutil.rmtree(out / d, ignore_errors=True)
     out.mkdir(parents=True, exist_ok=True)
     emit(f"job {job['name']}: {job['source']} → {out}")
-    _execute(data, job, run, STEPS[0], emit, should_stop)
+    _execute(data, job, run, STEPS[0], emit, should_stop, jobs_file)
     return run
 
 
 def retry_job(name: str, emit: Emit = _stdout, should_stop: Callable[[], bool] | None = None) -> Run:
     """Resume the job's latest failed or stopped run from its failed step, using files on disk only."""
-    data = load_jobs()
+    jobs_file = jobs_path()
+    data = load_jobs(jobs_file)
     job = _find_job(data, name)
     if job is None:
         raise RunnerError(f"no job named {name!r}")
@@ -429,7 +434,7 @@ def retry_job(name: str, emit: Emit = _stdout, should_stop: Callable[[], bool] |
     run["status"] = RUN_RUNNING
     emit(f"job {job['name']}: retrying from {STEP_LABELS[first]}")
     _say(run, emit, f"retry {_now()}: from {STEP_LABELS[first]}")
-    _execute(data, job, run, first, emit, should_stop)
+    _execute(data, job, run, first, emit, should_stop, jobs_file)
     return run
 
 

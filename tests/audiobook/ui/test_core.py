@@ -18,6 +18,7 @@ from src.audiobook.runner import OVERWRITE_WARNING, import_existing, load_jobs, 
 from src.audiobook.ui import _Worker, make_server
 from src.audiobook.ui.page import PAGE
 
+IDLE_TIMEOUT_S = 30
 NARRATION = "كان الرجل يمشي في الطريق الطويل وحده بينما الشمس تغرب خلف البيوت القديمة"
 DIALOGUE = "قال أحمد: كيف حالك اليوم يا صديقي وهل وصلت إلى البيت قبل المساء"
 
@@ -92,9 +93,15 @@ def books(tmp_path):
 @pytest.fixture
 def client(home):
     server = start_server()
-    yield Client(server)
-    server.shutdown()
-    server.server_close()
+    c = Client(server)
+    try:
+        yield c
+    finally:
+        try:
+            c.wait_idle(IDLE_TIMEOUT_S)  # a still-running worker would save into whatever SAWT_HOME is current later
+        finally:
+            server.shutdown()
+            server.server_close()
 
 
 class TestServer:
@@ -912,6 +919,7 @@ class TestPathsAndWording:
         assert st == 400 and "job name" in d["error"] and "--" not in d["error"]
         st, d = client.post("/api/runs", {"path": str(book), "name": "x", "newJob": True})
         assert "--" not in d.get("error", "")
+        client.wait_idle()  # that post queued a real run
         st, d = client.post("/api/runs", {"path": str(book), "name": "novel", "newJob": True})
         assert st == 400 and "pick another job name" in d["error"] and "--" not in d["error"]
         st, d = client.post("/api/runs", {"path": str(books), "name": "z"})
@@ -1614,3 +1622,19 @@ class TestDelete:
         assert load_jobs()["jobs"] == []
         with pytest.raises(runner_core.RunnerError):
             runner_core.delete_job("a")
+
+
+class TestJobsFilePinned:
+    def test_run_keeps_saving_to_the_file_it_started_with(self, home, books, tmp_path, monkeypatch):
+        other = tmp_path / "other_home"
+        real = runner_core._STEP_FUNCS["chapters"]
+
+        def switch(job, run):  # SAWT_HOME changes mid-run (what a torn-down test did to a straggler worker)
+            monkeypatch.setenv("SAWT_HOME", str(other))
+            return real(job, run)
+
+        monkeypatch.setitem(runner_core._STEP_FUNCS, "chapters", switch)
+        started = home / "jobs.json"
+        runner_core.run_book(make_book(books, "a"), assume_yes=True, emit=lambda m: None)
+        assert not (other / "jobs.json").exists()
+        assert json.loads(started.read_text(encoding="utf-8"))["jobs"][0]["runs"][-1]["status"] == runner_core.RUN_READY
