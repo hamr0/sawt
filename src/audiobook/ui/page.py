@@ -48,7 +48,8 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v{font:13px/1.5 var(--font);color:var(--text);background:var(--bg);min-width:0}
 .v button,.v input,.v select{font:inherit;color:inherit}
 .v .dim{color:var(--textDim)}
-.v .pth{direction:ltr;unicode-bidi:isolate;text-align:left;overflow-wrap:anywhere}
+.v .pth{direction:ltr;unicode-bidi:isolate;text-align:left;line-height:1.8;padding-bottom:2px}
+.v .pth .seg{display:inline-block;max-width:100%;white-space:nowrap;overflow-wrap:anywhere;unicode-bidi:isolate;overflow:visible}
 .v .nm{unicode-bidi:plaintext;text-align:start;overflow-wrap:anywhere}
 .v .btn{background:var(--panel2);border:1px solid var(--borderStrong);border-radius:0;padding:6px 10px;min-height:32px;cursor:pointer;color:var(--text);white-space:normal}
 .v .btn:hover{background:var(--panel)}
@@ -102,7 +103,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v .l-skip{color:var(--textDim)}.v .l-run{color:var(--cyan)}.v .l-note{color:var(--amber)}.v .l-final{color:var(--amber);font-weight:700;margin-top:4px}
 .v .acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 10px}
 .v dl.det{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:2px 12px;margin:0 0 10px}
-.v dl.det dt{color:var(--textDim)}.v dl.det dd{margin:0;overflow-wrap:anywhere}
+.v dl.det dt{color:var(--textDim)}.v dl.det dd{margin:0;overflow-wrap:anywhere;line-height:1.8;padding-bottom:2px}
 .v .banner{padding:8px 10px;border:1px solid;margin:8px 0;overflow-wrap:anywhere}
 .v .b-amber{background:var(--amberBg);border-color:var(--amber);color:var(--amber)}
 .v .b-red{background:var(--redBg);border-color:var(--red);color:var(--red)}
@@ -178,7 +179,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     tab: 1, view: null, open: {},
     busy: false, current: null, queued: [], runError: null, dismissedErr: '', statusKnown: false,
     panel: false, form: { path: '', name: '', fiction: true, ssml: false, newJob: false },
-    formErr: {}, formNote: '', generalErr: '', overwrite: null, starting: false,
+    offerNew: false, formErr: {}, formNote: '', generalErr: '', overwrite: null, starting: false,
     skipped: [], queuedNames: [], msg: '', retryErr: '',
     renaming: null, renameVal: '', renameErr: '', focusNext: null
   };
@@ -186,10 +187,19 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function nm(s) { return '<span class="nm" dir="auto">' + esc(s) + '</span>'; }
-  function pth(s) { return '<bdi class="pth" dir="ltr">' + esc(s) + '</bdi>'; }
-  /* message text that may echo a filesystem path: paths render strictly LTR */
+  /* a path: LTR overall, each /-separated segment its own bidi isolate, line breaks only after "/" */
+  function pthInner(escaped) {
+    return escaped.split('/').map(function (seg) { return seg ? '<bdi dir="auto" class="seg">' + seg + '</bdi>' : ''; }).join('/<wbr>');
+  }
+  function pth(s) { return '<bdi class="pth" dir="ltr">' + pthInner(esc(s)) + '</bdi>'; }
+  function isPath(t) { return /^(\/|~\/)/.test(t); }
+  /* message text (plain from the server): paths render LTR per segment; quoted 'names' and (names) are isolates */
   function msgHtml(s) {
-    return esc(s).replace(/(^|[\s(])((?:\/|~\/)[^\s,;)]*)/g, function (m, a, p) { return a + '<bdi class="pth" dir="ltr">' + p + '</bdi>'; });
+    return esc(s).replace(/&#39;([^&]*?)&#39;|\(([^()]*)\)|(^|[\s])((?:\/|~\/)[^\s,;)]*)/g, function (m, q, par, sp, p) {
+      if (p !== undefined) return sp + '<bdi class="pth" dir="ltr">' + pthInner(p) + '</bdi>';
+      var t = q !== undefined ? q : par, inner = isPath(t) ? '<bdi class="pth" dir="ltr">' + pthInner(t) + '</bdi>' : '<bdi dir="auto">' + t + '</bdi>';
+      return q !== undefined ? '&#39;' + inner + '&#39;' : '(' + inner + ')';
+    });
   }
   function when(d) { return d ? String(d).replace('T', ' ') : ''; }
   function dayOf(d) { return d ? String(d).slice(0, 10) : ''; }
@@ -451,7 +461,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     else if (state.formNote) h += '<div class="fhint" id="e-name">' + esc(state.formNote) + '</div>';
     h += '<fieldset><legend class="sr">Book type</legend><label class="opt"><input type="radio" name="mode" data-f="mode" data-fid="mode-fic" value="fic"' + (f.fiction ? ' checked' : '') + '> fiction</label><label class="opt"><input type="radio" name="mode" data-f="mode" data-fid="mode-non" value="non"' + (!f.fiction ? ' checked' : '') + '> non-fiction</label></fieldset>';
     h += '<fieldset><label class="opt"><input type="checkbox" data-f="ssml" data-fid="ssml"' + (f.ssml ? ' checked' : '') + '> SSML (Azure only)</label>' +
-      (f.newJob ? '<label class="opt"><input type="checkbox" data-f="newJob" data-fid="newJob" checked> new job (keep the old files)</label>' : '') + '</fieldset>';
+      (f.newJob || state.offerNew ? '<label class="opt"><input type="checkbox" data-f="newJob" data-fid="newJob"' + (f.newJob ? ' checked' : '') + '> new job (keep the old files)</label>' : '') + '</fieldset>';
     h += '<div class="go"><button type="button" class="btn pri" data-act="start" data-fid="start" data-start' + (startState().disabled ? ' disabled aria-disabled="true"' : '') + '>[ start ]</button><span class="dim busy" data-start-why>' + esc(why) + '</span></div>';
     if (state.generalErr) h += '<div class="banner b-red" role="alert">' + msgHtml(state.generalErr) + '</div>';
     if (state.overwrite) {
@@ -501,12 +511,12 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   /* ---------- actions ---------- */
   function openPanel() { state.panel = true; state.focusNext = 'path'; }
   function closePanel() {
-    state.panel = false; state.overwrite = null; state.formErr = {}; state.formNote = ''; state.generalErr = '';
+    state.panel = false; state.overwrite = null; state.offerNew = false; state.formErr = {}; state.formNote = ''; state.generalErr = '';
     state.focusNext = 'drawer';
   }
   function start(confirm) {
     var f = state.form, p = f.path.trim();
-    state.formErr = {}; state.formNote = ''; state.generalErr = ''; state.overwrite = null;
+    state.formErr = {}; state.formNote = ''; state.generalErr = ''; state.overwrite = null; state.offerNew = false;
     if (!p) { state.formErr.path = 'path is required: absolute path to a book file or folder'; render(); return; }
     var body = { path: p, fiction: f.fiction, ssml: f.ssml, newJob: f.newJob, confirm: !!confirm };
     if (f.name.trim()) body.name = f.name.trim();
@@ -515,7 +525,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       state.starting = false;
       var d = r.data;
       if (r.status === 202) {
-        state.form = { path: '', name: '', fiction: true, ssml: false, newJob: false };
+        state.form = { path: '', name: '', fiction: true, ssml: false, newJob: false }; state.offerNew = false;
         state.skipped = d.skipped || []; state.queuedNames = d.queued || [];
         state.panel = false; state.tab = 1; state.view = null; state.focusNext = 'drawer';
         state.msg = 'started ' + d.queued.join(', ');
@@ -525,9 +535,9 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
         refreshAll().then(function () { if (state.jobs.some(function (j) { return j.name === d.queued[0]; })) selectJob(d.queued[0]); });
         return;
       }
-      if (r.status === 409 && d.overwrite) { state.overwrite = { message: d.message, jobs: d.jobs || [] }; state.focusNext = 'newjob'; }
+      if (r.status === 409 && d.overwrite) { state.overwrite = { message: d.message, jobs: d.jobs || [] }; state.offerNew = true; state.focusNext = 'newjob'; }
       else if (r.status === 409 && d.busy) { state.busy = true; state.generalErr = d.error; startPolling(); }
-      else if (d.field === 'path' || d.field === 'name') { state.formErr[d.field] = d.error; if (d.skipped) state.skipped = d.skipped; }
+      else if (d.field === 'path' || d.field === 'name') { state.formErr[d.field] = d.error; if (d.field === 'name' && /tick "new job"/.test(d.error)) state.offerNew = true; if (d.skipped) state.skipped = d.skipped; }
       else state.generalErr = d.error || 'request failed';
       render();
     });

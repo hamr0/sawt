@@ -510,11 +510,17 @@ global.history = { replaceState: function () {} };
 global.fetch = function (u) { var d = u === '/api/status' ? { busy: busy, current: null, queued: [] } : u === '/api/jobs' ? { jobs: [] } : {};
   return Promise.resolve({ ok: true, status: 200, json: function () { return Promise.resolve(d); } }); };
 //DRIVER
+var conflict = process.argv[2] === 'conflict', overwrite = process.argv[2] === 'overwrite';
 var started = process.argv[2] === 'start';
 if (started) global.fetch = function (u, o) {
   var d = u === '/api/status' ? { busy: false, current: null, queued: [] } : u === '/api/jobs' ? { jobs: [] }
     : u === '/api/runs' ? { queued: ['one'], skipped: [] } : {};
   return Promise.resolve({ ok: true, status: u === '/api/runs' ? 202 : 200, json: function () { return Promise.resolve(d); } }); };
+if (conflict || overwrite) global.fetch = function (u, o) {
+  var d = u === '/api/status' ? { busy: false, current: null, queued: [] } : u === '/api/jobs' ? { jobs: [] }
+    : conflict ? { error: "this book already has job '\u0635\u062f\u0649-\u0627\u0644\u0646\u0633\u064a\u0627\u0646'; re-run it under that job name (\u0635\u062f\u0649-\u0627\u0644\u0646\u0633\u064a\u0627\u0646) or tick \"new job\"", field: 'name' }
+    : { overwrite: true, message: 'x', jobs: ['old'] };
+  return Promise.resolve({ ok: u.indexOf('/api/runs') !== 0, status: u === '/api/runs' ? (conflict ? 400 : 409) : 200, json: function () { return Promise.resolve(d); } }); };
 function fire(t, target) { listeners[t]({ target: target }); }
 function type(v) { fire('input', { value: v, dataset: { f: 'path' } }); }
 fire('click', { closest: function () { return { dataset: { act: 'drawer' }, disabled: false }; } });
@@ -523,6 +529,16 @@ setTimeout(function () {
   type(''); out.empty = [btn.disabled, why.textContent];
   type('/books/my-novel.epub'); out.typed = [btn.disabled, btn.attrs['aria-disabled'], why.textContent, nm.placeholder];
   type('   '); out.blank = [btn.disabled, why.textContent];
+  if (conflict || overwrite) {
+    type('/books/one.txt');
+    fire('click', { closest: function () { return { dataset: { act: 'start' }, disabled: false }; } });
+    setTimeout(function () {
+      out.afterStart = app.innerHTML;
+      if (overwrite) fire('click', { closest: function () { return { dataset: { act: 'newjob' }, disabled: false }; } });
+      out.afterAct = app.innerHTML;
+      console.log(JSON.stringify(out)); process.exit(0); }, 100);
+    return;
+  }
   if (started) {
     type('/books/one.txt');
     fire('click', { closest: function () { return { dataset: { act: 'start' }, disabled: false }; } });
@@ -562,8 +578,36 @@ class TestStartButtonSync:
         assert "started one" in html
         assert "dismissSkip" not in html and "b-cyan" not in html
 
+    def test_name_conflict_renders_unchecked_new_job_checkbox(self, tmp_path):
+        html = self._run(tmp_path, "conflict")["afterStart"]
+        box = re.search(r'<input type="checkbox" data-f="newJob"[^>]*>', html)
+        assert box and "checked" not in box.group(0)
+
+    def test_overwrite_conflict_new_job_action_ticks_the_box(self, tmp_path):
+        out = self._run(tmp_path, "overwrite")
+        assert re.search(r'<input type="checkbox" data-f="newJob"[^>]*>', out["afterStart"])
+        box = re.search(r'<input type="checkbox" data-f="newJob"[^>]*>', out["afterAct"])
+        assert box and "checked" in box.group(0)
+
+    def test_message_isolates_arabic_names_and_paths(self, tmp_path):
+        html = self._run(tmp_path, "conflict")["afterStart"]
+        assert "&#39;<bdi dir=\"auto\">\u0635\u062f\u0649-\u0627\u0644\u0646\u0633\u064a\u0627\u0646</bdi>&#39;" in html
+        assert "(<bdi dir=\"auto\">\u0635\u062f\u0649" in html
+
 
 class TestPathsAndWording:
+    def test_path_segments_are_isolates_with_wbr_after_slashes(self):
+        js = PAGE.split("<script>")[1]
+        for fn in ("function esc", "function pthInner", "function pth", "function msgHtml"):
+            assert fn in js
+        assert "<wbr>" in js and "unicode-bidi:isolate" in PAGE
+        assert "white-space:nowrap" in PAGE.split(".pth .seg")[1].split("}")[0]
+        assert "overflow-wrap:anywhere" not in re.search(r"\.v \.pth\{[^}]*\}", PAGE).group(0)
+
+    def test_underscore_not_clipped_in_paths(self):
+        rule = re.search(r"\.v \.pth[^{]*\{[^}]*line-height:([\d.]+)", PAGE)
+        assert rule and float(rule.group(1)) >= 1.5
+
     def test_paths_render_ltr_isolated(self):
         assert re.search(r"function pth\(s\) \{ return '<bdi class=\"pth\" dir=\"ltr\">'", PAGE)
         assert "unicode-bidi:isolate" in PAGE
@@ -584,3 +628,18 @@ class TestPathsAndWording:
         assert st == 400 and "pick another job name" in d["error"] and "--" not in d["error"]
         st, d = client.post("/api/runs", {"path": str(books), "name": "z"})
         assert "--" not in d["error"]
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
+def test_path_renders_one_isolate_per_segment(tmp_path):
+    js = re.search(r"<script>(.*)</script>", PAGE, re.S).group(1)
+    helpers = js[js.index("function esc"):js.index("function when")]
+    f = tmp_path / "h.js"
+    f.write_text(helpers + "\nconsole.log(JSON.stringify([pth('/tmp/x/books/رحلة-ابن-فطومة.txt'),"
+                 "msgHtml('bad /tmp/a/صدى b')]));", encoding="utf-8")
+    r = subprocess.run(["node", str(f)], capture_output=True, text=True, timeout=20)
+    assert r.returncode == 0, r.stderr
+    a, b = json.loads(r.stdout)
+    assert a.count('<bdi dir="auto" class="seg">') == 4 and a.count("/<wbr>") == 4
+    assert '<bdi dir="auto" class="seg">رحلة-ابن-فطومة.txt</bdi>' in a
+    assert 'dir="ltr"' in a and '<bdi dir="auto" class="seg">صدى</bdi>' in b
