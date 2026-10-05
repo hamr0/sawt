@@ -545,17 +545,11 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     if (!row) return top + '<div class="empty">select a job</div>';
     if (row.placeholder) {
       var pq = qinfo(row.name), pb = state.tab === 1 ? queuedBody(row.name) : '<div class="empty">no runs yet</div>';
-      return top + '<div class="rhead">' + mk('queued') + nm(row.name) + '<span class="dim">queued' + (pq ? ' — position ' + qtext(pq) : '') + '</span></div>' + tabsHtml() +
+      return top + '<div class="rhead">' + mk('queued') + nm(row.name) + '<span class="dim"><span class="st-queued">queued</span>' + (pq ? ' · ' + qtext(pq) : '') + '</span></div>' + tabsHtml() +
         '<div class="rpanel" role="tabpanel" id="tabpanel" aria-labelledby="tab-' + state.tab + '">' + pb + '</div><div class="msg" role="status">' + esc(state.msg) + '</div>';
     }
-    var job = state.job;
-    var k = key(row.status);
-    if (job && job.runs.length && !job.missing) k = key(job.runs[job.runs.length - 1].status);
-    if (job && job.missing) k = 'missing';
-    var word = stale(k) ? 'running (interrupted)' : STX[k];
-    var rq = qinfo(row.name);
-    if (rq) { k = 'queued'; word = 'queued — position ' + qtext(rq); }
-    var h = top + '<div class="rhead">' + mk(k) + nm(row.name) + '<span class="dim">' + esc(word) + '</span><button type="button" class="btn mini hdr-ren" data-act="rename" data-arg="' + esc(row.name) + '">[ rename ]</button></div>';
+    var job = state.job, cs = cardStatus(row);  /* the same mapping the card uses, so heading and card always agree */
+    var h = top + '<div class="rhead">' + mk(cs.k) + nm(row.name) + '<span class="dim"><span class="st-' + cs.k + '">' + esc(cs.word) + '</span> · ' + esc(cs.why) + '</span><button type="button" class="btn mini hdr-ren" data-act="rename" data-arg="' + esc(row.name) + '">[ rename ]</button></div>';
     if (state.renaming === row.name) h += renameForm('ren-hdr');
     if (job && job.missing) h += '<div class="banner b-amber">output folder is gone — ' + pth(job.output) + '. history is still readable; retry is disabled.</div>';
     h += tabsHtml();

@@ -658,6 +658,8 @@ setTimeout(function () {
     cl('reload');
     setTimeout(function () {
       out.cards = app.innerHTML;
+      var pick = function (n) { fire('click', { closest: function () { return { dataset: { act: 'sel', arg: n }, disabled: false }; } }); return /<div class="rhead">(.*?)<button/.exec(app.innerHTML)[1]; };
+      out.selA = pick('a'); out.selC = pick('c'); out.selH = pick('h'); out.selD = pick('d'); out.selI = pick('i'); pick('a');
       var snap = function (v) { srch(v); return app.innerHTML; };
       out.latin = snap('MYBOOK-JOB'); out.src = snap('myBOOK.epub'); out.ar = snap('\u0631\u0648\u0627\u064a\u0629'); out.arsrc = snap('\u0643\u062a\u0627\u0628'); out.none = snap('zzz');
       cl('searchclear'); out.cleared = app.innerHTML;
@@ -834,7 +836,7 @@ class TestStartButtonSync:
         assert first.count('<div class="card') == 3 and 'st-queued">queued</span> \u00b7 2 of 3' in first and 'st-queued">queued</span> \u00b7 3 of 3' in first
         assert "[\u2026]" in first  # queued status mark
         ph = out["placeholder"]  # selecting a placeholder card: its Run tab, no job entry needed
-        assert "queued \u2014 position 2 of 3" in ph and "[ stop ]" in ph and "[ delete ]" not in ph and "[ rename ]" not in ph.split('class="rhead"')[1]
+        assert 'st-queued">queued</span> \u00b7 2 of 3' in ph and "[ stop ]" in ph and "[ delete ]" not in ph and "[ rename ]" not in ph.split('class="rhead"')[1]
         assert not any(c[1] == "/api/jobs/b" for c in out["calls"])  # placeholder never fetches a job
         running = out["running"]
         assert "[ stop ]" in running and '[ delete ]</button><span class="dim">running or queued' in running
@@ -879,6 +881,15 @@ class TestStartButtonSync:
         # status word carries its status colour class; line 2 is the muted row
         assert 'class="row2"><span class="st-failed">failed</span> \u00b7 chapters error' in h
         assert "ready for audio" not in re.sub(r"<[^>]+>", "", h.split('class="rpanel"')[0].split("jobsel")[1].split("</select>")[1])
+        # the right-pane heading uses the same mapping as the card (mark, word, explanation), for every state
+        def heading(html):
+            return re.sub(r"<[^>]+>", "", html).strip()
+
+        for key, name in (("selA", "a"), ("selC", "c"), ("selH", "h"), ("selD", "d"), ("selI", "i")):
+            mark, line2 = expect[name]
+            assert heading(out[key]) == f"{mark}{name}{line2}", (name, heading(out[key]))
+        assert "partial \u00b7 artifacts ready, audio pending" in heading(out["selA"]) and "ready for audio" not in heading(out["selA"])
+        assert "failed \u00b7 chapters error" in heading(out["selC"])
         # search: case-insensitive on name or source file name, Latin and Arabic, live count, clear
         assert "jobs (1 of 11)" in out["latin"] and "jobs (1 of 11)" in out["src"] and "jobs (1 of 11)" in out["ar"] and "jobs (1 of 11)" in out["arsrc"]
         assert 'data-arg="mybook-job"' in out["src"] and 'data-arg="a"' not in out["src"].split('class="list"')[1].split("</aside>")[0]
