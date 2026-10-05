@@ -698,6 +698,10 @@ setTimeout(function () {
       out.dup = [btn.disabled, why.textContent, btn.textContent];
       fire('input', { value: 'taken', dataset: { f: 'rowname', i: '0' } });    // duplicate of an existing job
       out.dupJob = [btn.disabled, why.textContent];
+      var bads = ['a/b', 'a\\b', '.hidden', 'x\ny', 'x'.repeat(101), 'a\u200fb'];
+      out.bad = bads.map(function (v) { fire('input', { value: v, dataset: { f: 'rowname', i: '0' } }); return btn.disabled; });
+      fire('input', { value: '\u0631\u0648\u0627\u064a\u0629 \u062c\u062f\u064a\u062f\u0629 - 2', dataset: { f: 'rowname', i: '0' } });
+      out.arabic = btn.disabled;
       fire('input', { value: 'fresh', dataset: { f: 'rowname', i: '0' } });
       out.fixed = [btn.disabled, why.textContent, btn.textContent];
       change('rownew', 2, true); out.newjob = app.innerHTML;
@@ -822,6 +826,7 @@ class TestStartButtonSync:
         assert out["dup"] == [True, "fix the name errors first", "[ start 3 books ]"]
         assert out["dupJob"] == [True, "fix the name errors first"]
         assert out["fixed"] == [False, "", "[ start 3 books ]"]
+        assert out["bad"] == [True] * 6 and out["arabic"] is False  # live name rules mirror the runner's
         assert 'data-f="rownew" data-i="2" data-fid="rnew-2" checked' in out["newjob"]
         assert 'value="taken-2"' in out["newjob"] and "name already taken" not in out["newjob"].split('data-rerr="2"')[1][:80]
         # start sends only ticked rows, in list order
@@ -1737,3 +1742,52 @@ class TestOrphanedFolder:
         runner_core.delete_job("novel")
         run = runner_core.run_book(book, assume_yes=True, confirm=lambda _: pytest.fail("must not prompt"), emit=lambda m: None)
         assert run["status"] == runner_core.RUN_READY
+
+
+class TestJobNames:
+    @pytest.mark.parametrize("raw,ok", [
+        ("  رواية جديدة - 2  ", "رواية جديدة - 2"),   # Arabic, spaces, dash; trimmed
+        (" lead and trail ", "lead and trail"),
+        ("x" * 100, "x" * 100),
+    ])
+    def test_accepted_and_trimmed(self, raw, ok):
+        assert runner_core._check_name(raw) == ok
+
+    @pytest.mark.parametrize("raw,text", [
+        ("", "cannot be empty"), ("   ", "cannot be empty"), (".hidden", "dot"), ("a/b", "/ or"), ("a\\b", "/ or"),
+        ("x\ny", "control"), ("x\ty", "control"), ("a\u202eb", "control"), ("a\u200fb", "control"), ("a\x00b", "control"),
+        ("x" * 101, "too long"),
+    ])
+    def test_rejected_with_clear_message(self, raw, text):
+        with pytest.raises(runner_core.RunnerError, match=text):
+            runner_core._check_name(raw)
+
+    def test_ui_single_file_name_errors_land_on_the_field(self, client, books):
+        book = make_book(books, "novel")
+        for raw, text in (("x\ny", "control"), ("x" * 101, "too long"), ("a/b", "/ or"), (".z", "dot")):
+            status, data = client.post("/api/runs", {"path": str(book), "name": raw})
+            assert status == 400 and data["field"] == "name" and text in data["error"], raw
+        assert client.get("/api/status")[1]["busy"] is False
+
+    def test_ui_books_list_row_error_and_trimmed_arabic_name(self, client, books):
+        a, b = make_book(books, "a"), make_book(books, "b")
+        status, data = client.post("/api/runs", {"books": [book_item(a, "x" * 101)]})
+        assert status == 400 and data["field"] == "books" and "too long" in data["error"]
+        status, data = client.post("/api/runs", {"books": [book_item(a, "  رواية جديدة  "), book_item(b, "b")]})
+        assert status == 202 and data["queued"] == ["رواية جديدة", "b"]
+        client.wait_idle()
+        assert (books / "رواية جديدة_sawt").is_dir()
+
+    def test_rename_uses_the_same_rules(self, client, books):
+        client.post("/api/runs", {"path": str(make_book(books, "novel"))})
+        client.wait_idle()
+        status, data = client.post("/api/jobs/novel/rename", {"name": "a\nb"})
+        assert status == 400 and data["field"] == "name" and "control" in data["error"]
+        status, data = client.post("/api/jobs/novel/rename", {"name": "  جديد  "})
+        assert status == 200 and data == {"name": "جديد"} and client.job("جديد")["name"] == "جديد"
+
+    def test_cli_rename_and_default_name(self, home, books):
+        with pytest.raises(runner_core.RunnerError, match="control"):
+            runner_core.run_book(make_book(books, "n"), name="a\nb", assume_yes=True, emit=lambda m: None)
+        run = runner_core.run_book(make_book(books, "n"), name=" spaced ", assume_yes=True, emit=lambda m: None)
+        assert run is not None and load_jobs()["jobs"][0]["name"] == "spaced"

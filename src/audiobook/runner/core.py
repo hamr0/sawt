@@ -17,6 +17,7 @@ import os
 import shutil
 import sys
 import tempfile
+import unicodedata
 import uuid
 from contextlib import contextmanager
 from datetime import datetime
@@ -78,6 +79,7 @@ IMPORT_FORMATS = ("epub", "docx", "txt")  # pdf is out of scope
 OVERWRITE_WARNING = (
     "overwriting the last run's files — start a new job instead to keep them"
 )
+MAX_NAME_CHARS = 100
 ORPHAN_WARNING = (
     "this folder already holds output from a job no longer in history — "
     "running will overwrite its files (including any edited review files)"
@@ -415,16 +417,31 @@ def _execute(
 # ---------------------------------------------------------------------------
 
 
-def _check_name(name: str) -> None:
-    if not name or name.startswith(".") or "/" in name or "\\" in name:
-        raise RunnerError(f"invalid job name {name!r}")
+def _check_name(name: str) -> str:
+    """Validate a job name (CLI and UI share this) and return it trimmed.
+
+    Allowed: any printable text, Arabic and spaces included. Rejected: empty, a leading dot,
+    path separators, control/format characters (newlines, tabs, bidi controls), over 100 chars.
+    """
+    name = name.strip()
+    if not name:
+        raise RunnerError("job name cannot be empty")
+    if name.startswith("."):
+        raise RunnerError("job name cannot start with a dot")
+    if "/" in name or "\\" in name:
+        raise RunnerError("job name cannot contain / or \\")
+    if any(unicodedata.category(c) in ("Cc", "Cf") for c in name):
+        raise RunnerError("job name cannot contain control or invisible characters (newlines, tabs, bidi marks)")
+    if len(name) > MAX_NAME_CHARS:
+        raise RunnerError(f"job name is too long ({len(name)} characters; the limit is {MAX_NAME_CHARS})")
+    return name
 
 
 def _resolve_job(data: dict, book: Path, name: str | None, new_job: bool) -> tuple[Job | None, str]:
     """Pick the existing job to re-run, or return (None, name) for a new one."""
     source = str(book)
-    chosen = name or book.stem
-    _check_name(chosen)
+    name = _check_name(name) if name else None
+    chosen = _check_name(book.stem) if name is None else name
     same_source = [j for j in data["jobs"] if j["source"] == source]
     if new_job:
         if find_job(data, chosen):
@@ -543,7 +560,7 @@ def retry_job(name: str, emit: Emit = _stdout, should_stop: Callable[[], bool] |
 
 def rename_job(old: str, new: str) -> None:
     """Change the job's label only; its output folder name stays fixed."""
-    _check_name(new)
+    new = _check_name(new)
 
     def change(data: dict) -> None:
         job = find_job(data, old)

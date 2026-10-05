@@ -577,10 +577,21 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 
   /* ---------- folder pick list ---------- */
   function rowName(r) { return r.job && !r.newJob ? r.job : r.nm.trim(); }
+  /* mirrors the runner's _check_name (the server re-validates): same limits, same wording */
+  var NAME_MAX = 100, NAME_INVISIBLE = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0605\u061c\u06dd\u070f\u180e\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u206f\ufeff\ufff9-\ufffb]/;
+  function nameProblem(n) {
+    if (n.charAt(0) === '.') return 'job name cannot start with a dot';
+    if (/[\/\\]/.test(n)) return 'job name cannot contain / or \\';
+    if (NAME_INVISIBLE.test(n)) return 'job name cannot contain control or invisible characters';
+    if (Array.from(n).length > NAME_MAX) return 'job name is too long (max ' + NAME_MAX + ' characters)';
+    return '';
+  }
   function rowErr(r, i) {
     if (!r.on || (r.job && !r.newJob)) return '';
     var n = r.nm.trim();
     if (!n) return 'name required';
+    var bad = nameProblem(n);
+    if (bad) return bad;
     if (state.jobs.some(function (j) { return j.name === n; })) return 'name already taken by another job';
     var rows = state.scan.rows;
     for (var k = 0; k < rows.length; k++) if (k !== i && rows[k].on && rowName(rows[k]) === n) return 'same name as another ticked book';
