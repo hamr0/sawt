@@ -510,6 +510,11 @@ global.history = { replaceState: function () {} };
 global.fetch = function (u) { var d = u === '/api/status' ? { busy: busy, current: null, queued: [] } : u === '/api/jobs' ? { jobs: [] } : {};
   return Promise.resolve({ ok: true, status: 200, json: function () { return Promise.resolve(d); } }); };
 //DRIVER
+var started = process.argv[2] === 'start';
+if (started) global.fetch = function (u, o) {
+  var d = u === '/api/status' ? { busy: false, current: null, queued: [] } : u === '/api/jobs' ? { jobs: [] }
+    : u === '/api/runs' ? { queued: ['one'], skipped: [] } : {};
+  return Promise.resolve({ ok: true, status: u === '/api/runs' ? 202 : 200, json: function () { return Promise.resolve(d); } }); };
 function fire(t, target) { listeners[t]({ target: target }); }
 function type(v) { fire('input', { value: v, dataset: { f: 'path' } }); }
 fire('click', { closest: function () { return { dataset: { act: 'drawer' }, disabled: false }; } });
@@ -518,6 +523,12 @@ setTimeout(function () {
   type(''); out.empty = [btn.disabled, why.textContent];
   type('/books/my-novel.epub'); out.typed = [btn.disabled, btn.attrs['aria-disabled'], why.textContent, nm.placeholder];
   type('   '); out.blank = [btn.disabled, why.textContent];
+  if (started) {
+    type('/books/one.txt');
+    fire('click', { closest: function () { return { dataset: { act: 'start' }, disabled: false }; } });
+    setTimeout(function () { out.afterStart = app.innerHTML; console.log(JSON.stringify(out)); process.exit(0); }, 100);
+    return;
+  }
   console.log(JSON.stringify(out)); process.exit(0);
 }, 50);
 """
@@ -545,3 +556,31 @@ class TestStartButtonSync:
         # status poll flipped busy while the panel was open: the re-render reflects it
         assert 'data-start disabled aria-disabled="true"' in out["html"]
         assert out["typed"][0] is True and "run is in progress" in out["typed"][2]
+
+    def test_single_queued_run_shows_no_empty_banner(self, tmp_path):
+        html = self._run(tmp_path, "start")["afterStart"]
+        assert "started one" in html
+        assert "dismissSkip" not in html and "b-cyan" not in html
+
+
+class TestPathsAndWording:
+    def test_paths_render_ltr_isolated(self):
+        assert re.search(r"function pth\(s\) \{ return '<bdi class=\"pth\" dir=\"ltr\">'", PAGE)
+        assert "unicode-bidi:isolate" in PAGE
+        assert "pth(job.source)" in PAGE and "pth(job.output)" in PAGE
+        assert "dir=\"ltr\"" in PAGE.split("function msgHtml")[1].split("function when")[0]
+        assert "esc(job.source" not in PAGE and "esc(job.output" not in PAGE
+
+    def test_ui_errors_have_no_cli_flags(self, client, books):
+        book = make_book(books)
+        client.post("/api/runs", {"path": str(book)})
+        client.wait_idle()
+        other = make_book(books, stem="other")
+        st, d = client.post("/api/runs", {"path": str(other), "name": "novel"})
+        assert st == 400 and "job name" in d["error"] and "--" not in d["error"]
+        st, d = client.post("/api/runs", {"path": str(book), "name": "x", "newJob": True})
+        assert "--" not in d.get("error", "")
+        st, d = client.post("/api/runs", {"path": str(book), "name": "novel", "newJob": True})
+        assert st == 400 and "pick another job name" in d["error"] and "--" not in d["error"]
+        st, d = client.post("/api/runs", {"path": str(books), "name": "z"})
+        assert "--" not in d["error"]

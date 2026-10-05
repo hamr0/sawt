@@ -48,6 +48,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v{font:13px/1.5 var(--font);color:var(--text);background:var(--bg);min-width:0}
 .v button,.v input,.v select{font:inherit;color:inherit}
 .v .dim{color:var(--textDim)}
+.v .pth{direction:ltr;unicode-bidi:isolate;text-align:left;overflow-wrap:anywhere}
 .v .nm{unicode-bidi:plaintext;text-align:start;overflow-wrap:anywhere}
 .v .btn{background:var(--panel2);border:1px solid var(--borderStrong);border-radius:0;padding:6px 10px;min-height:32px;cursor:pointer;color:var(--text);white-space:normal}
 .v .btn:hover{background:var(--panel)}
@@ -185,6 +186,11 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function nm(s) { return '<span class="nm" dir="auto">' + esc(s) + '</span>'; }
+  function pth(s) { return '<bdi class="pth" dir="ltr">' + esc(s) + '</bdi>'; }
+  /* message text that may echo a filesystem path: paths render strictly LTR */
+  function msgHtml(s) {
+    return esc(s).replace(/(^|[\s(])((?:\/|~\/)[^\s,;)]*)/g, function (m, a, p) { return a + '<bdi class="pth" dir="ltr">' + p + '</bdi>'; });
+  }
   function when(d) { return d ? String(d).replace('T', ' ') : ''; }
   function dayOf(d) { return d ? String(d).slice(0, 10) : ''; }
   function key(s) {
@@ -311,7 +317,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     }).join('') + '</div>';
   }
   function detailsHtml(job, run) {
-    return '<dl class="det"><dt>source</dt><dd>' + esc(job.source || '(unknown)') + '</dd><dt>output</dt><dd>' + esc(job.output) +
+    return '<dl class="det"><dt>source</dt><dd>' + (job.source ? pth(job.source) : '(unknown)') + '</dd><dt>output</dt><dd>' + pth(job.output) +
       '</dd><dt>settings</dt><dd>' + settingsText(run) + '</dd><dt>started</dt><dd>' + esc(when(run.date)) + '</dd></dl>';
   }
   function failedStep(run) { return STEPS.filter(function (s) { return run.steps[s] === 'failed'; })[0] || null; }
@@ -332,7 +338,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       h += '<div class="acts"><button type="button" class="btn pri" data-act="retry" data-fid="retry"' + (why ? ' disabled aria-disabled="true"' : '') + '>[ retry ]</button>' +
         (why ? '<span class="dim">' + esc(why) + '</span>' : from ? '<span class="dim">resumes from "' + esc(LABEL[from]) + '"</span>' : '') + '</div>';
     }
-    if (state.retryErr) h += '<div class="banner b-red" role="alert">' + esc(state.retryErr) + '</div>';
+    if (state.retryErr) h += '<div class="banner b-red" role="alert">' + msgHtml(state.retryErr) + '</div>';
     return h + detailsHtml(job, run);
   }
   function histTab(job) {
@@ -347,7 +353,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
         out += '<div class="runbody">' + (k === 'imported' ? '<div class="dim">imported in place — not run by the runner</div>' : '') +
           '<div class="log small" tabindex="0">' + logHtml(r) + '</div>';
         if (r.errors && r.errors.length) {
-          out += '<div class="banner b-red">' + r.errors.map(function (e) { return esc(LABEL[e.step] || e.step) + ' — ' + esc(e.message); }).join('<br>') + '</div>';
+          out += '<div class="banner b-red">' + r.errors.map(function (e) { return esc(LABEL[e.step] || e.step) + ' — ' + msgHtml(e.message); }).join('<br>') + '</div>';
         }
         out += '<button type="button" class="btn mini" data-act="viewrun" data-arg="' + i + '">[ open in run ]</button></div>';
       }
@@ -368,20 +374,18 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     if (state.unreachable) h += '<div class="banner b-red" role="alert">server unreachable — <button type="button" class="lnk" data-act="reload">[ retry ]</button></div>';
     var e = state.runError;
     if (e && state.dismissedErr !== e.job + '|' + e.message) {
-      h += '<div class="banner b-red" role="alert">run could not complete for ' + nm(e.job) + ' — ' + esc(e.message) +
+      h += '<div class="banner b-red" role="alert">run could not complete for ' + nm(e.job) + ' — ' + msgHtml(e.message) +
         ' <button type="button" class="lnk" data-act="dismissErr">[ dismiss ]</button></div>';
     }
-    if (state.skipped.length || state.queuedNames.length) {
-      h += '<div class="banner b-cyan" role="status">';
-      if (state.queuedNames.length > 1) h += 'queued: ' + state.queuedNames.map(nm).join(', ') + '<br>';
-      if (state.skipped.length) h += 'skipped ' + state.skipped.length + ' file(s):<ul>' + state.skipped.map(function (s) { return '<li>' + nm(s.file) + ' — ' + esc(s.reason) + '</li>'; }).join('') + '</ul>';
-      h += '<div class="bacts"><button type="button" class="lnk" data-act="dismissSkip">[ dismiss ]</button></div></div>';
-    }
+    var note = '';
+    if (state.queuedNames.length > 1) note += 'queued: ' + state.queuedNames.map(nm).join(', ') + '<br>';
+    if (state.skipped.length) note += 'skipped ' + state.skipped.length + ' file(s):<ul>' + state.skipped.map(function (s) { return '<li>' + nm(s.file) + ' — ' + msgHtml(s.reason) + '</li>'; }).join('') + '</ul>';
+    if (note) h += '<div class="banner b-cyan" role="status">' + note + '<div class="bacts"><button type="button" class="lnk" data-act="dismissSkip">[ dismiss ]</button></div></div>';
     return h;
   }
   function rightHtml() {
     var top = banners();
-    if (state.jobsErr) return top + '<div class="banner b-red" role="alert">' + esc(state.jobsErr) + ' <button type="button" class="lnk" data-act="reload">[ retry ]</button></div>';
+    if (state.jobsErr) return top + '<div class="banner b-red" role="alert">' + msgHtml(state.jobsErr) + ' <button type="button" class="lnk" data-act="reload">[ retry ]</button></div>';
     if (state.loading) return '<div class="empty">loading...</div>';
     if (!state.jobs.length) {
       return top + '<div class="empty">no jobs yet — [ + new job ] or [ import existing output/ ]<br>paste the absolute path of a book file or folder; steps 1-4 run straight through, then pause before the paid audio step.' +
@@ -396,10 +400,10 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     var word = stale(k) ? 'running (interrupted)' : STX[k];
     var h = top + '<div class="rhead">' + mk(k) + nm(row.name) + '<span class="dim">' + esc(word) + '</span><button type="button" class="btn mini hdr-ren" data-act="rename" data-arg="' + esc(row.name) + '">[ rename ]</button></div>';
     if (state.renaming === row.name) h += renameForm('ren-hdr');
-    if (job && job.missing) h += '<div class="banner b-amber">output folder is gone — ' + esc(job.output) + '. history is still readable; retry is disabled.</div>';
+    if (job && job.missing) h += '<div class="banner b-amber">output folder is gone — ' + pth(job.output) + '. history is still readable; retry is disabled.</div>';
     h += tabsHtml();
     var body;
-    if (state.jobErr) body = '<div class="banner b-red" role="alert">' + esc(state.jobErr) + '</div>';
+    if (state.jobErr) body = '<div class="banner b-red" role="alert">' + msgHtml(state.jobErr) + '</div>';
     else if (!job) body = '<div class="empty">loading...</div>';
     else body = state.tab === 1 ? runTab(job) : state.tab === 2 ? histTab(job) : artTab();
     return h + '<div class="rpanel" role="tabpanel" id="tabpanel" aria-labelledby="tab-' + state.tab + '">' + body + '</div><div class="msg" role="status">' + esc(state.msg) + '</div>';
@@ -440,18 +444,18 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     var h = '<div class="drawer" role="region" aria-label="New job"><h3><span>new job</span><button type="button" class="btn mini" data-act="drawer" data-fid="drawer-x">[ × close ]</button></h3>';
     h += '<label class="lbl" for="f-path">path to a book file or folder</label><input class="field" id="f-path" data-f="path" data-fid="path" dir="ltr" autocomplete="off" spellcheck="false" placeholder="absolute path to a book file or folder" value="' + esc(f.path) + '"' +
       (e.path ? ' aria-invalid="true" aria-describedby="e-path"' : '') + '>';
-    if (e.path) h += '<div class="ferr" id="e-path" role="alert">' + esc(e.path) + '</div>';
+    if (e.path) h += '<div class="ferr" id="e-path" role="alert">' + msgHtml(e.path) + '</div>';
     h += '<label class="lbl" for="f-name">job name (single file only)</label><input class="field" id="f-name" data-f="name" data-fid="name" dir="auto" autocomplete="off" placeholder="' + esc(ph) + '" value="' + esc(f.name) + '"' +
       (e.name ? ' aria-invalid="true" aria-describedby="e-name"' : state.formNote ? ' aria-describedby="e-name"' : '') + '>';
-    if (e.name) h += '<div class="ferr" id="e-name" role="alert">' + esc(e.name) + '</div>';
+    if (e.name) h += '<div class="ferr" id="e-name" role="alert">' + msgHtml(e.name) + '</div>';
     else if (state.formNote) h += '<div class="fhint" id="e-name">' + esc(state.formNote) + '</div>';
     h += '<fieldset><legend class="sr">Book type</legend><label class="opt"><input type="radio" name="mode" data-f="mode" data-fid="mode-fic" value="fic"' + (f.fiction ? ' checked' : '') + '> fiction</label><label class="opt"><input type="radio" name="mode" data-f="mode" data-fid="mode-non" value="non"' + (!f.fiction ? ' checked' : '') + '> non-fiction</label></fieldset>';
     h += '<fieldset><label class="opt"><input type="checkbox" data-f="ssml" data-fid="ssml"' + (f.ssml ? ' checked' : '') + '> SSML (Azure only)</label>' +
       (f.newJob ? '<label class="opt"><input type="checkbox" data-f="newJob" data-fid="newJob" checked> new job (keep the old files)</label>' : '') + '</fieldset>';
     h += '<div class="go"><button type="button" class="btn pri" data-act="start" data-fid="start" data-start' + (startState().disabled ? ' disabled aria-disabled="true"' : '') + '>[ start ]</button><span class="dim busy" data-start-why>' + esc(why) + '</span></div>';
-    if (state.generalErr) h += '<div class="banner b-red" role="alert">' + esc(state.generalErr) + '</div>';
+    if (state.generalErr) h += '<div class="banner b-red" role="alert">' + msgHtml(state.generalErr) + '</div>';
     if (state.overwrite) {
-      h += '<div class="banner b-amber" role="group" aria-label="Overwrite warning"><b>this path already has a job: ' + state.overwrite.jobs.map(nm).join(', ') + '</b><br>' + esc(state.overwrite.message) +
+      h += '<div class="banner b-amber" role="group" aria-label="Overwrite warning"><b>this path already has a job: ' + state.overwrite.jobs.map(nm).join(', ') + '</b><br>' + msgHtml(state.overwrite.message) +
         '<div class="bacts"><button type="button" class="btn warn" data-act="overwrite" data-fid="overwrite">[ overwrite and run ]</button><button type="button" class="btn pri" data-act="newjob" data-fid="newjob">[ start as new job ]</button><button type="button" class="btn" data-act="cancel" data-fid="cancel">[ cancel ]</button></div></div>';
     }
     return h + '</div>';

@@ -102,7 +102,7 @@ class _Worker:
 
     def _fail(self, name: str, message: str) -> None:
         with self.lock:
-            self._error = {"job": name, "message": message}
+            self._error = {"job": name, "message": _ui_text(message)}
 
 
 # ---------------------------------------------------------------------------
@@ -117,8 +117,22 @@ class _HttpError(Exception):
         self.payload = payload
 
 
+_CLI_WORDING = (  # runner messages are CLI-phrased; the UI says the same thing in its own words
+    (re.compile(r"pick another with --name"), "pick another job name"),
+    (re.compile(r"re-run it \(--name ([^)]*)\) or use --new-job"),
+     r're-run it under that job name (\1) or tick "new job"'),
+    (re.compile(r"--name and --new-job apply"), "job name and new job apply"),
+)
+
+
+def _ui_text(message: str) -> str:
+    for pattern, text in _CLI_WORDING:
+        message = pattern.sub(text, message)
+    return message
+
+
 def _bad(message: str, field: str | None = None, **extra) -> _HttpError:
-    payload = {"error": message, **extra}
+    payload = {"error": _ui_text(message), **extra}
     if field:
         payload["field"] = field
     return _HttpError(400, payload)
@@ -183,7 +197,7 @@ class _Handler(BaseHTTPRequestHandler):
         except _HttpError as exc:
             self._json(exc.status, exc.payload)
         except RunnerError as exc:  # e.g. unreadable jobs.json
-            self._json(500, {"error": str(exc)})
+            self._json(500, {"error": _ui_text(str(exc))})
         except Exception:
             logger.exception("unhandled error on %s %s", method, self.path)
             self._json(500, {"error": "internal error"})
@@ -260,7 +274,7 @@ class _Handler(BaseHTTPRequestHandler):
                 job, job_name = _resolve_job(data, book, name, new_job)
             except RunnerError as exc:
                 if len(books) > 1:  # one bad book must not block the rest of the folder
-                    skipped_out.append({"file": book.name, "reason": str(exc)})
+                    skipped_out.append({"file": book.name, "reason": _ui_text(str(exc))})
                     continue
                 raise _bad(str(exc), "name" if (name or new_job) else "path", skipped=skipped_out) from None
             if job is None and job_name in taken:
