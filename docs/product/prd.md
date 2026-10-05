@@ -137,7 +137,7 @@ Five stages, each a package under `src/audiobook/` with logic in `core.py`; test
 
 ## 5. Next build: local UI + runner
 
-Status: Spec signed off 2026-10-05. Modules 0, 1 and 2 built (feat/runner, feat/ui); module 3 (Artifacts tab) not built.
+Status: Spec signed off 2026-10-05. Modules 0, 1, 2 and 3 built (feat/runner, feat/ui); module 3 real-browser check pending.
 
 ### Problem & goal
 
@@ -176,7 +176,7 @@ Hosting, other users, logins; a database; editing files in the browser; audio ge
 | 0 | Runner, CLI only, POC first: takes a path, runs steps 1–4, writes `jobs.json`, retries from the failed step. | Real runs on 2–3 test books plus tests; one run forced to fail, then retried. |
 | 1 | Look: 5 `/live-canvas` variations; owner picks one. | Owner picked variant D (light + dark themes, independently scrolling job list). |
 | 2 | UI shell: path input, start, live log, job cards, history. | Tests (337 passing, including a Node fake-DOM page test) plus a real-browser check of themes, live run, new-job flow and Arabic paths/names. |
-| 3 | Artifacts tab: step folders, open-folder, file links. | — |
+| 3 | Artifacts tab: step folders, open-folder, file links. | Tests (383 passing: listing, path guard, viewer, open-folder, Node fake-DOM tab test); real-browser check pending. |
 
 After the last module: propose `/self-review`.
 
@@ -190,6 +190,15 @@ After the last module: propose `/self-review`.
 - A job left "running" after a crash or server stop shows as interrupted, with Retry available.
 - In a folder run, a book whose job name is already taken is skipped and listed; the rest of the folder still runs.
 - Arabic display: paths render left-to-right with segments that break only at `/`; names and paths embedded in messages are bidi-isolated and don't wrap.
+
+### Module 3 spec (signed off 2026-10-05)
+
+- **Tab:** one block per step folder present in the job's output, in order `01_ingestion` … `04_ssml`, plus `05_audio` if present. Header = folder name, file count, `[ open folder ]`. Files listed under it grouped by subfolder (`03_segments/ssml/`, `review/`), each with relative path and size. More than 10 files starts collapsed. Missing step → "<folder> — not produced". Output folder gone → "folder missing" plus the path (LTR styling).
+- **Endpoints:** `GET /api/jobs/<name>/files` (listing); `POST /api/jobs/<name>/open` `{"path": rel folder or ""}` opens the system file manager (`xdg-open` / `open` / `os.startfile`; argument list, no shell, not waited on; module-level function so tests monkeypatch it); `GET /view?job=&path=` read-only viewer. All behind the existing host check.
+- **Viewer:** UTF-8 HTML with its own strict CSP and no scripts. `.txt`/`.ssml`/`.json`/`.xml` in `<pre dir="auto">`, each line its own `dir="auto"` element; `.csv` as a table (stdlib `csv`, sticky header, `dir="auto"` cells); everything `html.escape`d. Other extensions download (`Content-Disposition: attachment`). 5 MB cap, above it a message instead of content. Same monospace look and light/dark tokens (`prefers-color-scheme`). File links open in a new tab (`target="_blank" rel="noopener"`).
+- **Path guard:** paths are relative to the job's recorded `output` (new `_sawt/` and imported jobs alike). Absolute paths and NUL bytes are refused; the rest is `Path.resolve()`d (symlinks followed) and must be `is_relative_to(output.resolve())`. 403 on absolute, `..` escape, symlink out, NUL; 404 unknown job. The listing skips symlinked dirs and files resolving outside. `/open` uses the same guard and only accepts directories.
+- **Freshness:** listing reloads when the tab opens, when the job changes while it is open, and when a run finishes. No file watching.
+- **Out of scope:** editing, audio preview, search.
 
 ### Open questions (non-blocking)
 

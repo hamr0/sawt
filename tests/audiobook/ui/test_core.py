@@ -2,6 +2,7 @@
 import http.client
 import json
 import re
+import os
 import shutil
 import subprocess
 import threading
@@ -134,7 +135,7 @@ class TestServer:
 
     def test_unknown_routes_404(self, client):
         assert client.get("/nope")[0] == 404
-        assert client.get("/files/a/b/c")[0] == 404  # module 3 not built
+        assert client.get("/files/a/b/c")[0] == 404
         assert client.get("/api/jobs/x/artifacts")[0] == 404
 
 
@@ -479,9 +480,11 @@ class TestPage:
         for lab in ("labnote", "fixtures.js", "LiveCanvas", "overlay-vanilla", "data-lab"):
             assert lab not in PAGE
 
-    def test_artifacts_tab_is_placeholder_only(self):
-        assert "artifacts — module 3, not built yet" in PAGE
-        assert "/api/jobs/' + enc" in PAGE and "/artifacts" not in PAGE and "/files/" not in PAGE
+    def test_artifacts_tab_is_wired(self):
+        assert "module 3, not built" not in PAGE
+        assert "/files'" in PAGE and "/open'" in PAGE and "/view?job=" in PAGE
+        assert 'target="_blank" rel="noopener"' in PAGE
+        assert "[ open folder ]" in PAGE and "not produced" in PAGE and "folder missing" in PAGE
 
     @pytest.mark.skipif(shutil.which("node") is None, reason="node not installed")
     def test_page_js_parses(self, tmp_path):
@@ -511,7 +514,21 @@ global.fetch = function (u) { var d = u === '/api/status' ? { busy: busy, curren
   return Promise.resolve({ ok: true, status: 200, json: function () { return Promise.resolve(d); } }); };
 //DRIVER
 var conflict = process.argv[2] === 'conflict', overwrite = process.argv[2] === 'overwrite';
-var started = process.argv[2] === 'start';
+var started = process.argv[2] === 'start', arts = process.argv[2] === 'arts';
+global.calls = [];
+if (arts) global.fetch = function (u, o) {
+  global.calls.push([(o && o.method) || 'GET', u, o && o.body]);
+  var files = { missing: false, output: '/x/out', steps: [
+    { name: '01_ingestion', present: true, count: 2, collapsed: false, groups: [{ dir: '', files: [
+      { name: 'clean_text.txt', rel: 'clean_text.txt', path: '01_ingestion/clean_text.txt', size: 2048 },
+      { name: 'p<b>.csv', rel: 'p<b>.csv', path: '01_ingestion/p<b>.csv', size: 12 }] }] },
+    { name: '02_chapters', present: true, count: 11, collapsed: true, groups: [{ dir: '', files: [] }] },
+    { name: '03_segments', present: false }] };
+  var d = u === '/api/status' ? { busy: false, current: null, queued: [] }
+    : u === '/api/jobs' ? { jobs: [{ name: '\u0631\u0648\u0627\u064a\u0629', status: 'imported', date: '', runs: 0 }] }
+    : u.slice(-6) === '/files' ? files : u.slice(-5) === '/open' ? { opened: '02_chapters' }
+    : { name: '\u0631\u0648\u0627\u064a\u0629', output: '/x/out', source: '', runs: [], missing: false };
+  return Promise.resolve({ ok: true, status: 200, json: function () { return Promise.resolve(d); } }); };
 if (started) global.fetch = function (u, o) {
   var d = u === '/api/status' ? { busy: false, current: null, queued: [] } : u === '/api/jobs' ? { jobs: [] }
     : u === '/api/runs' ? { queued: ['one'], skipped: [] } : {};
@@ -537,6 +554,15 @@ setTimeout(function () {
       if (overwrite) fire('click', { closest: function () { return { dataset: { act: 'newjob' }, disabled: false }; } });
       out.afterAct = app.innerHTML;
       console.log(JSON.stringify(out)); process.exit(0); }, 100);
+    return;
+  }
+  if (arts) {
+    fire('click', { closest: function () { return { dataset: { act: 'tab', arg: '3' }, disabled: false }; } });
+    setTimeout(function () {
+      out.html3 = app.innerHTML;
+      fire('click', { closest: function () { return { dataset: { act: 'openfolder', arg: '02_chapters' }, disabled: false }; } });
+      setTimeout(function () { out.calls = global.calls; out.afterOpen = app.innerHTML; console.log(JSON.stringify(out)); process.exit(0); }, 100);
+    }, 100);
     return;
   }
   if (started) {
@@ -595,6 +621,21 @@ class TestStartButtonSync:
         assert "(<bdi dir=\"auto\" class=\"nmi\">\u0635\u062f\u0649" in html
 
 
+    def test_artifacts_tab_renders_blocks_links_and_open(self, tmp_path):
+        out = self._run(tmp_path, "arts")
+        html = out["html3"]
+        assert "files" in " ".join(c[1] for c in out["calls"])
+        assert html.count("[ open folder ]") == 2  # two present step folders
+        assert "03_segments \u2014 not produced" in html
+        assert 'href="/view?job=%D8%B1' in html and 'target="_blank" rel="noopener"' in html
+        assert "01_ingestion%2Fp%3Cb%3E.csv" in html and "p&lt;b&gt;.csv" in html and "<b>.csv" not in html
+        assert "2.0 KB" in html
+        # 11 files: starts collapsed (no file rows), the 2-file block is expanded
+        assert 'aria-expanded="false"' in html and 'aria-expanded="true"' in html
+        assert ["POST", "/api/jobs/%D8%B1%D9%88%D8%A7%D9%8A%D8%A9/open", '{"path":"02_chapters"}'] in out["calls"]
+        assert "opened 02_chapters" in out["afterOpen"]
+
+
 class TestPathsAndWording:
     def test_path_segments_are_isolates_with_wbr_after_slashes(self):
         js = PAGE.split("<script>")[1]
@@ -643,3 +684,301 @@ def test_path_renders_one_isolate_per_segment(tmp_path):
     assert a.count('<bdi dir="ltr" class="seg">') == 4 and a.count("/<wbr>") == 4
     assert '<bdi dir="ltr" class="seg">رحلة-ابن-فطومة.txt</bdi>' in a
     assert 'dir="ltr"' in a and '<bdi dir="ltr" class="seg">صدى</bdi>' in b
+
+
+# ---------------------------------------------------------------------------
+# Module 3: artifacts
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def opened(monkeypatch):
+    """Every test that can reach /open records the call; no file manager is ever launched."""
+    calls = []
+    monkeypatch.setattr(ui_core, "_open_folder", lambda path: calls.append(path))
+    return calls
+
+
+@pytest.fixture
+def job(client, home, tmp_path):
+    """A job (name 'bk') whose output folder holds a small pipeline tree; returns the output Path."""
+    out = tmp_path / "bk_sawt"
+    (out / "01_ingestion").mkdir(parents=True)
+    (out / "01_ingestion" / "clean_text.txt").write_text(NARRATION + "\n\n" + DIALOGUE, encoding="utf-8")
+    (out / "01_ingestion" / "paragraphs.csv").write_text("n,text\n1,x\n", encoding="utf-8")
+    seg = out / "03_segments"
+    (seg / "ssml").mkdir(parents=True)
+    (seg / "review").mkdir()
+    (seg / "segments.csv").write_text("a,b\n1,2\n", encoding="utf-8")
+    for i in range(3):
+        (seg / "ssml" / f"chapter_{i}.csv").write_text("n,text\n1,x\n", encoding="utf-8")
+    (seg / "review" / "chapter_0.txt").write_text("review", encoding="utf-8")
+    save_jobs({"version": load_jobs().get("version", 1), "jobs": [
+        {"name": "bk", "source": str(tmp_path / "bk.txt"), "output": str(out), "runs": []}]})
+    return out
+
+
+def raw_get(client, path):
+    conn = http.client.HTTPConnection("127.0.0.1", client.port, timeout=10)
+    conn.request("GET", path, headers={"Host": f"127.0.0.1:{client.port}"})
+    r = conn.getresponse()
+    body = r.read()
+    conn.close()
+    return r.status, {k.lower(): v for k, v in r.getheaders()}, body
+
+
+def view(client, rel, name="bk"):
+    return raw_get(client, f"/view?job={quote(name)}&path={quote(rel)}")
+
+
+class TestArtifactListing:
+    def test_steps_in_order_with_groups_sizes_and_missing_step(self, client, job):
+        status, data = client.get("/api/jobs/bk/files")
+        assert status == 200 and data["missing"] is False and data["output"] == str(job)
+        assert [(s["name"], s["present"]) for s in data["steps"]] == [
+            ("01_ingestion", True), ("02_chapters", False), ("03_segments", True), ("04_ssml", False)]
+        ing = data["steps"][0]
+        assert ing["count"] == 2 and ing["collapsed"] is False
+        assert [f["name"] for f in ing["groups"][0]["files"]] == ["clean_text.txt", "paragraphs.csv"]
+        assert ing["groups"][0]["files"][1] == {"name": "paragraphs.csv", "rel": "paragraphs.csv",
+                                                "path": "01_ingestion/paragraphs.csv", "size": 11}
+        seg = data["steps"][2]
+        assert [g["dir"] for g in seg["groups"]] == ["", "review", "ssml"]  # top level first
+        assert seg["count"] == 5
+        assert [f["path"] for f in seg["groups"][2]["files"]][0] == "03_segments/ssml/chapter_0.csv"
+        assert seg["groups"][2]["files"][0]["rel"] == "ssml/chapter_0.csv"
+
+    def test_05_audio_listed_only_when_present(self, client, job):
+        assert "05_audio" not in [s["name"] for s in client.get("/api/jobs/bk/files")[1]["steps"]]
+        (job / "05_audio" / "gemini").mkdir(parents=True)
+        (job / "05_audio" / "gemini" / "chapter_1.mp3").write_bytes(b"id3")
+        steps = client.get("/api/jobs/bk/files")[1]["steps"]
+        assert steps[-1]["name"] == "05_audio" and steps[-1]["groups"][0]["dir"] == "gemini"
+
+    def test_more_than_ten_files_starts_collapsed(self, client, job):
+        d = job / "02_chapters"
+        d.mkdir()
+        for i in range(ui_core.COLLAPSE_OVER_FILES):
+            (d / f"c{i}.txt").write_text("x", encoding="utf-8")
+        step = client.get("/api/jobs/bk/files")[1]["steps"][1]
+        assert step["count"] == 10 and step["collapsed"] is False
+        (d / "c10.txt").write_text("x", encoding="utf-8")
+        step = client.get("/api/jobs/bk/files")[1]["steps"][1]
+        assert step["count"] == 11 and step["collapsed"] is True
+
+    def test_missing_job_folder(self, client, job):
+        shutil.rmtree(job)
+        status, data = client.get("/api/jobs/bk/files")
+        assert status == 200 and data == {"missing": True, "output": str(job), "steps": []}
+
+    def test_unknown_job_404_and_foreign_host_403(self, client, job):
+        assert client.get("/api/jobs/ghost/files")[0] == 404
+        assert client.get("/api/jobs/bk/files", host="evil.example.com")[0] == 403
+
+    def test_symlinks_out_are_not_listed(self, client, job, tmp_path):
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        (outside / "secret.txt").write_text("secret", encoding="utf-8")
+        (job / "01_ingestion" / "linkdir").symlink_to(outside, target_is_directory=True)
+        (job / "01_ingestion" / "linkfile.txt").symlink_to(outside / "secret.txt")
+        ing = client.get("/api/jobs/bk/files")[1]["steps"][0]
+        assert [f["name"] for g in ing["groups"] for f in g["files"]] == ["clean_text.txt", "paragraphs.csv"]
+        # a step folder that is itself a symlink out counts as not produced
+        (job / "02_chapters").symlink_to(outside, target_is_directory=True)
+        assert client.get("/api/jobs/bk/files")[1]["steps"][1]["present"] is False
+
+    def test_symlink_that_stays_inside_is_listed(self, client, job):
+        (job / "01_ingestion" / "alias.txt").symlink_to(job / "01_ingestion" / "clean_text.txt")
+        names = [f["name"] for g in client.get("/api/jobs/bk/files")[1]["steps"][0]["groups"] for f in g["files"]]
+        assert "alias.txt" in names
+
+    def test_imported_job_listing(self, client, tmp_path, monkeypatch):
+        out = tmp_path / "output" / "txt" / "oldbook"
+        (out / "01_ingestion").mkdir(parents=True)
+        (out / "01_ingestion" / "clean_text.txt").write_text("x", encoding="utf-8")
+        monkeypatch.setattr(ui_core, "import_existing", lambda: import_existing(tmp_path / "output", tmp_path / "data"))
+        client.post("/api/import")
+        data = client.get("/api/jobs/oldbook/files")[1]
+        assert data["steps"][0]["count"] == 1 and data["steps"][1]["present"] is False
+
+    def test_arabic_job_name(self, client, job):
+        data = load_jobs()
+        data["jobs"][0]["name"] = "رواية"
+        save_jobs(data)
+        assert client.get("/api/jobs/" + quote("رواية") + "/files")[0] == 200
+
+
+class TestPathGuard:
+    @pytest.mark.parametrize("rel", [
+        "../outside.txt", "01_ingestion/../../outside.txt", "..", "/etc/passwd",
+        "\\windows\\x", "01_ingestion/clean_text.txt\0.png", "\0",
+    ])
+    def test_escapes_rejected_everywhere(self, client, job, tmp_path, opened, rel):
+        (tmp_path / "outside.txt").write_text("out", encoding="utf-8")
+        assert view(client, rel)[0] == 403
+        assert client.post("/api/jobs/bk/open", {"path": rel})[0] == 403
+        assert opened == []
+
+    def test_absolute_path_inside_output_still_rejected(self, client, job):
+        assert view(client, str(job / "01_ingestion" / "clean_text.txt"))[0] == 403
+
+    def test_symlink_file_pointing_out_rejected(self, client, job, tmp_path):
+        (tmp_path / "secret.txt").write_text("secret", encoding="utf-8")
+        (job / "01_ingestion" / "leak.txt").symlink_to(tmp_path / "secret.txt")
+        status, _, body = view(client, "01_ingestion/leak.txt")
+        assert status == 403 and b"secret" not in body
+
+    def test_symlink_dir_pointing_out_rejected(self, client, job, tmp_path, opened):
+        outside = tmp_path / "outdir"
+        outside.mkdir()
+        (outside / "a.txt").write_text("x", encoding="utf-8")
+        (job / "01_ingestion" / "lnk").symlink_to(outside, target_is_directory=True)
+        assert view(client, "01_ingestion/lnk/a.txt")[0] == 403
+        assert client.post("/api/jobs/bk/open", {"path": "01_ingestion/lnk"})[0] == 403
+        assert opened == []
+
+    def test_dangling_symlink_out_rejected(self, client, job, tmp_path):
+        (job / "01_ingestion" / "gone.txt").symlink_to(tmp_path / "nowhere.txt")
+        assert view(client, "01_ingestion/gone.txt")[0] == 403
+
+    def test_unknown_job_404(self, client, job, opened):
+        assert view(client, "01_ingestion/clean_text.txt", name="ghost")[0] == 404
+        assert client.post("/api/jobs/ghost/open", {"path": ""})[0] == 404
+        assert opened == []
+
+    def test_missing_file_404_and_non_string_path(self, client, job, opened):
+        assert view(client, "01_ingestion/nope.txt")[0] == 404
+        assert client.post("/api/jobs/bk/open", {"path": 5})[0] == 403
+        assert client.post("/api/jobs/bk/open", {"path": ["a"]})[0] == 403
+        assert opened == []
+
+    def test_dotdot_that_stays_inside_is_fine(self, client, job):
+        assert view(client, "03_segments/../01_ingestion/clean_text.txt")[0] == 200
+
+    def test_view_foreign_host_rejected(self, client, job):
+        conn = http.client.HTTPConnection("127.0.0.1", client.port, timeout=10)
+        conn.request("GET", "/view?job=bk&path=01_ingestion/clean_text.txt", headers={"Host": "evil.example.com"})
+        assert conn.getresponse().status == 403
+        conn.close()
+
+
+class TestViewer:
+    def test_arabic_csv_is_a_table_and_escaped(self, client, job):
+        (job / "01_ingestion" / "paragraphs.csv").write_text(
+            f'n,text\n1,"{NARRATION}"\n2,"<script>alert(1)</script> & ""q"""\n', encoding="utf-8")
+        status, headers, body = view(client, "01_ingestion/paragraphs.csv")
+        page = body.decode("utf-8")
+        assert status == 200 and headers["content-type"] == "text/html; charset=utf-8"
+        assert "<table>" in page and "<thead><tr><th dir=\"auto\">n</th>" in page
+        assert f'<td dir="auto">{NARRATION}</td>' in page
+        assert "<script>" not in page and "&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;q&quot;" in page
+        assert "position:sticky" in page and "<title>paragraphs.csv</title>" in page
+        assert "job <bdi" in page and "01_ingestion/paragraphs.csv" in page
+
+    def test_csv_with_bom_and_embedded_newline(self, client, job):
+        (job / "01_ingestion" / "p.csv").write_bytes("\ufeffn,text\n1,\"a\nb\"\n".encode("utf-8"))
+        page = view(client, "01_ingestion/p.csv")[2].decode("utf-8")
+        assert "<th dir=\"auto\">n</th>" in page and "a\nb" in page
+
+    def test_txt_lines_each_dir_auto_and_escaped(self, client, job):
+        (job / "01_ingestion" / "clean_text.txt").write_text(f"{NARRATION}\n\n<b>x</b>\n{DIALOGUE}", encoding="utf-8")
+        status, _, body = view(client, "01_ingestion/clean_text.txt")
+        page = body.decode("utf-8")
+        assert status == 200 and '<pre dir="auto">' in page
+        assert f'<div dir="auto">{NARRATION}</div><div dir="auto"></div><div dir="auto">&lt;b&gt;x&lt;/b&gt;</div>' in page
+        assert "<b>x</b>" not in page
+
+    @pytest.mark.parametrize("ext", [".ssml", ".json", ".xml"])
+    def test_other_text_types_use_pre(self, client, job, ext):
+        (job / "01_ingestion" / f"f{ext}").write_text("<speak>x</speak>", encoding="utf-8")
+        page = view(client, f"01_ingestion/f{ext}")[2].decode("utf-8")
+        assert '<pre dir="auto"><div dir="auto">&lt;speak&gt;x&lt;/speak&gt;</div></pre>' in page
+
+    def test_unknown_extension_is_a_download(self, client, job):
+        (job / "01_ingestion" / "ملف.mp3").write_bytes(b"ID3\x00audio")
+        status, headers, body = view(client, "01_ingestion/ملف.mp3")
+        assert status == 200 and body == b"ID3\x00audio"
+        assert headers["content-disposition"].startswith("attachment; filename*=UTF-8''")
+        assert quote("ملف.mp3") in headers["content-disposition"]
+        assert headers["content-type"] == "application/octet-stream" and headers["x-content-type-options"] == "nosniff"
+
+    def test_html_file_is_never_rendered(self, client, job):
+        (job / "01_ingestion" / "x.html").write_text("<script>alert(1)</script>", encoding="utf-8")
+        _, headers, _ = view(client, "01_ingestion/x.html")
+        assert "attachment" in headers["content-disposition"] and headers["content-type"] == "application/octet-stream"
+
+    def test_oversize_file_gets_a_message(self, client, job, monkeypatch):
+        monkeypatch.setattr(ui_core, "VIEW_MAX_BYTES", 10)
+        (job / "01_ingestion" / "big.txt").write_text("x" * 50, encoding="utf-8")
+        status, _, body = view(client, "01_ingestion/big.txt")
+        page = body.decode("utf-8")
+        assert status == 200 and "too large to show" in page and "xxxxx" not in page
+
+    def test_csp_and_no_scripts(self, client, job):
+        status, headers, body = view(client, "01_ingestion/clean_text.txt")
+        csp = headers["content-security-policy"]
+        assert csp == ui_core.VIEW_CSP and "default-src 'none'" in csp and "script-src" not in csp
+        assert b"<script" not in body and headers["cache-control"] == "no-store"
+        assert "prefers-color-scheme: dark" in body.decode("utf-8")
+
+    def test_directory_is_404(self, client, job):
+        assert view(client, "01_ingestion")[0] == 404
+
+    def test_bad_utf8_does_not_crash(self, client, job):
+        (job / "01_ingestion" / "bad.txt").write_bytes(b"ok \xff\xfe end")
+        assert view(client, "01_ingestion/bad.txt")[0] == 200
+
+
+class TestOpenFolder:
+    def test_opens_resolved_directory(self, client, job, opened):
+        status, data = client.post("/api/jobs/bk/open", {"path": "03_segments/ssml"})
+        assert status == 200 and data == {"opened": "03_segments/ssml"}
+        assert opened == [(job / "03_segments" / "ssml").resolve()]
+
+    def test_empty_path_opens_output_folder(self, client, job, opened):
+        assert client.post("/api/jobs/bk/open", {})[0] == 200
+        assert client.post("/api/jobs/bk/open", {"path": ""})[0] == 200
+        assert opened == [job.resolve()] * 2
+
+    def test_file_rejected(self, client, job, opened):
+        status, data = client.post("/api/jobs/bk/open", {"path": "01_ingestion/clean_text.txt"})
+        assert status == 400 and "folders" in data["error"] and opened == []
+
+    def test_missing_folder_404(self, client, job, opened):
+        assert client.post("/api/jobs/bk/open", {"path": "04_ssml"})[0] == 404
+        assert opened == []
+
+    def test_foreign_host_and_content_type(self, client, job, opened):
+        assert client.post("/api/jobs/bk/open", {}, host="evil.example.com")[0] == 403
+        assert client.call("POST", "/api/jobs/bk/open", raw=b"{}", ctype="text/plain")[0] == 415
+        assert opened == []
+
+    def test_opener_failure_is_reported(self, client, job, monkeypatch):
+        def boom(path):
+            raise FileNotFoundError("xdg-open")
+        monkeypatch.setattr(ui_core, "_open_folder", boom)
+        status, data = client.post("/api/jobs/bk/open", {})
+        assert status == 500 and "file manager" in data["error"]
+
+    @pytest.mark.parametrize("platform,cmd", [("linux", "xdg-open"), ("darwin", "open")])
+    def test_opener_uses_arg_list_no_shell_no_wait(self, monkeypatch, tmp_path, platform, cmd):
+        seen = {}
+
+        class FakePopen:
+            def __init__(self, args, **kw):
+                seen["args"], seen["kw"] = args, kw
+
+            def wait(self, *a, **k):
+                raise AssertionError("must not wait")
+
+        monkeypatch.setattr(ui_core.sys, "platform", platform)
+        monkeypatch.setattr(ui_core.subprocess, "Popen", FakePopen)
+        ui_core._open_folder(tmp_path)
+        assert seen["args"] == [cmd, str(tmp_path)] and not seen["kw"].get("shell")
+
+    def test_windows_uses_startfile(self, monkeypatch, tmp_path):
+        calls = []
+        monkeypatch.setattr(ui_core.sys, "platform", "win32")
+        monkeypatch.setattr(os, "startfile", calls.append, raising=False)
+        ui_core._open_folder(tmp_path)
+        assert calls == [tmp_path]

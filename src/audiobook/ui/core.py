@@ -1,21 +1,32 @@
-"""Module 2: local UI shell.
+"""Modules 2-3: local UI shell and artifacts tab.
 
 A stdlib ``http.server`` on 127.0.0.1 that serves one inline page and a small
 JSON API over the runner's public functions. The runner stays the single writer
 of ``jobs.json``: runs execute on one worker thread, and anything else that
 writes (rename, import) is refused while the worker is busy.
+
+Module 3 adds read-only file access: a per-job listing, a viewer page and an
+open-folder action. Every path is relative to the job's recorded output folder
+and passes ``_resolve_inside`` (symlinks followed) before it is touched.
 """
 
 import argparse
+import csv
+import html
+import io
 import json
 import logging
+import os
 import re
+import shutil
+import subprocess
+import sys
 import threading
 import webbrowser
 from collections import deque
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import parse_qs, quote, unquote, urlsplit
 
 from ..runner import (
     OVERWRITE_WARNING, RUN_FAILED, RUN_RUNNING, STEP_DIRS, RunnerError,
@@ -40,7 +51,16 @@ PAGE_CSP = (
     "font-src https://fonts.gstatic.com; connect-src 'self'"
 )
 
-_JOB_ROUTE = re.compile(r"^/api/jobs/([^/]+)(?:/(retry|rename))?$")
+# Artifacts tab: step folders in pipeline order (05_audio only when it exists).
+ARTIFACT_STEP_DIRS = (*STEP_DIRS.values(), "05_audio")
+AUDIO_DIR = "05_audio"
+COLLAPSE_OVER_FILES = 10  # a step block with more files than this starts collapsed
+VIEW_MAX_BYTES = 5 * 1024 * 1024
+VIEW_TEXT_EXTS = (".txt", ".ssml", ".json", ".xml")
+VIEW_CSP = "default-src 'none'; style-src 'unsafe-inline'"
+DOWNLOAD_CHUNK_BYTES = 1024 * 1024
+
+_JOB_ROUTE = re.compile(r"^/api/jobs/([^/]+)(?:/(retry|rename|files|open))?$")
 
 
 # ---------------------------------------------------------------------------
@@ -192,6 +212,8 @@ class _Handler(BaseHTTPRequestHandler):
             if method == "GET" and path == "/":
                 return self._send(200, PAGE.encode("utf-8"), "text/html; charset=utf-8",
                                   {"Content-Security-Policy": PAGE_CSP})
+            if method == "GET" and path == "/view":
+                return self._view(parse_qs(urlsplit(self.path).query))
             status, payload = self._route(method, path)
             self._json(status, payload)
         except _HttpError as exc:
@@ -220,6 +242,8 @@ class _Handler(BaseHTTPRequestHandler):
             m = _JOB_ROUTE.match(path)
             if m and not m.group(2):
                 return 200, _job_detail(unquote(m.group(1)))
+            if m and m.group(2) == "files":
+                return 200, _list_files(_job_output(unquote(m.group(1))))
         elif method == "POST":
             if path == "/api/runs":
                 return self._post_runs(worker, self._body())
@@ -236,6 +260,8 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._post_retry(worker, unquote(m.group(1)))
             if m and m.group(2) == "rename":
                 return self._post_rename(worker, unquote(m.group(1)), self._body())
+            if m and m.group(2) == "open":
+                return self._post_open(unquote(m.group(1)), self._body())
         raise _HttpError(404, {"error": "not found"})
 
     @staticmethod
@@ -302,6 +328,42 @@ class _Handler(BaseHTTPRequestHandler):
             raise _HttpError(409, {"busy": True, "error": "a run is in progress — wait for it to end"})
         return 202, {"queued": [n for _, n, _ in plan], "skipped": skipped_out}
 
+    @staticmethod
+    def _post_open(name: str, body: dict) -> tuple[int, dict]:
+        rel = body.get("path", "")
+        target = _resolve_inside(_job_output(name), rel)
+        if not target.is_dir():
+            raise _bad("only folders can be opened")
+        try:
+            _open_folder(target)
+        except OSError as exc:
+            logger.warning("open folder %s: %s", target, exc)
+            raise _HttpError(500, {"error": "could not open the file manager"}) from None
+        return 200, {"opened": rel}
+
+    def _view(self, query: dict) -> None:
+        name, rel = (query.get(k, [""])[0] for k in ("job", "path"))
+        target = _resolve_inside(_job_output(name), rel)
+        if not target.is_file():
+            raise _HttpError(404, {"error": "no such file"})
+        ext, size = target.suffix.lower(), target.stat().st_size
+        if ext not in (*VIEW_TEXT_EXTS, ".csv"):
+            return self._download(target, size)
+        body = _view_page(name, rel, target, ext, size)
+        self._send(200, body.encode("utf-8"), "text/html; charset=utf-8",
+                   {"Content-Security-Policy": VIEW_CSP})
+
+    def _download(self, target: Path, size: int) -> None:
+        self.send_response(200)
+        self.send_header("Content-Type", "application/octet-stream")
+        self.send_header("Content-Length", str(size))
+        self.send_header("Content-Disposition", f"attachment; filename*=UTF-8''{quote(target.name)}")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.end_headers()
+        with target.open("rb") as fh:
+            shutil.copyfileobj(fh, self.wfile, DOWNLOAD_CHUNK_BYTES)
+
     def _post_retry(self, worker: _Worker, name: str) -> tuple[int, dict]:
         job = next((j for j in load_jobs()["jobs"] if j["name"] == name), None)
         if job is None:
@@ -338,6 +400,143 @@ def _job_detail(name: str) -> dict:
     if job is None:
         raise _HttpError(404, {"error": f"no job named {name!r}"})
     return {**job, "missing": not Path(job["output"]).is_dir()}
+
+
+# ---------------------------------------------------------------------------
+# Artifacts: path guard, listing, viewer, open folder
+# ---------------------------------------------------------------------------
+
+
+def _job_output(name: str) -> Path:
+    job = next((j for j in load_jobs()["jobs"] if j["name"] == name), None)
+    if job is None:
+        raise _HttpError(404, {"error": f"no job named {name!r}"})
+    return Path(job["output"])
+
+
+def _resolve_inside(output: Path, rel: object) -> Path:
+    """Resolve ``rel`` under the job's output folder; 403 on anything that could leave it.
+
+    Absolute paths, NUL bytes and non-text are refused up front; the rest is resolved
+    (following symlinks) and must still sit inside the resolved output folder.
+    """
+    if not isinstance(rel, str) or "\0" in rel or Path(rel).is_absolute() or rel.startswith(("/", "\\")):
+        raise _HttpError(403, {"error": "forbidden path"})
+    try:
+        base = output.resolve()
+        resolved = (base / rel).resolve()
+    except (OSError, RuntimeError, ValueError):  # symlink loop, unreadable component
+        raise _HttpError(403, {"error": "forbidden path"}) from None
+    if not resolved.is_relative_to(base):
+        raise _HttpError(403, {"error": "forbidden path"})
+    if not resolved.exists():
+        raise _HttpError(404, {"error": "not found"})
+    return resolved
+
+
+def _open_folder(path: Path) -> None:
+    """Show a folder in the system file manager; never waits on it, never uses a shell."""
+    if sys.platform.startswith("win"):
+        os.startfile(path)  # noqa: S606 - Windows only
+    else:
+        cmd = "open" if sys.platform == "darwin" else "xdg-open"
+        subprocess.Popen([cmd, str(path)], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                         stderr=subprocess.DEVNULL, start_new_session=True)
+
+
+def _step_files(output: Path, base: Path, step_dir: Path) -> list[dict]:
+    """Files under one step folder; symlinked dirs and files that resolve outside are skipped."""
+    files = []
+    for root, dirs, names in os.walk(step_dir, followlinks=False):
+        dirs[:] = sorted(d for d in dirs if not (Path(root) / d).is_symlink())
+        for fname in sorted(names):
+            f = Path(root) / fname
+            try:
+                real = f.resolve()
+                if not (real.is_relative_to(base) and real.is_file()):
+                    continue
+                size = real.stat().st_size
+            except OSError:
+                continue
+            rel = f.relative_to(step_dir).as_posix()
+            files.append({"name": fname, "rel": rel, "path": f.relative_to(output).as_posix(),
+                          "group": rel.rpartition("/")[0], "size": size})
+    return files
+
+
+def _list_files(output: Path) -> dict:
+    if not output.is_dir():
+        return {"missing": True, "output": str(output), "steps": []}
+    base = output.resolve()
+    steps = []
+    for dirname in ARTIFACT_STEP_DIRS:
+        step_dir = output / dirname
+        usable = step_dir.is_dir() and not step_dir.is_symlink()
+        if not usable and dirname == AUDIO_DIR:
+            continue
+        if not usable:
+            steps.append({"name": dirname, "present": False})
+            continue
+        files = _step_files(output, base, step_dir)
+        groups: dict[str, list[dict]] = {}
+        for f in sorted(files, key=lambda f: (f["group"] != "", f["group"], f["name"])):
+            groups.setdefault(f["group"], []).append({k: f[k] for k in ("name", "rel", "path", "size")})
+        steps.append({"name": dirname, "present": True, "count": len(files),
+                      "collapsed": len(files) > COLLAPSE_OVER_FILES,
+                      "groups": [{"dir": g, "files": fs} for g, fs in groups.items()]})
+    return {"missing": False, "output": str(output), "steps": steps}
+
+
+_VIEW_STYLE = """
+:root{--bg:#e1e2e7;--panel:#d0d5e3;--text:#3257ad;--dim:#4c598a;--border:#c4c8da;--field:#ffffff}
+@media (prefers-color-scheme: dark){:root{--bg:#1a1b26;--panel:#1f2335;--text:#c0caf5;--dim:#a9b1d6;--border:#292e42;--field:#16161e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 'Courier Prime','Courier New',monospace}
+header{padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--border)}
+header h1{margin:0;font-size:15px;overflow-wrap:anywhere}
+header .meta{color:var(--dim);font-size:12px;overflow-wrap:anywhere}
+main{padding:12px 16px}
+pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--field);border:1px solid var(--border);padding:10px;font:inherit}
+pre div{min-height:1.5em}
+table{border-collapse:collapse;width:100%}
+th,td{border:1px solid var(--border);padding:4px 8px;vertical-align:top;text-align:start;overflow-wrap:anywhere;white-space:pre-wrap}
+th{position:sticky;top:0;background:var(--panel)}
+td{background:var(--field)}
+.note{border:1px dashed var(--dim);padding:14px;color:var(--dim)}
+"""
+
+
+def _view_body(target: Path, ext: str, size: int) -> str:
+    if size > VIEW_MAX_BYTES:
+        return (f'<div class="note">file is too large to show here ({size / 1024 / 1024:.1f} MB; '
+                f"limit {VIEW_MAX_BYTES // 1024 // 1024} MB) — open the folder and use a text editor.</div>")
+    text = target.read_bytes().decode("utf-8-sig", errors="replace")
+    if ext == ".csv":
+        try:
+            rows = list(csv.reader(io.StringIO(text, newline="")))
+        except csv.Error as exc:
+            return f'<div class="note">could not parse this CSV: {html.escape(str(exc))}</div>'
+        if not rows:
+            return '<div class="note">empty file</div>'
+        cell = lambda tag, row: "".join(f'<{tag} dir="auto">{html.escape(c)}</{tag}>' for c in row)  # noqa: E731
+        head = f"<thead><tr>{cell('th', rows[0])}</tr></thead>"
+        body = "".join(f"<tr>{cell('td', r)}</tr>" for r in rows[1:])
+        return f"<table>{head}<tbody>{body}</tbody></table>"
+    lines = "".join(f'<div dir="auto">{html.escape(line)}</div>' for line in text.splitlines())
+    return f'<pre dir="auto">{lines}</pre>'
+
+
+def _view_page(job: str, rel: str, target: Path, ext: str, size: int) -> str:
+    return (
+        '<!doctype html>\n<html lang="en"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        '<meta name="color-scheme" content="light dark">'
+        f"<title>{html.escape(target.name)}</title><style>{_VIEW_STYLE}</style></head><body>"
+        f'<header><h1 dir="auto">{html.escape(target.name)}</h1>'
+        f'<div class="meta">job <bdi dir="auto">{html.escape(job)}</bdi> · '
+        f'<bdi dir="ltr">{html.escape(rel)}</bdi></div></header>'
+        f"<main>{_view_body(target, ext, size)}</main></body></html>"
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -127,6 +127,15 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
 .v .busy{font-size:12px}
 .v .ren-card .ren{padding:6px}
 .v .ren-hdr{display:none}
+.v a{color:var(--accent)}
+.v .step{border:1px solid var(--border);background:var(--panel2);margin-bottom:8px}
+.v .stephead{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:4px 8px}
+.v .steptog{flex:1;min-width:0;text-align:left;background:none;border:0;padding:4px 0;cursor:pointer;overflow-wrap:anywhere}
+.v .steptog:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.v .stepbody{padding:0 8px 8px}
+.v .gname{color:var(--textDim);margin:6px 0 2px}
+.v .frow{display:flex;gap:12px;justify-content:space-between;align-items:baseline;padding:1px 0 1px 2ch}
+.v .frow .sz{color:var(--textDim);white-space:nowrap;direction:ltr}
 .v .drawer{border:1px solid var(--accent);background:var(--panel);padding:10px;margin-bottom:10px}
 .v .drawer h3{margin:0 0 8px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
 .v .drawer .field{margin-bottom:8px}
@@ -182,7 +191,8 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     panel: false, form: { path: '', name: '', fiction: true, ssml: false, newJob: false },
     offerNew: false, formErr: {}, formNote: '', generalErr: '', overwrite: null, starting: false,
     skipped: [], queuedNames: [], msg: '', retryErr: '',
-    renaming: null, renameVal: '', renameErr: '', focusNext: null
+    renaming: null, renameVal: '', renameErr: '', focusNext: null,
+    files: null, filesErr: '', fexp: {}
   };
   var polling = false;
 
@@ -252,7 +262,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       if (state.selected === null || names.indexOf(state.selected) < 0) {
         var want = hashJob();
         state.selected = names.indexOf(want) >= 0 ? want : (names[0] || null);
-        state.job = null;
+        state.job = null; state.files = null;
       }
     });
   }
@@ -265,7 +275,22 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       if (r.ok) { state.job = r.data; state.jobErr = ''; } else { state.job = null; state.jobErr = r.data.error || 'could not load job'; }
     });
   }
-  function refreshAll() { return loadStatus().then(loadJobs).then(loadJob).then(function () { render(); }); }
+  /* artifacts listing: loaded when the tab opens, the job changes while it is open, or a run finishes (no watching) */
+  function loadFiles() {
+    var name = state.selected;
+    if (name === null) { state.files = null; return Promise.resolve(); }
+    return api('GET', '/api/jobs/' + enc(name) + '/files').then(function (r) {
+      if (state.selected !== name) return;
+      if (r.ok) { state.files = r.data; state.filesErr = ''; } else { state.files = null; state.filesErr = r.data.error || 'could not list files'; }
+    });
+  }
+  function onTab() { if (state.tab === 3 && state.selected !== null) loadFiles().then(render); }
+  function refreshAll() {
+    var was = state.busy, finished = false;
+    return loadStatus().then(function () { finished = was && !state.busy; }).then(loadJobs).then(loadJob).then(function () {
+      if (state.tab === 3 && (finished || state.files === null)) return loadFiles();
+    }).then(function () { render(); });
+  }
 
   function tick() {
     refreshAll().then(function () {
@@ -283,11 +308,12 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     try { return decodeURIComponent(m[1]); } catch (e) { return null; }
   }
   function selectJob(name) {
-    state.selected = name; state.job = null; state.jobLoading = true; state.view = null;
+    state.selected = name; state.job = null; state.jobLoading = true; state.view = null; state.files = null; state.filesErr = '';
     state.msg = ''; state.retryErr = ''; state.renaming = null;
     try { history.replaceState(null, '', '#job=' + enc(name)); } catch (e) { }
     render();
     loadJob().then(render);
+    onTab();
   }
   window.addEventListener('hashchange', function () {
     var h = hashJob();
@@ -372,7 +398,29 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     }
     return out;
   }
-  function artTab() { return '<div class="empty">artifacts — module 3, not built yet</div>'; }
+  function fmtSize(n) { return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(1) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
+  function fileLink(job, f) {
+    return '<div class="frow"><a href="/view?job=' + enc(job) + '&amp;path=' + enc(f.path) + '" target="_blank" rel="noopener">' + pth(f.rel) + '</a><span class="sz">' + fmtSize(f.size) + '</span></div>';
+  }
+  function stepHtml(job, s) {
+    if (!s.present) return '<div class="step"><div class="stephead dim">' + esc(s.name) + ' — not produced</div></div>';
+    var k = job + '|' + s.name, open = k in state.fexp ? state.fexp[k] : !s.collapsed;
+    var h = '<div class="step"><div class="stephead"><button type="button" class="steptog" data-act="ftoggle" data-arg="' + esc(s.name) + '" aria-expanded="' + open + '">' + (open ? '▾' : '▸') + ' <b>' + esc(s.name) + '</b> <span class="dim">· ' + s.count + ' file' + (s.count === 1 ? '' : 's') + '</span></button>' +
+      '<button type="button" class="btn mini" data-act="openfolder" data-arg="' + esc(s.name) + '">[ open folder ]</button></div>';
+    if (open) {
+      h += '<div class="stepbody">' + (s.count ? s.groups.map(function (g) {
+        return (g.dir ? '<div class="gname">' + pth(g.dir + '/') + ' <span class="dim">· ' + g.files.length + '</span></div>' : '') + g.files.map(function (f) { return fileLink(job, f); }).join('');
+      }).join('') : '<div class="dim">empty</div>') + '</div>';
+    }
+    return h + '</div>';
+  }
+  function artTab(job) {
+    if (state.filesErr) return '<div class="banner b-red" role="alert">' + msgHtml(state.filesErr) + '</div>';
+    var f = state.files;
+    if (!f) return '<div class="empty">loading...</div>';
+    if (f.missing) return '<div class="banner b-amber">folder missing — ' + pth(f.output) + '</div>';
+    return f.steps.map(function (s) { return stepHtml(job.name, s); }).join('');
+  }
 
   function renameForm(cls) {
     var id = 'rn-' + cls;
@@ -416,7 +464,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     var body;
     if (state.jobErr) body = '<div class="banner b-red" role="alert">' + msgHtml(state.jobErr) + '</div>';
     else if (!job) body = '<div class="empty">loading...</div>';
-    else body = state.tab === 1 ? runTab(job) : state.tab === 2 ? histTab(job) : artTab();
+    else body = state.tab === 1 ? runTab(job) : state.tab === 2 ? histTab(job) : artTab(job);
     return h + '<div class="rpanel" role="tabpanel" id="tabpanel" aria-labelledby="tab-' + state.tab + '">' + body + '</div><div class="msg" role="status">' + esc(state.msg) + '</div>';
   }
 
@@ -562,6 +610,12 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
       } else { state.renameErr = r.data.error || 'rename failed'; render(); }
     });
   }
+  function doOpen(rel) {
+    api('POST', '/api/jobs/' + enc(state.selected) + '/open', { path: rel }).then(function (r) {
+      state.msg = r.ok ? 'opened ' + rel + ' in the file manager' : (r.data.error || 'could not open folder');
+      render();
+    });
+  }
   function importExisting() {
     api('POST', '/api/import', {}).then(function (r) {
       state.msg = r.ok ? 'imported ' + r.data.imported.length + ' job(s)' : (r.data.error || 'import failed');
@@ -571,7 +625,11 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
   function act(a, arg) {
     switch (a) {
       case 'sel': selectJob(arg); return;
-      case 'tab': state.tab = +arg; state.msg = ''; break;
+      case 'tab': state.tab = +arg; state.msg = ''; onTab(); break;
+      case 'ftoggle': var fk = state.job.name + '|' + arg, cur = fk in state.fexp ? state.fexp[fk] : null;
+        if (cur === null) { var st = state.files && state.files.steps.filter(function (x) { return x.name === arg; })[0]; cur = !(st && st.collapsed); }
+        state.fexp[fk] = !cur; break;
+      case 'openfolder': doOpen(arg); return;
       case 'toggle': var k = (state.job ? state.job.name : '') + '#' + arg; state.open[k] = !state.open[k]; break;
       case 'viewrun': state.view = +arg; state.tab = 1; break;
       case 'latest': state.view = null; break;
@@ -625,14 +683,14 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 var(--font);h
     else if (e.target.getAttribute && e.target.getAttribute('role') === 'tab' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
       e.preventDefault();
       state.tab = ((state.tab - 1 + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length) + 1;
-      state.focusNext = 'tab|' + state.tab; render();
+      state.focusNext = 'tab|' + state.tab; onTab(); render();
     }
   });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && state.panel && !state.renaming) { closePanel(); render(); return; }
     var t = e.target, tag = t && t.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.ctrlKey || e.metaKey || e.altKey) return;
-    if ((e.key === '1' || e.key === '2' || e.key === '3') && state.job) { state.tab = +e.key; state.msg = ''; render(); }
+    if ((e.key === '1' || e.key === '2' || e.key === '3') && state.job) { state.tab = +e.key; state.msg = ''; onTab(); render(); }
   });
 
   /* theme: light <-> dark; default follows prefers-color-scheme */
