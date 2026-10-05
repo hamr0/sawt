@@ -169,7 +169,7 @@ def save_jobs(data: dict, path: Path | None = None) -> None:
         raise
 
 
-def _find_job(data: dict, name: str) -> Job | None:
+def find_job(data: dict, name: str) -> Job | None:
     return next((j for j in data["jobs"] if j["name"] == name), None)
 
 
@@ -345,7 +345,7 @@ def _resolve_job(data: dict, book: Path, name: str | None, new_job: bool) -> tup
     _check_name(chosen)
     same_source = [j for j in data["jobs"] if j["source"] == source]
     if new_job:
-        if _find_job(data, chosen):
+        if find_job(data, chosen):
             raise RunnerError(f"job name {chosen!r} is already taken — pick another with --name")
         return None, chosen
     if same_source:
@@ -356,7 +356,7 @@ def _resolve_job(data: dict, book: Path, name: str | None, new_job: bool) -> tup
                 f"re-run it (--name {job['name']}) or use --new-job"
             )
         return job, job["name"]
-    if _find_job(data, chosen):
+    if find_job(data, chosen):
         raise RunnerError(f"job name {chosen!r} is already taken by another book — pick another with --name")
     return None, chosen
 
@@ -431,7 +431,7 @@ def retry_job(name: str, emit: Emit = _stdout, should_stop: Callable[[], bool] |
     """Resume the job's latest failed or stopped run from its failed step, using files on disk only."""
     jobs_file = jobs_path()
     data = load_jobs(jobs_file)
-    job = _find_job(data, name)
+    job = find_job(data, name)
     if job is None:
         raise RunnerError(f"no job named {name!r}")
     run = job["runs"][-1] if job["runs"] else None
@@ -460,10 +460,10 @@ def rename_job(old: str, new: str) -> None:
     """Change the job's label only; its output folder name stays fixed."""
     _check_name(new)
     data = load_jobs()
-    job = _find_job(data, old)
+    job = find_job(data, old)
     if job is None:
         raise RunnerError(f"no job named {old!r}")
-    if _find_job(data, new):
+    if find_job(data, new):
         raise RunnerError(f"job name {new!r} is already taken")
     job["name"] = new
     save_jobs(data)
@@ -472,7 +472,7 @@ def rename_job(old: str, new: str) -> None:
 def delete_job(name: str) -> None:
     """Remove the job from history. Its files on disk are never touched."""
     data = load_jobs()
-    if _find_job(data, name) is None:
+    if find_job(data, name) is None:
         raise RunnerError(f"no job named {name!r}")
     data["jobs"] = [j for j in data["jobs"] if j["name"] != name]
     save_jobs(data)
@@ -512,7 +512,7 @@ def import_existing(
             if not any(present.values()):
                 continue
             name = book_dir.name
-            if _find_job(data, name):
+            if find_job(data, name):
                 skipped.append((name, "already in history"))
                 continue
             src = Path(books_root) / fmt / f"{name}.{fmt}"

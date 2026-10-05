@@ -31,7 +31,7 @@ from urllib.parse import parse_qs, quote, unquote, urlsplit
 
 from ..runner import (
     OVERWRITE_WARNING, ORPHAN_WARNING, RUN_FAILED, RUN_RUNNING, RUN_STOPPED, STEP_DIRS, RunnerError,
-    delete_job, free_job_name, has_step_output, new_job_output, import_existing, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
+    delete_job, find_job, free_job_name, has_step_output, new_job_output, import_existing, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
 )
 from ..runner.core import _resolve_job
 from .page import FONT_FACE, PAGE
@@ -397,7 +397,7 @@ class _Handler(BaseHTTPRequestHandler):
             shutil.copyfileobj(fh, self.wfile, DOWNLOAD_CHUNK_BYTES)
 
     def _post_retry(self, worker: _Worker, name: str) -> tuple[int, dict]:
-        job = next((j for j in load_jobs()["jobs"] if j["name"] == name), None)
+        job = find_job(load_jobs(), name)
         if job is None:
             raise _HttpError(404, {"error": f"no job named {name!r}"})
         last = job["runs"][-1] if job["runs"] else None
@@ -506,7 +506,7 @@ def _sorted_rows(rows: list[dict]) -> list[dict]:
 
 
 def _job_detail(name: str) -> dict:
-    job = next((j for j in load_jobs()["jobs"] if j["name"] == name), None)
+    job = find_job(load_jobs(), name)
     if job is None:
         raise _HttpError(404, {"error": f"no job named {name!r}"})
     return {**job, "missing": not Path(job["output"]).is_dir()}
@@ -518,7 +518,7 @@ def _job_detail(name: str) -> dict:
 
 
 def _job_output(name: str) -> Path:
-    job = next((j for j in load_jobs()["jobs"] if j["name"] == name), None)
+    job = find_job(load_jobs(), name)
     if job is None:
         raise _HttpError(404, {"error": f"no job named {name!r}"})
     return Path(job["output"])
