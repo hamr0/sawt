@@ -344,6 +344,7 @@ AL_LISS_SEGMENTS = Path(
 )
 
 
+@pytest.mark.corpus
 @pytest.mark.skipif(
     not (AL_LISS_SEGMENTS / "ssml" / "chapter_01.csv").exists(),
     reason="Real EPUB data not available",

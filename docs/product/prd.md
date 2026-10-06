@@ -137,7 +137,7 @@ Five stages, each a package under `src/audiobook/` with logic in `core.py`; test
 
 ## 5. Next build: local UI + runner
 
-Status: Spec signed off 2026-10-05. Modules 0, 1, 2 and 3 built (feat/runner, feat/ui); module 3 real-browser check pending.
+Status: Spec signed off 2026-10-05. Modules 0, 1, 2 and 3 built (feat/runner, feat/ui); module 3 real-browser check done.
 
 ### Problem & goal
 
@@ -176,7 +176,7 @@ Hosting, other users, logins; a database; editing files in the browser; audio ge
 | 0 | Runner, CLI only, POC first: takes a path, runs steps 1–4, writes `jobs.json`, retries from the failed step. | Real runs on 2–3 test books plus tests; one run forced to fail, then retried. |
 | 1 | Look: 5 `/live-canvas` variations; owner picks one. | Owner picked variant D (light + dark themes, independently scrolling job list). |
 | 2 | UI shell: path input, start, live log, job cards, history. | Tests (337 passing, including a Node fake-DOM page test) plus a real-browser check of themes, live run, new-job flow and Arabic paths/names. |
-| 3 | Artifacts tab: step folders, open-folder, file links. | Tests (383 passing: listing, path guard, viewer, open-folder, Node fake-DOM tab test); real-browser check pending. |
+| 3 | Artifacts tab: step folders, open-folder, file links. | Tests (383 passing: listing, path guard, viewer, open-folder, Node fake-DOM tab test); real-browser check done. |
 
 After the last module: propose `/self-review`.
 
@@ -227,7 +227,7 @@ After the last module: propose `/self-review`.
 
 ## 5b. Next build: CI
 
-Status: Next, not specced. Needs owner sign-off on a spec before it is built.
+Status: Spec signed off 2026-10-06. Built on feat/ci.
 
 ### Why
 
@@ -239,11 +239,20 @@ github.com/hamr0/sawt has no CI (no `.github/workflows`) and `main` has no branc
 - The tests need the git-ignored `data/books/` corpus and node (for the fake-DOM page tests). The spec must decide how CI gets test books (small committed fixtures vs. skip markers) and must install node.
 - Python version: not pinned anywhere in the repo (`pyproject.toml` and `requirements.txt` state none; the owner's machine runs 3.14). The spec must choose and pin one.
 
-### Open questions
+### Spec
 
-- Fixture strategy for book-dependent tests: small committed fixtures vs. skip markers.
-- Whether to add branch protection on `main` requiring green CI.
-- Whether to include a secrets scan in CI.
+- Fixtures: `tests/fixtures/sample.txt` (a ~5 KB CC BY 4.0 excerpt) replaces the full-book TXT in the ingest tests. Tests that need the real corpus carry `@pytest.mark.corpus` (registered in `pyproject.toml`) and keep their skip guards, so they skip when the books are absent, locally and in CI.
+- Python 3.14 is pinned via `.python-version` and `requires-python = ">=3.14"`; node 22 is installed for the fake-DOM page tests.
+- No branch protection: the owner pushes to `main` directly, and the `/release` skill already gates on `gh run watch --exit-status`.
+- Secrets scan: gitleaks (pinned version, checksum verified) over the new commits only. `.gitleaksignore` lists the historical findings (a dead AWS key pair in the Polly guides, kept in history by owner decision).
+- Skip ceiling: with `SAWT_CI=1` the run fails if any non-`corpus` test skips, so a missing node or fixture cannot silently shrink coverage.
+- Out of scope: lint/format gate, coverage thresholds, Python version matrix, corpus caching, publishing.
+
+### Open questions (resolved)
+
+- Fixture strategy for book-dependent tests: both. A small committed fixture for the TXT ingest tests; the `corpus` marker for tests that need the real books.
+- Whether to add branch protection on `main` requiring green CI: no.
+- Whether to include a secrets scan in CI: yes, gitleaks over new commits only.
 
 ## 6. Non-requirements / out of scope
 

@@ -16,6 +16,14 @@ restarting from zero. Two eras:
   Two-voice Arabic audiobooks from raw book files via the four-POC
   pipeline (ingestion → chapter split → segmentation → SSML/TTS).
 
+## [Unreleased]
+
+### Added
+- GitHub Actions CI (`.github/workflows/ci.yml`): pytest on push/PR to `main` (Python 3.14, node 22) plus a gitleaks scan of the new commits.
+- `corpus` pytest marker for tests that need the git-ignored `data/books` corpus; `tests/fixtures/sample.txt` (CC BY 4.0 excerpt) so the TXT ingest tests run without it.
+- `SAWT_CI=1` skip ceiling: CI fails if any non-`corpus` test skips.
+- `.python-version`, `pyproject.toml` (`[project]`, pytest markers), `.gitleaksignore` (historical dead AWS key).
+
 ## [0.16.0] — 2026-10-06
 
 ### Added

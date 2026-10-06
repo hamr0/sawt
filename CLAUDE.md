@@ -76,6 +76,8 @@ speculative code, no premature abstractions.
 pip install -r requirements.txt
 
 pytest tests/ -v                                    # Full suite (491 tests)
+pytest -m "not corpus" -q                           # Skip tests that need the git-ignored data/books corpus
+SAWT_CI=1 pytest tests/ -q -rs                      # What CI runs: fails if any non-corpus test skips
 pytest tests/audiobook/dialogue/ -v                 # One module
 pytest tests/audiobook/dialogue/test_core.py::TestDetectMarkers -v            # One class
 pytest tests/audiobook/dialogue/test_core.py::TestDetectMarkers::test_em_dash -v   # One test
@@ -111,7 +113,7 @@ data/books/{epub,docx,txt}/book.*
 | `dialogue/` | Production ready (~95%) | `segment_book(chapters_dir)`, `sync_review(segments_dir)` |
 | `ssml/` | Done (POC-4) | `generate_book_ssml()`, `make_voice_config()` |
 | `runner/` | Done (module 0, CLI only) | `run_book()`, `retry_job()`; `python -m src.audiobook.runner` |
-| `ui/` | Modules 2 + 3 built (jobs, live log, history, artifacts tab, file viewer, stop/delete, re-attach); module 3 real-browser check pending | `make_server()`, `serve()`; `python -m src.audiobook.ui` |
+| `ui/` | Modules 2 + 3 built (jobs, live log, history, artifacts tab, file viewer, stop/delete, re-attach); module 3 real-browser check done | `make_server()`, `serve()`; `python -m src.audiobook.ui` |
 | `voice_pool/`, `shared/` | **Stubs** — docstrings only, no code yet | — |
 | POC-5 audio generation | **Next** — not built | — |
 
