@@ -102,6 +102,7 @@ class Settings(TypedDict):
 
 
 class Run(TypedDict):
+    id: str  # stable identity: a save replaces only the runs its writer owns
     date: str
     settings: Settings
     status: str
@@ -165,6 +166,8 @@ def load_jobs(path: Path | None = None) -> dict:
         raise RunnerError(f"{path} is unreadable ({exc}); fix or remove it") from exc
     for job in data["jobs"]:
         job.setdefault("id", _legacy_id(job))  # old files: deterministic, persisted by the next save
+        for i, run in enumerate(job.get("runs", [])):
+            run.setdefault("id", uuid.uuid5(uuid.NAMESPACE_URL, f"{job['id']}|{run.get('date', '')}|{i}").hex)
     return data
 
 
@@ -200,11 +203,13 @@ def _mutate(change: Callable[[dict], object], path: Path | None = None):
         return result
 
 
-def _merge_job(path: Path, job: Job, create: bool = False) -> bool:
-    """Write only this job's runs into the current file, matched by id.
+def _merge_job(path: Path, job: Job, run: Run | None = None, create: bool = False) -> bool:
+    """Write this writer's run (matched by run id; appended if new) into the current file.
 
-    The file's name/source/output win (a rename made meanwhile survives, and ``job`` picks the
-    new name up). False if the job is gone, i.e. deleted by someone else: it is not resurrected.
+    Every run in the file the writer does not own is kept, so another writer's runs are never
+    lost; runs stay in date order. The file's name/source/output win (a rename made meanwhile
+    survives, and ``job`` picks the new name up). False if the job is gone, i.e. deleted by
+    someone else: it is not resurrected.
     """
     def change(data: dict) -> bool:
         cur = next((j for j in data["jobs"] if j["id"] == job["id"]), None)
@@ -215,7 +220,14 @@ def _merge_job(path: Path, job: Job, create: bool = False) -> bool:
                 raise RunnerError(f"job name {job['name']!r} is already taken")
             data["jobs"].append(job)
             return True
-        cur["runs"] = job["runs"]
+        if run is not None:
+            runs = cur["runs"]
+            at = next((i for i, r in enumerate(runs) if r["id"] == run["id"]), None)
+            if at is None:
+                runs.append(run)
+            else:
+                runs[at] = run
+            runs.sort(key=lambda r: r.get("date", ""))  # stable: equal dates keep file order
         job["name"] = cur["name"]
         return True
     return _mutate(change, path)
@@ -362,7 +374,7 @@ def _execute(
     jobs_file = jobs_file or jobs_path()
 
     def sync() -> bool:
-        if _merge_job(jobs_file, job):
+        if _merge_job(jobs_file, job, run):
             return True
         emit(f"job {job['name']} was deleted while running — stopping; nothing more is saved")
         return False
@@ -471,6 +483,7 @@ def has_step_output(out: Path) -> bool:
 
 def _new_run(settings: Settings) -> Run:
     return {
+        "id": uuid.uuid4().hex,
         "date": _now(),
         "settings": settings,
         "status": RUN_RUNNING,
@@ -522,7 +535,7 @@ def run_book(
     for d in STEP_DIRS.values():
         shutil.rmtree(out / d, ignore_errors=True)
     out.mkdir(parents=True, exist_ok=True)
-    if not _merge_job(jobs_file, job, create=is_new):
+    if not _merge_job(jobs_file, job, run, create=is_new):
         raise RunnerError(f"job {job['name']!r} was deleted — nothing to run")
     emit(f"job {job['name']}: {job['source']} → {out}")
     _execute(job, run, STEPS[0], emit, should_stop, jobs_file)
@@ -612,6 +625,7 @@ def imported_job(name: str, source: str, output: Path) -> Job | None:
         "source": source,
         "output": str(output.resolve()),
         "runs": [{
+            "id": uuid.uuid4().hex,
             "date": datetime.fromtimestamp(mtime).isoformat(timespec="seconds"),
             "settings": {"ssml": present["ssml"], "fiction": present["dialogue"]},
             "status": RUN_IMPORTED,

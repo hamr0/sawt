@@ -233,7 +233,7 @@ class TestHistory:
         assert set(job) == {"id", "name", "source", "output", "runs"} and len(job["id"]) == 32
         assert job["source"] == str((tmp_path / "novel.txt").resolve())
         run = job["runs"][0]
-        assert set(run) == {"date", "settings", "status", "steps", "log", "errors"}
+        assert set(run) == {"id", "date", "settings", "status", "steps", "log", "errors"}
         assert run["settings"] == {"ssml": False, "fiction": True}
         assert run["log"][-1] == "ready for audio — paused before paid step"
 
@@ -369,3 +369,79 @@ class TestSharedHistory:
             runner_core._mutate(lambda d: None)
             runner_core._mutate(lambda d: None)
         assert sum("no file locking" in r.message for r in caplog.records) == 1
+
+
+class TestRunIds:
+    """A save replaces only the run its writer owns (matched by run id); other writers' runs survive."""
+
+    def _job(self, tmp_path, lines):
+        go(make_book(tmp_path), lines)
+        return json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"][0]
+
+    def _append_run(self, name, status="ready for audio — paused", date="2099-01-01T00:00:00"):
+        def change(data):
+            job = runner_core.find_job(data, name)
+            job["runs"].append({"id": "b" * 32, "date": date, "settings": {"ssml": False, "fiction": True},
+                                "status": status, "steps": {}, "log": ["other writer"], "errors": []})
+        runner_core._mutate(change)
+
+    def test_every_run_has_a_stable_id(self, tmp_path, home, lines):
+        job = self._job(tmp_path, lines)
+        assert len(job["runs"][0]["id"]) == 32
+        go(tmp_path / "novel.txt", lines)  # second run of the same job
+        runs = json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"][0]["runs"]
+        assert len({r["id"] for r in runs}) == 2
+
+    def test_other_writers_run_added_mid_run_survives(self, tmp_path, home, lines, monkeypatch):
+        real = runner_core._STEP_FUNCS["chapters"]
+        fired = []
+
+        def step(job, run):
+            if not fired:
+                fired.append(1)
+                self._append_run("novel")  # another process saves a 2nd run for the same job
+            return real(job, run)
+
+        monkeypatch.setitem(runner_core._STEP_FUNCS, "chapters", step)
+        go(make_book(tmp_path), lines)
+        runs = json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"][0]["runs"]
+        assert [r["log"][-1] if r["id"] == "b" * 32 else r["status"] for r in runs] == [runner_core.RUN_READY, "other writer"]
+        assert len(runs) == 2 and runs[0]["status"] == runner_core.RUN_READY  # date order: ours first
+
+    def test_retry_updates_its_run_while_another_run_is_appended(self, tmp_path, home, lines, monkeypatch):
+        boom = {"on": True}
+        real = runner_core._STEP_FUNCS["dialogue"]
+
+        def flaky(job, run):
+            if boom["on"]:
+                raise RuntimeError("x")
+            self._append_run("novel")  # during the retry
+            return real(job, run)
+
+        monkeypatch.setitem(runner_core._STEP_FUNCS, "dialogue", flaky)
+        go(make_book(tmp_path), lines)
+        failed_id = json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"][0]["runs"][0]["id"]
+        boom["on"] = False
+        runner_core.retry_job("novel", emit=lines.append)
+        runs = json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"][0]["runs"]
+        by_id = {r["id"]: r for r in runs}
+        assert len(runs) == 2 and by_id[failed_id]["status"] == runner_core.RUN_READY and by_id["b" * 32]["log"] == ["other writer"]
+
+    def test_legacy_runs_without_ids_load_and_round_trip(self, tmp_path, home):
+        home.mkdir(parents=True)
+        run = {"date": "2026-01-01T00:00:00", "settings": {"ssml": False, "fiction": True}, "status": "failed",
+               "steps": {}, "log": [], "errors": []}
+        old = {"jobs": [{"name": "a", "source": "", "output": "/o/a", "runs": [dict(run), dict(run, date="2026-01-02T00:00:00")]}]}
+        jobs_path().write_text(json.dumps(old), encoding="utf-8")
+        first = [r["id"] for r in runner_core.load_jobs()["jobs"][0]["runs"]]
+        assert len(set(first)) == 2 and first == [r["id"] for r in runner_core.load_jobs()["jobs"][0]["runs"]]  # stable
+        rename_job("a", "a2")  # persists
+        saved = json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"][0]
+        assert [r["id"] for r in saved["runs"]] == first and saved["name"] == "a2"
+
+    def test_delete_mid_run_still_not_resurrected(self, tmp_path, home, lines, monkeypatch):
+        real = runner_core._STEP_FUNCS["chapters"]
+        monkeypatch.setitem(runner_core._STEP_FUNCS, "chapters",
+                            lambda job, run: (runner_core.delete_job("novel"), real(job, run))[1])
+        go(make_book(tmp_path), lines)
+        assert json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"] == []
