@@ -225,6 +225,26 @@ After the last module: propose `/self-review`.
 - No way to cancel a queued folder run once started. — resolved: [ stop ]
 - The UI font loads from the network (Google Fonts); offline it falls back. Decide whether to bundle it or drop it. — resolved: bundled locally
 
+## 5b. Next build: CI
+
+Status: Next, not specced. Needs owner sign-off on a spec before it is built.
+
+### Why
+
+github.com/hamr0/sawt has no CI (no `.github/workflows`) and `main` has no branch protection, so the release gate's "merge only on green CI" step cannot run and tests only ever run on the owner's machine. A recent test leak (a test overwrote the real `~/.config/sawt/jobs.json`) shows that machine-specific state hides failures.
+
+### Minimum scope to spec
+
+- Run `python -m pytest tests/ -q` on push and on pull request to `main`.
+- The tests need the git-ignored `data/books/` corpus and node (for the fake-DOM page tests). The spec must decide how CI gets test books (small committed fixtures vs. skip markers) and must install node.
+- Python version: not pinned anywhere in the repo (`pyproject.toml` and `requirements.txt` state none; the owner's machine runs 3.14). The spec must choose and pin one.
+
+### Open questions
+
+- Fixture strategy for book-dependent tests: small committed fixtures vs. skip markers.
+- Whether to add branch protection on `main` requiring green CI.
+- Whether to include a secrets scan in CI.
+
 ## 6. Non-requirements / out of scope
 
 - PDF input.
