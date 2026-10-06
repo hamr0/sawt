@@ -1,0 +1,72 @@
+# CI: tests (corpus-free) + secrets scan over the new commits.
+#
+# The git-ignored data/books corpus is absent here, so tests marked `corpus` skip.
+# SAWT_CI=1 makes any OTHER skip fail the run (see tests/conftest.py).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:                # unlike publish, a newer push supersedes the older run
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0    # full history: the gitleaks step scans a commit range
+      - uses: actions/setup-python@v6
+        with:
+          python-version-file: .python-version
+          cache: pip
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22  # the UI page tests run the real page JS under node
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Test
+        env:
+          SAWT_CI: "1"
+          SAWT_HOME: ${{ runner.temp }}/sawt-home   # never touch a real jobs.json
+        run: python -m pytest tests/ -q -rs
+      - name: Secrets scan (gitleaks, new commits only)
+        env:
+          GITLEAKS_VERSION: 8.30.1
+          GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+          EVENT_NAME: ${{ github.event_name }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_SHA: ${{ github.sha }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Pinned binary + checksum, not a floating action: the scanner itself is
+          # supply-chain surface. The checksum is the one from the release's
+          # gitleaks_<version>_checksums.txt.
+          TARBALL="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfL -o "$RUNNER_TEMP/$TARBALL" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${TARBALL}"
+          echo "${GITLEAKS_SHA256}  $RUNNER_TEMP/$TARBALL" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/$TARBALL" -C "$RUNNER_TEMP" gitleaks
+
+          # Only new commits: history holds a dead, already-handled key (.gitleaksignore),
+          # and old commits were reviewed. A new branch push has an all-zeros `before`,
+          # so scan just the pushed commit.
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            RANGE="${PR_BASE}..${PR_HEAD}"
+          elif [ "$PUSH_BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            RANGE="-1 ${PUSH_SHA}"
+          else
+            RANGE="${PUSH_BEFORE}..${PUSH_SHA}"
+          fi
+          # --redact: never print a secret into the CI log.
+          "$RUNNER_TEMP/gitleaks" git --redact --no-banner --log-opts="$RANGE" .
