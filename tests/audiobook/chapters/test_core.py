@@ -381,6 +381,7 @@ def _all_book_names():
     return EPUB_BOOKS + DOCX_BOOKS + TXT_BOOKS
 
 
+@pytest.mark.corpus
 @pytest.mark.parametrize("book_name", _all_book_names())
 class TestRealBooks:
     def test_no_oversized_units(self, book_name):

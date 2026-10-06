@@ -875,6 +875,7 @@ ZUQAQ_CH02 = Path("output/epub/zuqaq-al-midaqq/02_chapters/chapter_02.txt")
 THARTHARA_CH02 = Path("output/epub/tharthara-fawq-al-nil-hindawi/02_chapters/chapter_02.txt")
 
 
+@pytest.mark.corpus
 @pytest.mark.skipif(not AL_LISS_CH02.exists(), reason="Real EPUB data not available")
 class TestIntegrationAlLiss:
     def test_segments_produced(self, tmp_path):
@@ -920,6 +921,7 @@ class TestIntegrationAlLiss:
         assert "\\\\" in text
 
 
+@pytest.mark.corpus
 @pytest.mark.skipif(not ZUQAQ_CH02.exists(), reason="Real EPUB data not available")
 class TestIntegrationZuqaq:
     def test_segments_produced(self, tmp_path):
@@ -945,6 +947,7 @@ class TestIntegrationZuqaq:
         assert "«" in all_text
 
 
+@pytest.mark.corpus
 @pytest.mark.skipif(not THARTHARA_CH02.exists(), reason="Real EPUB data not available")
 class TestIntegrationTharthara:
     def test_segments_produced(self, tmp_path):
@@ -977,6 +980,7 @@ class TestIntegrationTharthara:
 AL_LISS_CHAPTERS = Path("output/epub/al-liss-wal-kilab/02_chapters")
 
 
+@pytest.mark.corpus
 @pytest.mark.skipif(not AL_LISS_CHAPTERS.exists(), reason="Real EPUB data not available")
 class TestIntegrationFullBook:
     def test_segment_full_book(self, tmp_path):
