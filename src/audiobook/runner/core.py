@@ -252,6 +252,22 @@ def save_jobs(data: dict, path: Path | None = None) -> None:
         raise
 
 
+def resolved_source(source: str) -> str:
+    """A source path in canonical form for comparing (symlinks followed); '' stays ''."""
+    if not source:
+        return ""
+    try:
+        return str(Path(source).resolve())
+    except (OSError, RuntimeError):
+        return source
+
+
+def find_job_by_source(data: dict, book: Path) -> Job | None:
+    """The job that owns ``book``; entries written unresolved are resolved at compare time."""
+    want = resolved_source(str(book))
+    return next((j for j in data["jobs"] if j.get("source") and resolved_source(j["source"]) == want), None)
+
+
 def find_job(data: dict, name: str) -> Job | None:
     return next((j for j in data["jobs"] if j["name"] == name), None)
 
@@ -451,10 +467,10 @@ def _check_name(name: str) -> str:
 
 def _resolve_job(data: dict, book: Path, name: str | None, new_job: bool) -> tuple[Job | None, str]:
     """Pick the existing job to re-run, or return (None, name) for a new one."""
-    source = str(book)
     name = _check_name(name) if name else None
     chosen = _check_name(book.stem) if name is None else name
-    same_source = [j for j in data["jobs"] if j["source"] == source]
+    want = resolved_source(str(book))
+    same_source = [j for j in data["jobs"] if j.get("source") and resolved_source(j["source"]) == want]
     if new_job:
         if find_job(data, chosen):
             raise RunnerError(f"job name {chosen!r} is already taken — pick another with --name")
@@ -506,6 +522,7 @@ def run_book(
     should_stop: Callable[[], bool] | None = None,
 ) -> Run | None:
     """Run steps 1-4 on one book. Returns the run, or None if the user declined the overwrite."""
+    book = Path(book).resolve()  # sources are stored and matched by resolved path
     jobs_file = jobs_path()  # resolved once: every save in this run goes to the same file
     data = load_jobs(jobs_file)
     job, job_name = _resolve_job(data, book, name, new_job)
@@ -643,7 +660,8 @@ def reattach_job(book: Path, name: str) -> Job:
     one run marked imported, like ``import_existing``.
     """
     name = _check_name(name)
-    out = new_job_output(Path(book), name)
+    book = Path(book).resolve()
+    out = new_job_output(book, name)
     if not has_step_output(out):
         raise RunnerError(f"nothing to re-attach: {out} has no step output")
 

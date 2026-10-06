@@ -445,3 +445,44 @@ class TestRunIds:
                             lambda job, run: (runner_core.delete_job("novel"), real(job, run))[1])
         go(make_book(tmp_path), lines)
         assert json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"] == []
+
+
+class TestResolvedSources:
+    def test_symlink_reattach_then_real_path_run_is_the_same_job(self, tmp_path, home, lines):
+        real = tmp_path / "real"
+        real.mkdir()
+        book = make_book(real)
+        go(book, lines)
+        runner_core.delete_job("novel")
+        (tmp_path / "link").symlink_to(real, target_is_directory=True)
+        job = runner_core.reattach_job(tmp_path / "link" / "novel.txt", "novel")
+        assert job["source"] == str(book.resolve())  # stored resolved, not as typed
+        with pytest.raises(RunnerError, match="already has job 'novel'"):  # same book, not "taken by another book"
+            go(book, lines, name="Y")
+        go(book, lines)
+        jobs = json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"]
+        assert len(jobs) == 1 and len(jobs[0]["runs"]) == 2
+
+    def test_run_via_symlink_matches_existing_job(self, tmp_path, home, lines):
+        real = tmp_path / "real"
+        real.mkdir()
+        book = make_book(real)
+        go(book, lines)
+        (tmp_path / "link").symlink_to(real, target_is_directory=True)
+        go(tmp_path / "link" / "novel.txt", lines)
+        jobs = json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"]
+        assert len(jobs) == 1 and len(jobs[0]["runs"]) == 2 and jobs[0]["source"] == str(book.resolve())
+
+    def test_legacy_unresolved_entry_matches(self, tmp_path, home, lines):
+        real = tmp_path / "real"
+        real.mkdir()
+        book = make_book(real)
+        (tmp_path / "link").symlink_to(real, target_is_directory=True)
+        home.mkdir(parents=True)
+        legacy = {"jobs": [{"name": "old", "source": str(tmp_path / "link" / "novel.txt"),
+                            "output": str(real / "old_sawt"), "runs": []}]}
+        jobs_path().write_text(json.dumps(legacy), encoding="utf-8")
+        assert runner_core.find_job_by_source(runner_core.load_jobs(), book)["name"] == "old"
+        go(book, lines)  # re-run of the legacy job, not a new "novel" job
+        jobs = json.loads(jobs_path().read_text(encoding="utf-8"))["jobs"]
+        assert [j["name"] for j in jobs] == ["old"] and len(jobs[0]["runs"]) == 1

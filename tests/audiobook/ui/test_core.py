@@ -1890,3 +1890,39 @@ class TestReattach:
         runner_core.delete_job("novel")
         job = runner_core.reattach_job(book, "novel")
         assert job["runs"][0]["status"] == runner_core.RUN_IMPORTED and load_jobs()["jobs"][0]["name"] == "novel"
+
+
+class TestResolvedSourcesUi:
+    def test_scan_and_orphan_checks_use_resolved_paths(self, client, books, tmp_path):
+        real = books / "real"
+        real.mkdir()
+        book = make_book(real, "novel")
+        client.post("/api/runs", {"path": str(book)})
+        client.wait_idle()
+        # a legacy entry written unresolved (through a symlinked folder)
+        link = books / "link"
+        link.symlink_to(real, target_is_directory=True)
+        data = load_jobs()
+        data["jobs"][0]["source"] = str(link / "novel.txt")
+        save_jobs(data)
+        row = client.get("/api/scan?path=" + quote(str(link)))[1]["books"][0]
+        assert row["job"] == "novel" and row["path"] == str(book.resolve())
+        # running via the symlinked path is a new run on the same job, not a name clash
+        status, out = client.post("/api/runs", {"path": str(link / "novel.txt"), "confirm": True})
+        assert status == 202 and out["queued"] == ["novel"]
+        client.wait_idle()
+        assert len(client.get("/api/jobs")[1]["jobs"]) == 1
+
+    def test_reattach_via_symlink_then_real_path_run(self, client, books):
+        real = books / "real"
+        real.mkdir()
+        book = make_book(real, "novel")
+        client.post("/api/runs", {"path": str(book)})
+        client.wait_idle()
+        client.post("/api/jobs/novel/delete")
+        link = books / "link"
+        link.symlink_to(real, target_is_directory=True)
+        assert client.post("/api/jobs/reattach", {"path": str(link / "novel.txt"), "name": "novel"})[0] == 200
+        assert client.job("novel")["source"] == str(book.resolve())
+        row = client.get("/api/scan?path=" + quote(str(real)))[1]["books"][0]
+        assert row["job"] == "novel" and row["orphan"] is False

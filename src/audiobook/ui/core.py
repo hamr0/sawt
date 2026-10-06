@@ -31,7 +31,7 @@ from urllib.parse import parse_qs, quote, unquote, urlsplit
 
 from ..runner import (
     OVERWRITE_WARNING, ORPHAN_WARNING, RUN_FAILED, RUN_RUNNING, RUN_STOPPED, STEP_DIRS, RunnerError,
-    delete_job, find_job, free_job_name, has_step_output, new_job_output, import_existing, reattach_job, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
+    delete_job, find_job, find_job_by_source, free_job_name, has_step_output, new_job_output, import_existing, reattach_job, list_jobs, load_jobs, rename_job, retry_job, run_book, scan_path,
 )
 from ..runner.core import _resolve_job
 from .page import FONT_FACE, PAGE
@@ -320,7 +320,7 @@ class _Handler(BaseHTTPRequestHandler):
         data = load_jobs()
         plan, taken = [], set()  # (book, resolved name, existing job, new_job)
         for book, cname, cnew in candidates:
-            if cname is None and not cnew and not any(j["source"] == str(book) for j in data["jobs"]):
+            if cname is None and not cnew and find_job_by_source(data, book) is None:
                 cname = free_job_name(data, book.stem, taken)  # default name must not collide with another book's job
             try:
                 job, job_name = _resolve_job(data, book, cname, cnew)
@@ -509,7 +509,7 @@ def _scan_result(raw: object) -> dict:
     data = load_jobs()
     rows, reserved = [], set()
     for b in books:
-        job = next((j for j in data["jobs"] if j["source"] == str(b)), None)
+        job = find_job_by_source(data, b)
         free = free_job_name(data, b.stem, reserved)
         reserved.add(free)
         rows.append({"path": str(b), "file": b.name, "name": job["name"] if job else free,
