@@ -75,10 +75,15 @@ speculative code, no premature abstractions.
 ```bash
 pip install -r requirements.txt
 
-pytest tests/ -v                                    # Full suite (259 tests)
+pytest tests/ -v                                    # Full suite (491 tests)
 pytest tests/audiobook/dialogue/ -v                 # One module
 pytest tests/audiobook/dialogue/test_core.py::TestDetectMarkers -v            # One class
 pytest tests/audiobook/dialogue/test_core.py::TestDetectMarkers::test_em_dash -v   # One test
+
+python -m src.audiobook.runner <book-or-folder> [--ssml] [--non-fiction] [--name N]   # Steps 1-4 → <book dir>/<name>_sawt/
+python -m src.audiobook.runner --list | --retry <job> | --rename OLD NEW | --import-existing   # also --new-job, --yes (skip overwrite confirm); History in ~/.config/sawt/jobs.json (SAWT_HOME overrides)
+
+python -m src.audiobook.ui [--port 8765] [--no-open]   # Local UI on http://127.0.0.1:8765 (jobs, live run log, history)
 ```
 
 Note: `.env.example` is stale — it still lists AWS Polly keys. The code uses Azure
@@ -105,6 +110,8 @@ data/books/{epub,docx,txt}/book.*
 | `chapters/` | Production ready | `split_book(ingestion_dir)` |
 | `dialogue/` | Production ready (~95%) | `segment_book(chapters_dir)`, `sync_review(segments_dir)` |
 | `ssml/` | Done (POC-4) | `generate_book_ssml()`, `make_voice_config()` |
+| `runner/` | Done (module 0, CLI only) | `run_book()`, `retry_job()`; `python -m src.audiobook.runner` |
+| `ui/` | Modules 2 + 3 built (jobs, live log, history, artifacts tab, file viewer, stop/delete, re-attach); module 3 real-browser check pending | `make_server()`, `serve()`; `python -m src.audiobook.ui` |
 | `voice_pool/`, `shared/` | **Stubs** — docstrings only, no code yet | — |
 | POC-5 audio generation | **Next** — not built | — |
 
@@ -174,19 +181,22 @@ Errors carry pipeline context (`IngestionError(ValueError)`). Return types are `
   → `ar-SY/JO/LB`. Dialect changes meaning, not just accent. Never mix within a book.
 - Azure Arabic has **zero** `mstts:express-as` support (no emotion styles, no HD voices). Only
   rate/pitch/volume. Emotion work is blocked on the platform, not on us.
-- Multi-provider: Google Chirp3-HD (~$1.16/book, primary), ElevenLabs (~$21.74/book, premium),
-  Azure (~$8–12/book, baseline). OpenAI has no Arabic voices. Mishkal diacritization makes
-  pronunciation *worse* — send plain text.
+- **Production provider: Gemini 3.8 Flash TTS** (`gemini-3.8-flash-tts`, decided 2026-10-05).
+  Sulafat narrator + Leda dialogue, with `speech_metadata.style` direction. It beat ElevenLabs
+  in listening tests at about Google cost (~$54 for 5 novels with batch pricing vs ElevenLabs
+  ~$167). Its content filter blocks some violent literary passages in context; split and retry,
+  and fall back to Google Chirp3-HD (same voice names). OpenAI has no Arabic voices. Mishkal
+  diacritization makes pronunciation *worse* — send plain text.
 
 ## Docs
 
 | Topic | Location |
 |-------|----------|
-| Execution plan (source of truth) | `docs/02-features/PLAN.md` |
-| Product requirements | `docs/01-product/prd.md` |
-| Documentation hub / knowledge base | `docs/README.md`, `docs/KNOWLEDGE_BASE.md` |
-| POC results (1–4) | `docs/03-logs/POC{1,2,3,4}_RESULTS.md` |
-| Voice inventory (19 pairing-tested voices) | `docs/02-features/research/final_voices.csv` |
+| Product requirements (single source of truth) | `docs/product/prd.md` |
+| Learnings from POCs and research | `docs/product/learnings.md` |
+| Documentation hub | `docs/README.md` |
+| POC results (1–4) | `docs/logs/POC{1,2,3,4}_RESULTS.md` |
+| Voice inventory (19 pairing-tested voices) | `docs/logs/final_voices.csv` |
 
 Some docs still reference the old flat layout (`src/audiobook/ingest.py`,
 `docs/02-features/azure-audiobooks/…`). The tree above is authoritative.
@@ -200,5 +210,10 @@ Some docs still reference the old flat layout (`src/audiobook/ingest.py`,
 <!-- AGENT_RULES:START -->
 Consult when building something new or adding a feature — a standards guide, not hot
 context like MEMORY.md above:
-@.claude/remember/AGENT_RULES.md
+.claude/remember/AGENT_RULES.md
 <!-- AGENT_RULES:END -->
+
+<!-- DOCS_INDEX:START -->
+Docs map: `docs/index.md` — every doc in this project, with line counts.
+Search this corpus instead of reading it whole: `/docs-builder search <query words>`
+<!-- DOCS_INDEX:END -->

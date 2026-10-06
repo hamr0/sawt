@@ -1,4 +1,6 @@
 Provider,Voice,Gender,Accent,Tier,Use Case,Notes
+Gemini,Sulafat,F,MSA,V Liked,Narrative,"PRODUCTION narrator (styled: warm, calm, measured) — best of all providers, ~90%+ pronunciation"
+Gemini,Leda,F,MSA,V Liked,Narrative,"PRODUCTION dialogue (styled: soft, gentle, not dramatic) — pairs with Sulafat"
 Google,Sulafat,F,MSA,V Liked,Narrative,"VERY GOOD narrator in pairing test — good pron, good pace"
 Google,Leda,F,MSA,V Liked,Narrative,"soft, ok as dialogue in pairing test"
 Google,Enceladus,M,MSA,V Liked,Narrative,"good narrator in pairing test — good pron, good pace"

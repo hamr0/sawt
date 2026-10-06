@@ -31,8 +31,8 @@ Your AWS credentials are already configured in `.env` file. Verify they work:
 
 ```bash
 # Load credentials and test connection
-export AWS_ACCESS_KEY_ID=AKIAZT4LJJX2UI72WWGW
-export AWS_SECRET_ACCESS_KEY="kTcHel8semK3GZTDi3YeSe+fxMTueNI0N8mjURiE"
+export AWS_ACCESS_KEY_ID="your_access_key_id_here"
+export AWS_SECRET_ACCESS_KEY="your_secret_access_key_here"
 export AWS_DEFAULT_REGION=us-east-1
 
 # Test connection
@@ -61,8 +61,8 @@ Available voices: ['Zeina']
 cd /home/hamr/PycharmProjects/ArabicTTS
 
 # Set credentials
-export AWS_ACCESS_KEY_ID=AKIAZT4LJJX2UI72WWGW
-export AWS_SECRET_ACCESS_KEY="kTcHel8semK3GZTDi3YeSe+fxMTueNI0N8mjURiE"
+export AWS_ACCESS_KEY_ID="your_access_key_id_here"
+export AWS_SECRET_ACCESS_KEY="your_secret_access_key_here"
 export AWS_DEFAULT_REGION=us-east-1
 
 # Run test
@@ -289,8 +289,8 @@ For each audio file, rate on a scale of 1-10:
 
 ```bash
 # Check usage for current month
-export AWS_ACCESS_KEY_ID=AKIAZT4LJJX2UI72WWGW
-export AWS_SECRET_ACCESS_KEY="kTcHel8semK3GZTDi3YeSe+fxMTueNI0N8mjURiE"
+export AWS_ACCESS_KEY_ID="your_access_key_id_here"
+export AWS_SECRET_ACCESS_KEY="your_secret_access_key_here"
 export AWS_DEFAULT_REGION=us-east-1
 
 python3 -c "
@@ -455,8 +455,8 @@ code POC_RESULTS.md  # VS Code
 **Solution:**
 ```bash
 # Set credentials manually
-export AWS_ACCESS_KEY_ID=AKIAZT4LJJX2UI72WWGW
-export AWS_SECRET_ACCESS_KEY="kTcHel8semK3GZTDi3YeSe+fxMTueNI0N8mjURiE"
+export AWS_ACCESS_KEY_ID="your_access_key_id_here"
+export AWS_SECRET_ACCESS_KEY="your_secret_access_key_here"
 export AWS_DEFAULT_REGION=us-east-1
 
 # Then run test again
