@@ -16,11 +16,27 @@ restarting from zero. Two eras:
   Two-voice Arabic audiobooks from raw book files via the four-POC
   pipeline (ingestion → chapter split → segmentation → SSML/TTS).
 
-## [Unreleased]
+## [0.16.0] — 2026-10-06
 
 ### Added
 
-- **Local UI shell (PRD module 2).** `python -m src.audiobook.ui` serves a stdlib-only page on 127.0.0.1 (Host-header checked): job cards, new-job panel with inline overwrite warning, live run log with retry, history, rename, light/dark theme. Runs execute one at a time on a worker thread; the artifacts tab is a placeholder until module 3.
+- **Local UI shell (PRD module 2).** `python -m src.audiobook.ui` serves a stdlib-only page on 127.0.0.1 (Host-header checked): job cards, new-job panel with inline overwrite warning, live run log with retry, history, rename, light/dark theme. Runs execute one at a time on a worker thread.
+
+- **Artifacts tab, file viewer and open-folder (PRD module 3).** Each job's Artifacts tab lists its numbered step folders as collapsible blocks (all start collapsed; expansion is remembered across tab and job switches). Headers show the newest file's local date and a display name; steps not yet produced appear as greyed, non-expandable rows. Subfolders get a "dir/ · N files" subheader and files render as a responsive "name (size)" grid. A built-in viewer shows text and CSV files (short CSV columns do not wrap; lines with no strong direction default to RTL), and an open-folder button launches the system file manager (child processes are reaped).
+
+- **Folder pick list.** Pointing the new-job panel at a folder scans it (`GET /api/scan`) into a row list with tick box, editable job name, status and skipped files; `[ start N books ]` runs only the ticked rows. `POST /api/runs` accepts `{"books": [...]}` and re-validates every path and name. Default job names avoid taken names (`<stem>`, `<stem>-2`, ...), also used as the single-file placeholder.
+
+- **Job search and two-line status cards**, and a job heading that uses the card status.
+
+- **Stop, delete and queue view.** The Run tab has an action row: stop a run between steps (the run ends "stopped" and stays retryable), delete a job, and see waiting jobs as queued placeholder cards (`POST /api/stop`, `POST /api/jobs/<name>/delete`).
+
+- **Re-attach an orphaned job folder.** A `_sawt` output folder whose history entry is gone can be attached back to the job list from the UI.
+
+- **Orphan-folder overwrite confirm.** A new job whose output folder already holds step output (for example a job deleted from history) now gets the same overwrite warning and confirm as an existing job, in the CLI and in both UI run forms, instead of being cleared silently.
+
+- **Safe shared job history.** `jobs.json` is written as a locked read-merge-write matched by a stable job id (runs carry ids too), so a rename made mid-run survives, a delete mid-run is not resurrected, and one writer no longer overwrites another's runs. Delete is no longer refused while another job runs. Book sources are stored and matched by resolved path, and job names must be printable and at most 100 characters.
+
+- **Bundled offline font and layout polish.** Courier Prime (SIL OFL) is bundled in `ui/static/` and served from an allow-listed `GET /static/<name>`; the Google Fonts link and CSP hosts are gone (`font-src 'self'`), so the UI works offline. The job pane is wider (300px to 360px), the header has a tagline, Start enables as the path is typed, path segments and names are bidi-isolated, and error messages are worded for the UI.
 
 - **Runner CLI (PRD module 0).** `python -m src.audiobook.runner <book-or-folder>` chains ingest → chapters → dialogue (→ SSML with `--ssml`) into `<book dir>/<job name>_sawt/`, stops only on an error or at the pre-audio gate, retries from the failed step using only files on disk (`--retry`), and records every run in `~/.config/sawt/jobs.json` (`SAWT_HOME` overrides; `--list`, `--rename`, `--import-existing`). `ingest()` gained an optional `ingestion_dir` argument so the runner can choose the output folder.
 
@@ -72,6 +88,9 @@ restarting from zero. Two eras:
   `.claude/` state and are intentionally not shipped with the repo.
 
 - **Agent/IDE scratch gitignored and de-tracked.** `.gitignore` now default-denies every dot-directory (`.*/`), re-admitting only what ships (`.github/`). Per-machine agent/IDE state (`.claude/`, `.litectx/`, `.idea/`, …) regenerates locally and only added noise and churn; any already-committed copies are removed from tracking (local files kept on disk). Repo hygiene only.
+
+- **Test isolation guard.** `tests/conftest.py` pins `SAWT_HOME` for the whole session and asserts at the end that the real `~/.config/sawt/jobs.json` is unchanged; the UI test client waits for the worker to go idle before teardown.
+- **AWS keys removed from the archive docs.** The Polly guides in `docs/archive` now carry placeholders instead of real keys (the account behind the leaked key is deactivated; git history is left as is), and AWS's documentation example key is replaced so secret scans stay quiet.
 
 ### Infrastructure
 - Apache-2.0 LICENSE file added.
