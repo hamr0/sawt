@@ -38,3 +38,23 @@ def _isolated_sawt_home():
         shutil.rmtree(tmp, ignore_errors=True)
     after = _fingerprint(real)
     assert after == before, f"tests modified the real {real}"
+
+
+# --- CI skip ceiling -------------------------------------------------------------------
+# CI has no git-ignored data/books corpus, so `corpus` tests legitimately skip. Any OTHER
+# skip there (missing node, a vanished fixture) would silently shrink coverage while the
+# run stays green, so with SAWT_CI=1 the run fails if a non-corpus test skips.
+_unexpected_skips: list[str] = []
+
+
+def pytest_runtest_logreport(report):
+    if os.environ.get("SAWT_CI") == "1" and report.skipped and "corpus" not in report.keywords:
+        _unexpected_skips.append(report.nodeid)
+
+
+def pytest_sessionfinish(session, exitstatus):
+    if _unexpected_skips and exitstatus == 0:
+        print("\nSAWT_CI: non-corpus tests skipped (only `corpus` tests may skip in CI):")
+        for nodeid in dict.fromkeys(_unexpected_skips):
+            print(f"  {nodeid}")
+        session.exitstatus = 1
