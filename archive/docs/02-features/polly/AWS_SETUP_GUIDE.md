@@ -124,8 +124,8 @@ If you prefer minimal permissions, use this custom policy instead:
 **IMPORTANT:** This is the only time you can view the secret access key!
 
 1. You'll see:
-   - **Access key ID:** `AKIAIOSFODNN7EXAMPLE`
-   - **Secret access key:** `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`
+   - **Access key ID:** `your_access_key_id_here`
+   - **Secret access key:** `your_secret_access_key_here`
 
 2. **Download .csv file** OR copy both values to a secure location
 
