@@ -203,6 +203,8 @@ After the last module: propose `/self-review`.
 
 - Orphaned job folders: running a book whose `<name>_sawt` folder holds step output that no job in history owns (e.g. the job was deleted) never wipes it silently. The CLI warns and asks (`--yes` skips); the UI's overwrite banner offers `[ re-attach ]` (adds a job entry for the folder, source = the book, one run marked imported, files untouched, no run), `[ overwrite and run ]` and `[ cancel ]`. In the pick list such a row reads "folder exists — not in history". `POST /api/jobs/reattach {path, name}` re-validates that the folder is exactly `<book dir>/<name>_sawt`, has step output and is unowned. Re-attach is UI-only; the CLI has no command for it.
 
+- Book source paths are stored and matched **resolved** (symlinks followed), so re-attach, `run_book` and the folder scan agree on which job owns a book whichever path spelling is typed.
+
 ### Module 3 spec (signed off 2026-10-05)
 
 - **Tab:** one block per step folder present in the job's output, in order `01_ingestion` … `04_ssml`, plus `05_audio` if present. Header = folder name, file count, `[ open folder ]`. Files listed under it grouped by subfolder (`03_segments/ssml/`, `review/`), each with relative path and size. Every block starts collapsed (header row only); clicking the header expands it, and expansion resets whenever the tab is opened or the job changes. Missing step → "<folder> — not produced". Output folder gone → "folder missing" plus the path (LTR styling).

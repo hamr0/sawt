@@ -605,6 +605,12 @@ One-liners so the history is not lost:
 - The go/no-go passed: a forced step-3 failure, then retry, left steps 1-2 output byte-identical (the retry resumes from disk).
 - `ingest()` hard-coded its output location (`output/{format}/{book}/`). It got an optional `ingestion_dir` argument so the runner can write to `<book dir>/<name>_sawt/01_ingestion`; this was the one stage change.
 
+### Shared state and tests
+- `jobs.json` has more than one writer (a UI run, a CLI run, the owner deleting a job). Whole-file overwrite lost runs and resurrected deleted jobs; the fix is a locked read-merge-write keyed on stable job and run ids, never a snapshot of the file taken at run start. Date-sorting merged runs is still by local-time ISO strings (a clock step back can misorder them).
+- Tests must never touch the real history: `tests/conftest.py` sets a session-wide `SAWT_HOME` and asserts the real `jobs.json` is unchanged at session end; the UI client fixture drains the worker before shutdown.
+- A path stored unresolved is a path matched wrongly: store and compare book sources resolved, or a symlinked spelling creates a phantom "name already taken".
+- Bundle the font instead of loading it from the network: it lets the CSP drop external hosts (`font-src 'self'`) and the page works offline.
+
 ### Look
 - Bareloop style (DESIGN_PLAN.md); light-theme colours contrast-tuned to the AA checklist in DESIGN_PLAN.md.
 
