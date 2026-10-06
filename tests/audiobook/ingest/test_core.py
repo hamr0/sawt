@@ -11,7 +11,7 @@ from src.audiobook.ingest import (
 )
 
 BOOKS_DIR = Path("data/books")
-TXT_BOOK = BOOKS_DIR / "txt" / "رحلة-ابن-فطومة.txt"
+TXT_BOOK = Path(__file__).resolve().parents[2] / "fixtures" / "sample.txt"  # CC BY 4.0 excerpt, see fixtures/README.md
 EPUB_BOOK = BOOKS_DIR / "epub" / "tharthara-fawq-al-nil-hindawi.epub"
 DOCX_DIR = BOOKS_DIR / "docx"
 
@@ -106,6 +106,7 @@ class TestExtractTxt:
 # --- extract_epub tests ---
 
 class TestExtractEpub:
+    @pytest.mark.corpus
     @pytest.mark.skipif(not EPUB_BOOK.exists(), reason="EPUB test book not available")
     def test_extracts_arabic_text(self):
         text = extract_epub(str(EPUB_BOOK))
@@ -113,6 +114,7 @@ class TestExtractEpub:
         arabic_chars = sum(1 for c in text if "\u0600" <= c <= "\u06FF")
         assert arabic_chars > 1000
 
+    @pytest.mark.corpus
     @pytest.mark.skipif(not EPUB_BOOK.exists(), reason="EPUB test book not available")
     def test_paragraphs_are_reasonable_size(self):
         text = extract_epub(str(EPUB_BOOK))
@@ -140,12 +142,14 @@ def _first_docx():
 
 
 class TestExtractDocx:
+    @pytest.mark.corpus
     @pytest.mark.skipif(_first_docx() is None, reason="No DOCX test files available")
     def test_extracts_text(self):
         docx_file = _first_docx()
         text = extract_docx(str(docx_file))
         assert len(text) > 100
 
+    @pytest.mark.corpus
     @pytest.mark.skipif(_first_docx() is None, reason="No DOCX test files available")
     def test_has_arabic_content(self):
         docx_file = _first_docx()
@@ -163,18 +167,18 @@ class TestExtractDocx:
 class TestIngest:
     def test_ingest_txt_produces_output_files(self, tmp_path):
         result = ingest(str(TXT_BOOK), output_dir=str(tmp_path))
-        book_dir = tmp_path / "txt" / "رحلة-ابن-فطومة" / "01_ingestion"
+        book_dir = tmp_path / "txt" / "sample" / "01_ingestion"
         assert (book_dir / "clean_text.txt").exists()
         assert (book_dir / "paragraphs.csv").exists()
 
     def test_ingest_txt_clean_text_has_no_pres_forms(self, tmp_path):
         ingest(str(TXT_BOOK), output_dir=str(tmp_path))
-        clean_text = (tmp_path / "txt" / "رحلة-ابن-فطومة" / "01_ingestion" / "clean_text.txt").read_text()
+        clean_text = (tmp_path / "txt" / "sample" / "01_ingestion" / "clean_text.txt").read_text()
         assert not _has_presentation_forms(clean_text)
 
     def test_ingest_txt_csv_has_correct_columns(self, tmp_path):
         ingest(str(TXT_BOOK), output_dir=str(tmp_path))
-        csv_path = tmp_path / "txt" / "رحلة-ابن-فطومة" / "01_ingestion" / "paragraphs.csv"
+        csv_path = tmp_path / "txt" / "sample" / "01_ingestion" / "paragraphs.csv"
         with open(csv_path, "r") as f:
             reader = csv.DictReader(f)
             assert set(reader.fieldnames) == {
@@ -192,11 +196,12 @@ class TestIngest:
 
     def test_ingest_idempotent(self, tmp_path):
         ingest(str(TXT_BOOK), output_dir=str(tmp_path))
-        text1 = (tmp_path / "txt" / "رحلة-ابن-فطومة" / "01_ingestion" / "clean_text.txt").read_text()
+        text1 = (tmp_path / "txt" / "sample" / "01_ingestion" / "clean_text.txt").read_text()
         ingest(str(TXT_BOOK), output_dir=str(tmp_path))
-        text2 = (tmp_path / "txt" / "رحلة-ابن-فطومة" / "01_ingestion" / "clean_text.txt").read_text()
+        text2 = (tmp_path / "txt" / "sample" / "01_ingestion" / "clean_text.txt").read_text()
         assert text1 == text2
 
+    @pytest.mark.corpus
     @pytest.mark.skipif(not EPUB_BOOK.exists(), reason="EPUB test book not available")
     def test_ingest_epub_produces_output(self, tmp_path):
         result = ingest(str(EPUB_BOOK), output_dir=str(tmp_path))
@@ -210,6 +215,7 @@ class TestIngest:
         arabic_chars = sum(1 for c in clean_text if "\u0600" <= c <= "\u06FF")
         assert arabic_chars > 1000
 
+    @pytest.mark.corpus
     @pytest.mark.skipif(_first_docx() is None, reason="No DOCX test files available")
     def test_ingest_docx_produces_output(self, tmp_path):
         docx_file = _first_docx()
@@ -229,6 +235,7 @@ class TestIngest:
         result = ingest(str(TXT_BOOK), output_dir=str(tmp_path))
         assert "back_matter_removed" in result
 
+    @pytest.mark.corpus
     @pytest.mark.skipif(not EPUB_BOOK.exists(), reason="EPUB test book not available")
     def test_ingest_epub_strips_back_matter(self, tmp_path):
         result = ingest(str(EPUB_BOOK), output_dir=str(tmp_path))
